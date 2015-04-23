@@ -12,18 +12,18 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
 
-//import ee461l.groupstudy.myApi.MyApi;
+import ee461l.groupstudy.myApi.MyApi;
 
 /**
  * Created by britne on 4/11/15.
  */
 class SendLoginEndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
- /*   private static MyApi myApiService = null;
+    private static MyApi myApiService = null;
     private Context context;
-*/
+
     @Override
     protected String doInBackground(Pair<Context, String>... params) {
-       /* if(myApiService == null) {  // Only do this once
+       if(myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
                     // options for running against local devappserver
@@ -48,8 +48,7 @@ class SendLoginEndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void,
             return myApiService.sayHi(name).execute().getData();
         } catch (IOException e) {
             return e.getMessage();
-        }*/
-        return "fake";
+        }
     }
 
     @Override
