@@ -36,15 +36,17 @@ public class GroupsEndpoint {
      * A simple endpoint method that takes a name and says Hi back
      */
     @ApiMethod(name = "createGroup")
-    public Groups createGroup(@Named("groupName") String groupName, User adminUser) {
-        User testAdminUser = new User("Abraham", "1234");
+    public Groups createGroup(GroupWrapperEntity newGroup) {
+    /*    User testAdminUser = new User("Abraham", "1234");
         Groups groups = new Groups("GroupStudy", testAdminUser);
-
-        OfyService.ofy().save().entity(groups).now();
-        return groups;
+*/
+        Groups group = new Groups(newGroup.getGroupName(), newGroup.getAdminUser(), newGroup.getUsers(),
+                newGroup.getMessages(), newGroup.getTasks(), newGroup.getFileUris());
+        OfyService.ofy().save().entity(group).now();
+        return group;
     }
 
-    //loads the list of users in the app
+    //loads the list of groups in the app
     @ApiMethod(name = "loadGroups")
     public CollectionResponse<Groups> loadGroups(@Nullable @Named("cursor") String cursorString,
                                              @Nullable @Named("count") Integer count) {

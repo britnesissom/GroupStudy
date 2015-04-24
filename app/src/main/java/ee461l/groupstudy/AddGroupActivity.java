@@ -12,6 +12,11 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import ee461l.groupstudyendpoints.userEndpoint.model.User;
+
 
 public class AddGroupActivity extends ActionBarActivity {
 
@@ -19,6 +24,7 @@ public class AddGroupActivity extends ActionBarActivity {
 
     private EditText groupName;
     private EditText teammates;
+    private List<User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +34,13 @@ public class AddGroupActivity extends ActionBarActivity {
         groupName = (EditText) findViewById(R.id.group_name);
         teammates = (EditText) findViewById(R.id.teammates);
 
+        LoadUserEndpointsAsyncTask lueat = new LoadUserEndpointsAsyncTask(this, new OnRetrieveUsersTaskCompleted() {
+            @Override
+            public void onTaskCompleted(List<User> list) {
+                users = list;
+            }
+        });
+        lueat.execute();
     }
 
     /*
@@ -67,11 +80,30 @@ public class AddGroupActivity extends ActionBarActivity {
         String delimiters = ",[ ]*";
         String nameOfGroup = groupName.getText().toString();
         String[] usernames = teammates.getText().toString().split(delimiters);
-        Log.i(TAG,"" + usernames.toString());
+        ArrayList<User> listOfUsers = getUsersFromArray(usernames);
+        CreateGroupEndpointsAsyncTask cgeat = new CreateGroupEndpointsAsyncTask(this, nameOfGroup,
+                listOfUsers.get(0), listOfUsers);
+        Log.i(TAG,"" + usernames[0]);
 
         Intent intent = new Intent(this, NavDrawerGroups.class);
         intent.putExtra("group name", nameOfGroup);
         startActivity(intent);
+    }
+
+    //group needs arraylist of users not just their usernames
+    //find each user and add to arraylist
+
+    //FIX THIS CODE LATER BECAUSE IT IS VERY SLOW - O(n^2)
+    private ArrayList<User> getUsersFromArray(String[] usernames) {
+        ArrayList<User> listOfUsers = new ArrayList<>();
+        for (int i = 0; i < usernames.length; i++) {
+            for (int j = i; j < users.size(); j++) {
+                if (usernames[i].equals(users.get(j).getUsername())) {
+                    listOfUsers.add(users.get(j));
+                }
+            }
+        }
+        return listOfUsers;
     }
 
 

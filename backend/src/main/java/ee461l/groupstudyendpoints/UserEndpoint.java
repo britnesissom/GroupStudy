@@ -44,8 +44,8 @@ public class UserEndpoint {
     }
 
     //loads the list of users in the app
-    @ApiMethod(name = "loadUser")
-    public CollectionResponse<User> loadUser(@Nullable @Named("cursor") String cursorString,
+    @ApiMethod(name = "loadUsers")
+    public CollectionResponse<User> loadUsers(@Nullable @Named("cursor") String cursorString,
                          @Nullable @Named("count") Integer count) {
         Query<User> query = OfyService.ofy().load().type(User.class);
         if (count != null) query.limit(count);
