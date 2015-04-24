@@ -13,13 +13,13 @@ public class Groups {
     private String groupname;
     private ArrayList<String> fileUris;
     private ArrayList<String> messages;
-    private ArrayList<User> users;
+    private ArrayList<String> users;
     private ArrayList<String> tasks;
-    private User adminUser;
+    private String adminUser;
 
     //might need userID to make it easier to find user?
 
-    public Groups(String groupname, User adminUser, ArrayList<User> teammates, ArrayList<String> messages,
+    public Groups(String groupname, String adminUser, ArrayList<String> teammates, ArrayList<String> messages,
                   ArrayList<String> tasks, ArrayList<String> fileUris) {
         this.groupname = groupname;
         this.adminUser = adminUser;
@@ -39,7 +39,7 @@ public class Groups {
 
     public void setGroupname(String groupname) { this.groupname = groupname; }
 
-    public void changeAdminUser(User adminUser) { this.adminUser = adminUser; }
+    public void changeAdminUser(String adminUser) { this.adminUser = adminUser; }
 
     public ArrayList<String> getFileUris() {
         return fileUris;
@@ -49,9 +49,9 @@ public class Groups {
 
     public ArrayList<String> getTasks() { return tasks;}
 
-    public ArrayList<User> getUsers() { return users; }
+    public ArrayList<String> getUsers() { return users; }
 
-    public void setUsers(ArrayList<User> teammates) {
+    public void setUsers(ArrayList<String> teammates) {
         this.users = teammates;
     }
 }

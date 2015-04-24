@@ -14,7 +14,6 @@ import java.util.ArrayList;
 
 import ee461l.groupstudyendpoints.groupsEndpoint.GroupsEndpoint;
 import ee461l.groupstudyendpoints.groupsEndpoint.model.GroupWrapperEntity;
-import ee461l.groupstudyendpoints.userEndpoint.model.User;
 
 
 /**
@@ -25,7 +24,7 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Void> {
     private Context context;
     private GroupWrapperEntity groupWrapper;
 
-    CreateGroupEndpointsAsyncTask(Context context, String groupName, User adminUser, ArrayList<User> teammates) {
+    CreateGroupEndpointsAsyncTask(Context context, String groupName, String adminUser, ArrayList<String> teammates) {
         this.context = context;
 
         groupWrapper = new GroupWrapperEntity();

@@ -9,7 +9,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.List;
+
+import ee461l.groupstudyendpoints.groupsEndpoint.model.Groups;
 
 
 /**
@@ -27,6 +33,8 @@ public class HomePageFragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     private String menuChoice;
+    private List<Groups> groups;
+    private ListView groupsListView;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -57,6 +65,14 @@ public class HomePageFragment extends Fragment {
         if (getArguments() != null) {
             menuChoice = getArguments().getString(ARG_MENU_CHOICE_NUM);
         }
+
+        LoadGroupsEndpointsAsyncTask lgeat = new LoadGroupsEndpointsAsyncTask(
+                getActivity(), new OnRetrieveGroupsTaskCompleted() {
+            @Override
+            public void onRetrieveGroupsCompleted(List<Groups> groupsList) {
+                groups = groupsList;
+            }
+        });
     }
 
     @Override
@@ -67,6 +83,21 @@ public class HomePageFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_home_page, container, false);
         getActivity().setTitle("Home");
+
+        //initialize listview and adapter to list groups on home page
+        groupsListView = (ListView) rootView.findViewById(R.id.groups_list);
+        GroupsListViewAdapter adapter = new GroupsListViewAdapter(getActivity(), groups);
+        groupsListView.setAdapter(adapter);
+
+        //send group name to new activity so app knows which messages to load
+        groupsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View view, int pos, long id) {
+                Intent intent = new Intent(getActivity(), NavDrawerGroups.class);
+                intent.putExtra("groupName", groups.get(pos).getGroupName());
+                startActivity(intent);
+            }
+        });
         return rootView;
     }
 

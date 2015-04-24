@@ -14,6 +14,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.List;
+
+import ee461l.groupstudyendpoints.groupsEndpoint.model.Groups;
+
 
 public class NavDrawerGroups extends ActionBarActivity {
 
@@ -23,6 +27,7 @@ public class NavDrawerGroups extends ActionBarActivity {
     private ActionBarDrawerToggle drawerToggle;
     private CharSequence mDrawerTitle;  //title of navigation drawer eg menu
     private CharSequence mTitle;    //title of action bar
+    private String groupName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -30,10 +35,9 @@ public class NavDrawerGroups extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nav_drawer_layout);
 
-        //default view when app is loaded is the home page
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame,
-                new HomePageFragment()).commit();
+        //default view when group is opened is list of tasks?
+        groupName = getIntent().getStringExtra("groupName");
+
 
         mTitle = mDrawerTitle = getTitle();
 

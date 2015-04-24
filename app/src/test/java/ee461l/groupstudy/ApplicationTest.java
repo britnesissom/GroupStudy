@@ -26,7 +26,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         new CreateUserEndpointsAsyncTask(getContext()).execute("Sue","1234");
         new CreateUserEndpointsAsyncTask(getContext()).execute("Frank","12345");
 
-        new LoadUserEndpointsAsyncTask(getContext(), new OnRetrieveUsersTaskCompleted() {
+        new LoadGroupsEndpointsAsyncTask(getContext(), new OnRetrieveUsersTaskCompleted() {
             @Override
             public void onTaskCompleted(List<User> list) {
                 users = list;

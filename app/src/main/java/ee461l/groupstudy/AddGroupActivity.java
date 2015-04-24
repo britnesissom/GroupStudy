@@ -7,12 +7,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ee461l.groupstudyendpoints.userEndpoint.model.User;
@@ -34,7 +32,7 @@ public class AddGroupActivity extends ActionBarActivity {
         groupName = (EditText) findViewById(R.id.group_name);
         teammates = (EditText) findViewById(R.id.teammates);
 
-        LoadUserEndpointsAsyncTask lueat = new LoadUserEndpointsAsyncTask(this, new OnRetrieveUsersTaskCompleted() {
+        LoadGroupsEndpointsAsyncTask lueat = new LoadGroupsEndpointsAsyncTask(this, new OnRetrieveUsersTaskCompleted() {
             @Override
             public void onTaskCompleted(List<User> list) {
                 users = list;
@@ -80,10 +78,11 @@ public class AddGroupActivity extends ActionBarActivity {
         String delimiters = ",[ ]*";
         String nameOfGroup = groupName.getText().toString();
         String[] usernames = teammates.getText().toString().split(delimiters);
-        ArrayList<User> listOfUsers = getUsersFromArray(usernames);
+        ArrayList<String> listOfUsers = (ArrayList<String>) Arrays.asList(usernames);
+        Log.i(TAG,"" + usernames[0]);
         CreateGroupEndpointsAsyncTask cgeat = new CreateGroupEndpointsAsyncTask(this, nameOfGroup,
                 listOfUsers.get(0), listOfUsers);
-        Log.i(TAG,"" + usernames[0]);
+        cgeat.execute();
 
         Intent intent = new Intent(this, NavDrawerGroups.class);
         intent.putExtra("group name", nameOfGroup);
