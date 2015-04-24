@@ -10,13 +10,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.List;
+
+import ee461l.groupstudyendpoints.userEndpoint.model.User;
+
 
 public class LoginScreenActivity extends ActionBarActivity {
 
     EditText username;
     EditText password;
     Button login;
-    UserList userList;
+    List<ee461l.groupstudyendpoints.userEndpoint.model.User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,9 +31,13 @@ public class LoginScreenActivity extends ActionBarActivity {
         password = (EditText) findViewById(R.id.password);
         login = (Button) findViewById(R.id.login);
 
-        userList = new UserList();
-        User user = new User("test","0000");
-        userList.add(user);
+        LoadUserEndpointsAsyncTask ueat = new LoadUserEndpointsAsyncTask(this, new OnRetrieveUsersTaskCompleted() {
+            @Override
+            public void onTaskCompleted(List<User> list) {
+                users = list;
+            }
+        });
+        ueat.execute();
     }
 
 
@@ -60,21 +68,24 @@ public class LoginScreenActivity extends ActionBarActivity {
         String usernameText = username.getText().toString();
         String passwordText = password.getText().toString();
 
-        if (userList.checkIfTableContains(usernameText, passwordText)) {
-            Intent intent = new Intent(this,NavDrawerHomePage.class);
-            intent.putExtra("user list", userList);
-            startActivity(intent);
-        } else {
-            Toast.makeText(getApplicationContext(), "Invalid username or password",
-                    Toast.LENGTH_LONG).show();
-        }
+        //goes through each user to see if person who is trying to log in exists
+        for (int i = 0; i < users.size(); i++) {
 
+            //username, password combo is correct so log in the user
+            if (users.get(i).getUsername().equals(usernameText) &&
+                    users.get(i).getPassword().equals(passwordText)) {
+                Intent intent = new Intent(this, NavDrawerHomePage.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(getApplicationContext(), "Invalid username or password",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     //go to a new create account activity
     public void createAccount(View v) {
         Intent intent = new Intent(this,CreateNewAccountActivity.class);
-        intent.putExtra("user list", userList);
         startActivity(intent);
     }
 }

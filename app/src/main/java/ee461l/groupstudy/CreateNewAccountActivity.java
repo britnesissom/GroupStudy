@@ -9,6 +9,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.List;
+
+import ee461l.groupstudyendpoints.userEndpoint.model.User;
+
 
 /**
  * Created by Brian on 4/1/2015.
@@ -18,22 +24,19 @@ public class CreateNewAccountActivity extends ActionBarActivity {
     EditText username;
     EditText createPassword;
     EditText confirmPassword;
-    TextView nonmatchingPasswords;
     Button createAccountButton;
-    UserList userList;
+    List<ee461l.groupstudyendpoints.userEndpoint.model.User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_new_account);
 
-        userList = getIntent().getParcelableExtra("user list");
-
         username = (EditText) findViewById(R.id.create_username);
         createPassword = (EditText) findViewById(R.id.create_password);
         confirmPassword = (EditText) findViewById(R.id.confirm_password);
-        nonmatchingPasswords = (TextView) findViewById(R.id.nonmatching_passwords);
         createAccountButton = (Button) findViewById(R.id.create_account_button);
+
     }
 
 
@@ -69,20 +72,22 @@ public class CreateNewAccountActivity extends ActionBarActivity {
             //if user doesn't exist, add new user to list of users
             //else, tell them to choose a new name
             if (checkIfUserExists(usernameText) == false) {
-                User user = new User(usernameText, createPassword.getText().toString());
-                userList.add(user);
-
                 //be sure to change to NavDrawerHomePage!
+
+                //add user to server
+                CreateUserEndpointsAsyncTask cueat = new CreateUserEndpointsAsyncTask(this);
+                cueat.execute(usernameText, createPassword.getText().toString());
+
                 Intent intent = new Intent(this, NavDrawerHomePage.class);
-                intent.putExtra("user list", userList);
                 startActivity(intent);
             } else {
-                nonmatchingPasswords.setText("Username already taken");
-                nonmatchingPasswords.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(), "Username already taken",
+                        Toast.LENGTH_LONG).show();
+                clearTextFields();
             }
         } else {
-            nonmatchingPasswords.setText("Passwords do not match");
-            nonmatchingPasswords.setVisibility(View.VISIBLE);
+            Toast.makeText(getApplicationContext(), "Passwords do not match",
+                    Toast.LENGTH_LONG).show();
             clearTextFields();
         }
     }
@@ -93,7 +98,11 @@ public class CreateNewAccountActivity extends ActionBarActivity {
     }
 
     private boolean checkIfUserExists(String user) {
-        return userList.checkIfUserExists(user);
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getUsername().equals(user))
+                return true;
+        }
+        return false;
     }
 
 }

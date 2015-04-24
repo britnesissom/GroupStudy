@@ -19,7 +19,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_MENU_CHOICE_NUM = "menu_number";
-    UserList userList;
     TextView users;
     TextView event;
 

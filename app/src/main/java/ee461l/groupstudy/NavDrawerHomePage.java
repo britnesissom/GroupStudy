@@ -2,6 +2,7 @@ package ee461l.groupstudy;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.v4.widget.DrawerLayout;
@@ -75,9 +76,6 @@ public class NavDrawerHomePage extends ActionBarActivity {
         if (savedInstanceState == null) {
             selectItem(0);
         }
-
-        //to test that the google endpoints module is working
-        //new SendLoginEndpointsAsyncTask().execute(new Pair<Context, String>(this, "Manfred"));
     }
 
     @Override
