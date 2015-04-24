@@ -94,7 +94,7 @@ public class FileSharingFragment extends Fragment {
         FileListViewAdapter adapter = new FileListViewAdapter(getActivity(), filesFromServer);
         files.setAdapter(adapter);
 
-        // implement event when an item on list view is selected
+        // implement eventDate when an item on list view is selected
         files.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int pos, long id) {

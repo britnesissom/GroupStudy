@@ -10,11 +10,8 @@ import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 import ee461l.groupstudyendpoints.userEndpoint.UserEndpoint;
-import ee461l.groupstudyendpoints.userEndpoint.model.User;
 
 
 /**
@@ -52,13 +49,13 @@ class CreateUserEndpointsAsyncTask extends AsyncTask<String, Void, Void> {
         try {
             usersEndpointApi.createUser(userInfo[0], userInfo[1]).execute();
         } catch (IOException e) {
-            Log.i("UserEndpointsAsyncTask", "" + e.getMessage());
+            Log.i("CreateUserAsync", "" + e.getMessage());
         }
 
         return null;
     }
 
     @Override
-    protected void onPostExecute(Void result) {
-    }
+    protected void onPostExecute(Void result){
+   }
 }
