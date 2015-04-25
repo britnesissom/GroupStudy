@@ -10,23 +10,22 @@ public class Groups {
 
     @Id
     Long id;
-    private String groupname;
+    private String groupName;
     private ArrayList<String> fileUris;
     private ArrayList<String> messages;
-    private ArrayList<String> users;
+    private ArrayList<User> users;
     private ArrayList<String> tasks;
     private String adminUser;
 
     //might need userID to make it easier to find user?
 
-    public Groups(String groupname, String adminUser, ArrayList<String> teammates, ArrayList<String> messages,
-                  ArrayList<String> tasks, ArrayList<String> fileUris) {
-        this.groupname = groupname;
+    public Groups(String groupName, String adminUser, ArrayList<User> teammates) {
+        this.groupName = groupName;
         this.adminUser = adminUser;
-        this.fileUris = fileUris;
-        this.messages = messages;
+        this.fileUris = new ArrayList<>();
+        this.messages = new ArrayList<>();
         this.users = teammates;
-        this.tasks = tasks;
+        this.tasks = new ArrayList<>();
     }
 
     public long getId() { return id; }
@@ -34,10 +33,10 @@ public class Groups {
 //    public void setId(Long id) { this.id = id; }
 
     public String getGroupName() {
-        return groupname;
+        return groupName;
     }
 
-    public void setGroupname(String groupname) { this.groupname = groupname; }
+    public void setGroupname(String groupName) { this.groupName = groupName; }
 
     public void changeAdminUser(String adminUser) { this.adminUser = adminUser; }
 
@@ -49,9 +48,15 @@ public class Groups {
 
     public ArrayList<String> getTasks() { return tasks;}
 
-    public ArrayList<String> getUsers() { return users; }
+    public ArrayList<User> getUsers() {
+        return users;
+    }
 
-    public void setUsers(ArrayList<String> teammates) {
-        this.users = teammates;
+    public void setUsers(ArrayList<User> users) {
+        this.users = users;
+    }
+
+    public String getAdminUser() {
+        return adminUser;
     }
 }

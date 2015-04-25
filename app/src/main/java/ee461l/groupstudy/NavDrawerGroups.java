@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,10 +17,10 @@ import android.widget.ListView;
 
 import java.util.List;
 
-import ee461l.groupstudyendpoints.groupsEndpoint.model.Groups;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 
-public class NavDrawerGroups extends ActionBarActivity {
+public class NavDrawerGroups extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
@@ -28,6 +29,7 @@ public class NavDrawerGroups extends ActionBarActivity {
     private CharSequence mDrawerTitle;  //title of navigation drawer eg menu
     private CharSequence mTitle;    //title of action bar
     private String groupName;
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -37,6 +39,7 @@ public class NavDrawerGroups extends ActionBarActivity {
 
         //default view when group is opened is list of tasks?
         groupName = getIntent().getStringExtra("groupName");
+        username = getIntent().getStringExtra("username");
 
 
         mTitle = mDrawerTitle = getTitle();
@@ -117,7 +120,7 @@ public class NavDrawerGroups extends ActionBarActivity {
         //go to selected activity
         switch (position) {
             case 0: //go to home page
-                fragment = HomePageFragment.newInstance();
+                fragment = HomePageFragment.newInstance(username);
                 /*args = new Bundle();
                 args.putInt(MainPageFragment.ARG_MENU_CHOICE_NUM, position);*/
                 break;

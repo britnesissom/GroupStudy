@@ -3,6 +3,7 @@ package ee461l.groupstudy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,19 +14,19 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import ee461l.groupstudyendpoints.userEndpoint.model.User;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 
 /**
  * Created by Brian on 4/1/2015.
  */
-public class CreateNewAccountActivity extends ActionBarActivity {
+public class CreateNewAccountActivity extends AppCompatActivity {
 
     EditText username;
     EditText createPassword;
     EditText confirmPassword;
     Button createAccountButton;
-    List<ee461l.groupstudyendpoints.userEndpoint.model.User> users;
+    List<User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

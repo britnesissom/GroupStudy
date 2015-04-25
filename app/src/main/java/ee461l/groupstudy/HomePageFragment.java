@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import ee461l.groupstudyendpoints.groupsEndpoint.model.Groups;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 
 /**
@@ -29,12 +29,13 @@ import ee461l.groupstudyendpoints.groupsEndpoint.model.Groups;
 public class HomePageFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    public static final String ARG_MENU_CHOICE_NUM = "menu_number";
+    public static final String USERNAME = "username";
 
     // TODO: Rename and change types of parameters
     private String menuChoice;
     private List<Groups> groups;
     private ListView groupsListView;
+    private String username;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -45,11 +46,11 @@ public class HomePageFragment extends Fragment {
      * @return A new instance of fragment MainPageFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment newInstance() {
+    public static Fragment newInstance(String username) {
         Fragment fragment = new HomePageFragment();
-        /*Bundle args = new Bundle();
-        args.putString(ARG_MENU_CHOICE_NUM, menuChoiceNum);
-        fragment.setArguments(args);*/
+        Bundle args = new Bundle();
+        args.putString(USERNAME, username);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -63,7 +64,7 @@ public class HomePageFragment extends Fragment {
         setHasOptionsMenu(true);
 
         if (getArguments() != null) {
-            menuChoice = getArguments().getString(ARG_MENU_CHOICE_NUM);
+            username = getArguments().getString(USERNAME);
         }
 
         LoadGroupsEndpointsAsyncTask lgeat = new LoadGroupsEndpointsAsyncTask(
@@ -113,6 +114,7 @@ public class HomePageFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.create_group:
                 Intent intent = new Intent(getActivity(), AddGroupActivity.class);
+                intent.putExtra("username", username);
                 startActivity(intent);
                 return true;
             default:

@@ -1,8 +1,8 @@
 package ee461l.groupstudy;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,26 +13,29 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ee461l.groupstudyendpoints.userEndpoint.model.User;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 
-public class AddGroupActivity extends ActionBarActivity {
+public class AddGroupActivity extends AppCompatActivity {
 
     private static final String TAG = "AddGroupActivity";
 
     private EditText groupName;
     private EditText teammates;
     private List<User> users;
+    private String admin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group);
 
+        admin = getIntent().getStringExtra("username");
+
         groupName = (EditText) findViewById(R.id.group_name);
         teammates = (EditText) findViewById(R.id.teammates);
 
-        LoadGroupsEndpointsAsyncTask lueat = new LoadGroupsEndpointsAsyncTask(this, new OnRetrieveUsersTaskCompleted() {
+        LoadUserEndpointsAsyncTask lueat = new LoadUserEndpointsAsyncTask(this, new OnRetrieveUsersTaskCompleted() {
             @Override
             public void onTaskCompleted(List<User> list) {
                 users = list;
@@ -77,11 +80,12 @@ public class AddGroupActivity extends ActionBarActivity {
     public void createGroup(View view) {
         String delimiters = ",[ ]*";
         String nameOfGroup = groupName.getText().toString();
-        String[] usernames = teammates.getText().toString().split(delimiters);
-        ArrayList<String> listOfUsers = (ArrayList<String>) Arrays.asList(usernames);
-        Log.i(TAG,"" + usernames[0]);
+        String usernames = teammates.getText().toString();
+        String[] usernamesArray = teammates.getText().toString().split(delimiters);
+        ArrayList<User> listOfUsers = getUsersFromArray(usernamesArray);
+        Log.i(TAG,"" + usernames);
         CreateGroupEndpointsAsyncTask cgeat = new CreateGroupEndpointsAsyncTask(this, nameOfGroup,
-                listOfUsers.get(0), listOfUsers);
+                admin, listOfUsers);
         cgeat.execute();
 
         Intent intent = new Intent(this, NavDrawerGroups.class);

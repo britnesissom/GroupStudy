@@ -12,34 +12,42 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import ee461l.groupstudyendpoints.groupsEndpoint.GroupsEndpoint;
-import ee461l.groupstudyendpoints.groupsEndpoint.model.GroupWrapperEntity;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.GroupWrapperEntity;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
 
 
 /**
  * Created by britne on 4/11/15.
  */
 class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Void> {
-    private static GroupsEndpoint groupEndpointApi = null;
+    private static GroupstudyEndpoint groupEndpointApi = null;
     private Context context;
     private GroupWrapperEntity groupWrapper;
+    private String groupName;
+    private String adminUser;
+    private ArrayList<User> teammates;
 
-    CreateGroupEndpointsAsyncTask(Context context, String groupName, String adminUser, ArrayList<String> teammates) {
+    CreateGroupEndpointsAsyncTask(Context context, String groupName, String adminUser, ArrayList<User> teammates) {
         this.context = context;
+        this.groupName = groupName;
+        this.adminUser = adminUser;
+        this.teammates = teammates;
 
         groupWrapper = new GroupWrapperEntity();
-        groupWrapper.setGroupName(groupName);
-        groupWrapper.setAdminUser(adminUser);
-        groupWrapper.setUsers(teammates);
-        groupWrapper.setMessages(new ArrayList<String>());
-        groupWrapper.setTasks(new ArrayList<String>());
-        groupWrapper.setFileUris(new ArrayList<String>());
+        Groups group = new Groups();
+        group.setGroupName(groupName);
+        group.setAdminUser(adminUser);
+        group.setUsers(teammates);
+        groupWrapper.setGroup(group);
     }
 
     @Override
     protected Void doInBackground(Void... params) {
         if(groupEndpointApi == null) {  // Only do this once
-            GroupsEndpoint.Builder builder = new GroupsEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
+            GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
                     // options for running against local devappserver
                     // - 10.0.2.2 is localhost's IP address in Android emulator

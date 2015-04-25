@@ -10,7 +10,7 @@ import android.widget.Button;
 import java.io.File;
 import java.util.List;
 
-import ee461l.groupstudyendpoints.groupsEndpoint.model.Groups;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 /**
  * Created by britne on 4/24/15.

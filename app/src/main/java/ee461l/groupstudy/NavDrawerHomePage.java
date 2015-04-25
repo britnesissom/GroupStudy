@@ -9,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,7 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 
-public class NavDrawerHomePage extends ActionBarActivity {
+public class NavDrawerHomePage extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
@@ -24,12 +25,16 @@ public class NavDrawerHomePage extends ActionBarActivity {
     private ActionBarDrawerToggle drawerToggle;
     private CharSequence mDrawerTitle;  //title of navigation drawer eg menu
     private CharSequence mTitle;    //title of action bar
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nav_drawer_layout);
+
+        //we want username so we know if user is an admin or not
+        username = getIntent().getStringExtra("username");
 
         //default view when app is loaded is the home page
         FragmentManager fragmentManager = getFragmentManager();
@@ -114,7 +119,7 @@ public class NavDrawerHomePage extends ActionBarActivity {
         //go to selected activity
         switch (position) {
             case 0: //go to home page
-                fragment = HomePageFragment.newInstance();
+                fragment = HomePageFragment.newInstance(username);
                 /*args = new Bundle();
                 args.putInt(MainPageFragment.ARG_MENU_CHOICE_NUM, position);*/
                 break;
@@ -151,6 +156,7 @@ public class NavDrawerHomePage extends ActionBarActivity {
     //changes to group specific nav drawer
     public void newNavDrawerActivity(View view) {
         Intent intent = new Intent(this, NavDrawerGroups.class);
+        intent.putExtra("username", username);
         startActivity(intent);
     }
 }

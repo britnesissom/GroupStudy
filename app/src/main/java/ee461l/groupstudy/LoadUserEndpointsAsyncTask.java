@@ -13,15 +13,15 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import ee461l.groupstudyendpoints.userEndpoint.UserEndpoint;
-import ee461l.groupstudyendpoints.userEndpoint.model.User;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 
 /**
  * Created by britne on 4/11/15.
  */
 class LoadUserEndpointsAsyncTask extends AsyncTask<Void, Void, List<User>> {
-    private static UserEndpoint usersEndpointApi = null;
+    private static GroupstudyEndpoint usersEndpointApi = null;
     private Context context;
     private OnRetrieveUsersTaskCompleted listener;
 
@@ -33,7 +33,7 @@ class LoadUserEndpointsAsyncTask extends AsyncTask<Void, Void, List<User>> {
     @Override
     protected List<User> doInBackground(Void... params) {
         if(usersEndpointApi == null) {  // Only do this once
-            UserEndpoint.Builder builder = new UserEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
+            GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
                     // options for running against local devappserver
                     // - 10.0.2.2 is localhost's IP address in Android emulator

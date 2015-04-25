@@ -3,6 +3,7 @@ package ee461l.groupstudy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,15 +13,15 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import ee461l.groupstudyendpoints.userEndpoint.model.User;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 
-public class LoginScreenActivity extends ActionBarActivity {
+public class LoginScreenActivity extends AppCompatActivity {
 
     EditText username;
     EditText password;
     Button login;
-    List<ee461l.groupstudyendpoints.userEndpoint.model.User> users;
+    List<User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,7 @@ public class LoginScreenActivity extends ActionBarActivity {
             if (users.get(i).getUsername().equals(usernameText) &&
                     users.get(i).getPassword().equals(passwordText)) {
                 Intent intent = new Intent(this, NavDrawerHomePage.class);
+                intent.putExtra("username", users.get(i).getUsername());
                 startActivity(intent);
             } else {
                 Toast.makeText(getApplicationContext(), "Invalid username or password",

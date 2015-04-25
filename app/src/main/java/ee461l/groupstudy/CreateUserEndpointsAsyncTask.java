@@ -11,14 +11,14 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
 
-import ee461l.groupstudyendpoints.userEndpoint.UserEndpoint;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
 
 
 /**
  * Created by britne on 4/11/15.
  */
 class CreateUserEndpointsAsyncTask extends AsyncTask<String, Void, Void> {
-    private static UserEndpoint usersEndpointApi = null;
+    private static GroupstudyEndpoint usersEndpointApi = null;
     private Context context;
 
     CreateUserEndpointsAsyncTask(Context context) {
@@ -28,7 +28,7 @@ class CreateUserEndpointsAsyncTask extends AsyncTask<String, Void, Void> {
     @Override
     protected Void doInBackground(String... userInfo) {
         if(usersEndpointApi == null) {  // Only do this once
-            UserEndpoint.Builder builder = new UserEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
+            GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
                     // options for running against local devappserver
                     // - 10.0.2.2 is localhost's IP address in Android emulator
