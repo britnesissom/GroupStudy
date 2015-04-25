@@ -41,14 +41,20 @@ public class GroupstudyEndpoint {
     /*    User testAdminUser = new User("Abraham", "1234");
         Groups groups = new Groups("GroupStudy", testAdminUser);
 */
-        ArrayList<User> list = new ArrayList<>();
-        list.add(new User("person1", "000"));
-        list.add(new User("person2","1234"));
-        Groups group1 = new Groups("Group 1", "Brit'ne", list);
-       /* Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
-                newGroup.getGroup().getUsers());*/
-        OfyService.ofy().save().entity(group1).now();
-        return group1;
+        Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
+                newGroup.getGroup().getUsers());
+        OfyService.ofy().save().entity(group).now();
+        return group;
+    }
+
+    /**
+     * An endpoint that loads a single group so task, messaging, etc info can be retrieved
+     */
+    @ApiMethod(name = "retrieveSingleGroup")
+    public Groups retrieveSingleGroup(@Named("groupName") String groupName) {
+
+        //will return null if group does not exist
+        return OfyService.ofy().load().type(Groups.class).id(groupName).now();
     }
 
     //loads the list of groups in the app
@@ -124,5 +130,13 @@ public class GroupstudyEndpoint {
         }
 
         return CollectionResponse.<User>builder().setItems(listOfUsers).setNextPageToken(cursorString).build();
+    }
+
+    //loads the single user in the app
+    @ApiMethod(name = "retrieveSingleUser")
+    public User retrieveSingleUser(@Named("username") String username) {
+
+        //will return null if user is not found
+        return OfyService.ofy().load().type(User.class).id(username).now();
     }
 }

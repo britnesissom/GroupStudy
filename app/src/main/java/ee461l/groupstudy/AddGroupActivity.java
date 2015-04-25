@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
@@ -23,19 +22,29 @@ public class AddGroupActivity extends AppCompatActivity {
     private EditText groupName;
     private EditText teammates;
     private List<User> users;
-    private String admin;
+    private User adminUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group);
 
-        admin = getIntent().getStringExtra("username");
+        String admin = getIntent().getStringExtra("username");
+
+        //retrieves user to set as admin
+        LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
+            @Override
+            public void onRetrieveUserCompleted(User user) {
+                adminUser = user;
+            }
+        });
+        lsuat.execute(admin);
 
         groupName = (EditText) findViewById(R.id.group_name);
         teammates = (EditText) findViewById(R.id.teammates);
 
-        LoadUserEndpointsAsyncTask lueat = new LoadUserEndpointsAsyncTask(this, new OnRetrieveUsersTaskCompleted() {
+        //retrieve list of users to find them using what the user typed in
+        LoadUsersEndpointsAsyncTask lueat = new LoadUsersEndpointsAsyncTask(this, new OnRetrieveUsersTaskCompleted() {
             @Override
             public void onTaskCompleted(List<User> list) {
                 users = list;
@@ -85,11 +94,14 @@ public class AddGroupActivity extends AppCompatActivity {
         ArrayList<User> listOfUsers = getUsersFromArray(usernamesArray);
         Log.i(TAG,"" + usernames);
         CreateGroupEndpointsAsyncTask cgeat = new CreateGroupEndpointsAsyncTask(this, nameOfGroup,
-                admin, listOfUsers);
+                adminUser, listOfUsers);
         cgeat.execute();
 
+        //pass name of group and username to next activity so if user creates another group
+        //the app knows who the admin should be
         Intent intent = new Intent(this, NavDrawerGroups.class);
         intent.putExtra("group name", nameOfGroup);
+        intent.putExtra("username", getIntent().getStringExtra("username"));
         startActivity(intent);
     }
 

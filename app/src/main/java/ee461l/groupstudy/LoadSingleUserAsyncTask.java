@@ -10,30 +10,29 @@ import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 
 /**
  * Created by britne on 4/11/15.
  */
-class LoadGroupsEndpointsAsyncTask extends AsyncTask<Void, Void, List<Groups>> {
-    private static GroupstudyEndpoint groupsEndpointApi = null;
+class LoadSingleUserAsyncTask extends AsyncTask<String, Void, User> {
+    private static GroupstudyEndpoint usersEndpointApi = null;
     private Context context;
-    private OnRetrieveGroupsTaskCompleted listener;
+    private OnRetrieveSingleUserTaskCompleted listener;
 
-    LoadGroupsEndpointsAsyncTask(Context context, OnRetrieveGroupsTaskCompleted listener) {
+    LoadSingleUserAsyncTask(Context context, OnRetrieveSingleUserTaskCompleted listener) {
         this.context = context;
         this.listener = listener;
     }
 
     @Override
-    protected List<Groups> doInBackground(Void... params) {
-        if(groupsEndpointApi == null) {  // Only do this once
+    protected User doInBackground(String... username) {
+        if(usersEndpointApi == null) {  // Only do this once
             GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
                     // options for running against local devappserver
@@ -48,27 +47,21 @@ class LoadGroupsEndpointsAsyncTask extends AsyncTask<Void, Void, List<Groups>> {
                     });
             // end options for devappserver
 
-            groupsEndpointApi = builder.build();
+            usersEndpointApi = builder.build();
         }
 
         try {
-            List<Groups> groups = groupsEndpointApi.loadGroups().execute().getItems();
-            Log.i("LoadGroupsAsync", "groups retrieved");
-
-            //no groups have been added yet so objectify returns null
-            //not allowed when setting a list adapter so an empty arraylist needs to be created
-            if (groups == null)
-                groups = new ArrayList<>();
-
-            return groups;
+            User user = usersEndpointApi.retrieveSingleUser(username[0]).execute();
+            Log.i("LoadSingleUser", "user retrieved");
+            return user;
         } catch (IOException e) {
-            Log.i("LoadGroupsAsync", "" + e.getMessage());
-            return Collections.EMPTY_LIST;
+            Log.i("LoadSingleUserAsync", "" + e.getMessage());
+            return null;
         }
     }
 
     @Override
-    protected void onPostExecute(List<Groups> result) {
-        listener.onRetrieveGroupsCompleted(result);
+    protected void onPostExecute(User result) {
+        listener.onRetrieveUserCompleted(result);
     }
 }

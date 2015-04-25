@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -14,10 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import java.util.List;
-
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 
 public class NavDrawerGroups extends AppCompatActivity {
@@ -41,6 +36,9 @@ public class NavDrawerGroups extends AppCompatActivity {
         groupName = getIntent().getStringExtra("groupName");
         username = getIntent().getStringExtra("username");
 
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame,
+                new GroupHomePageFragment()).commit();
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -120,28 +118,31 @@ public class NavDrawerGroups extends AppCompatActivity {
         //go to selected activity
         switch (position) {
             case 0: //go to home page
-                fragment = HomePageFragment.newInstance(username);
+                fragment = AppHomePageFragment.newInstance(username);
                 /*args = new Bundle();
                 args.putInt(MainPageFragment.ARG_MENU_CHOICE_NUM, position);*/
                 break;
-            case 1: //go to calendar
+            case 1: //go to app's home page not group home page
+                Intent intent = new Intent(this, NavDrawerHomePage.class);
+                startActivity(intent);
+            case 2: //go to calendar
                 fragment = CalendarFragment.newInstance();
                 break;
-            case 2: //go to messages
+            case 3: //go to messages
                 fragment = MessagingFragment.newInstance();
                 break;
-            case 3: //go to files
+            case 4: //go to files
                 fragment = FileSharingFragment.newInstance();
                 break;
-            case 4: //go to meetings
-                fragment = CalendarFragment.newInstance();
+            case 5: //go to meetings
+                fragment = MeetingsFragment.newInstance();
                 break;
-            case 5:
+            case 6: //view info about the app
                 fragment = AboutFragment.newInstance();
                 break;
-            case 6:
-                Intent intent = new Intent(this, LoginScreenActivity.class);
-                startActivity(intent);
+            case 7: //log out of app
+                Intent i = new Intent(this, LoginScreenActivity.class);
+                startActivity(i);
             default:
         }
 

@@ -13,22 +13,25 @@ import com.googlecode.objectify.annotation.Id;
 public class User {
 
     @Id
-    Long id;
+    String id;
     private String username;
     private String password;
     private boolean adminUser;
 
-    //might need userID to make it easier to find user?
+    public User() {
+
+    }
 
     public User(String username, String password) {
         setUsername(username);
         setPassword(password);
+        setId(username);
         this.adminUser = false;
     }
 
-    public long getId() { return id; }
+    public String getId() { return id; }
 
-    public void setId(Long id) { this.id = id; }
+    public void setId(String id) { this.id = id; }
 
     public String getUsername() {
         return username;

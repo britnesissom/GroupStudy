@@ -2,11 +2,9 @@ package ee461l.groupstudy;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -39,7 +37,7 @@ public class NavDrawerHomePage extends AppCompatActivity {
         //default view when app is loaded is the home page
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame,
-                new HomePageFragment()).commit();
+                new AppHomePageFragment()).commit();
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -119,7 +117,7 @@ public class NavDrawerHomePage extends AppCompatActivity {
         //go to selected activity
         switch (position) {
             case 0: //go to home page
-                fragment = HomePageFragment.newInstance(username);
+                fragment = AppHomePageFragment.newInstance(username);
                 /*args = new Bundle();
                 args.putInt(MainPageFragment.ARG_MENU_CHOICE_NUM, position);*/
                 break;

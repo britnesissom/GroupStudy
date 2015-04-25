@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,11 +23,14 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
  */
 public class CreateNewAccountActivity extends AppCompatActivity {
 
+    private static final String TAG = "CreateNewAccount";
+
     EditText username;
     EditText createPassword;
     EditText confirmPassword;
     Button createAccountButton;
     List<User> users;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +70,23 @@ public class CreateNewAccountActivity extends AppCompatActivity {
     public void createNewAccount(View v) {
         String usernameText = username.getText().toString();
 
-        //makes sure the inputted passwords are the same
-        //makes sure user doesn't already exist
-        if (createPassword.getText().toString().equals(confirmPassword.getText().toString())) {
+        //make sure user does not already exist
+        LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
+            @Override
+            public void onRetrieveUserCompleted(User userLogin) {
+                user = userLogin;
+            }
+        });
+        lsuat.execute(username.getText().toString());
 
-            //if user doesn't exist, add new user to list of users
-            //else, tell them to choose a new name
-            if (checkIfUserExists(usernameText) == false) {
-                //be sure to change to NavDrawerHomePage!
+        //if user doesn't exist, add new user to list of users
+        //else, tell them to choose a new name
+        if (user != null) {
+            Log.i(TAG, "user exists");
+            //be sure to change to NavDrawerHomePage!
+            //makes sure the inputted passwords are the same
+            //makes sure user doesn't already exist
+            if (createPassword.getText().toString().equals(confirmPassword.getText().toString())) {
 
                 //add user to server
                 CreateUserEndpointsAsyncTask cueat = new CreateUserEndpointsAsyncTask(this);
@@ -82,12 +95,13 @@ public class CreateNewAccountActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, NavDrawerHomePage.class);
                 startActivity(intent);
             } else {
-                Toast.makeText(getApplicationContext(), "Username already taken",
+                Toast.makeText(getApplicationContext(), "Passwords do not match",
                         Toast.LENGTH_LONG).show();
                 clearTextFields();
             }
+
         } else {
-            Toast.makeText(getApplicationContext(), "Passwords do not match",
+            Toast.makeText(getApplicationContext(), "Username already taken",
                     Toast.LENGTH_LONG).show();
             clearTextFields();
         }

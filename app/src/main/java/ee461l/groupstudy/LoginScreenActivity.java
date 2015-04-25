@@ -2,7 +2,6 @@ package ee461l.groupstudy;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,10 +17,9 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 public class LoginScreenActivity extends AppCompatActivity {
 
-    EditText username;
-    EditText password;
-    Button login;
-    List<User> users;
+    private EditText username;
+    private EditText password;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,15 +28,7 @@ public class LoginScreenActivity extends AppCompatActivity {
 
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
-        login = (Button) findViewById(R.id.login);
 
-        LoadUserEndpointsAsyncTask ueat = new LoadUserEndpointsAsyncTask(this, new OnRetrieveUsersTaskCompleted() {
-            @Override
-            public void onTaskCompleted(List<User> list) {
-                users = list;
-            }
-        });
-        ueat.execute();
     }
 
 
@@ -66,22 +56,24 @@ public class LoginScreenActivity extends AppCompatActivity {
 
     //make sure the user actually exists before going to new homepage activity
     public void verifyUser(View v) {
-        String usernameText = username.getText().toString();
         String passwordText = password.getText().toString();
 
-        //goes through each user to see if person who is trying to log in exists
-        for (int i = 0; i < users.size(); i++) {
-
-            //username, password combo is correct so log in the user
-            if (users.get(i).getUsername().equals(usernameText) &&
-                    users.get(i).getPassword().equals(passwordText)) {
-                Intent intent = new Intent(this, NavDrawerHomePage.class);
-                intent.putExtra("username", users.get(i).getUsername());
-                startActivity(intent);
-            } else {
-                Toast.makeText(getApplicationContext(), "Invalid username or password",
-                        Toast.LENGTH_LONG).show();
+        LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
+            @Override
+            public void onRetrieveUserCompleted(User userLogin) {
+                user = userLogin;
             }
+        });
+        lsuat.execute(username.getText().toString());
+
+        //username, password combo is correct so log in the user
+        if (user != null && user.getPassword().equals(passwordText)) {
+            Intent intent = new Intent(this, NavDrawerHomePage.class);
+            intent.putExtra("username", user.getUsername());
+            startActivity(intent);
+        } else {
+            Toast.makeText(getApplicationContext(), "Invalid username or password",
+                    Toast.LENGTH_LONG).show();
         }
     }
 

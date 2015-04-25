@@ -10,6 +10,7 @@ import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,12 +21,12 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 /**
  * Created by britne on 4/11/15.
  */
-class LoadUserEndpointsAsyncTask extends AsyncTask<Void, Void, List<User>> {
+class LoadUsersEndpointsAsyncTask extends AsyncTask<Void, Void, List<User>> {
     private static GroupstudyEndpoint usersEndpointApi = null;
     private Context context;
     private OnRetrieveUsersTaskCompleted listener;
 
-    LoadUserEndpointsAsyncTask(Context context, OnRetrieveUsersTaskCompleted listener) {
+    LoadUsersEndpointsAsyncTask(Context context, OnRetrieveUsersTaskCompleted listener) {
         this.context = context;
         this.listener = listener;
     }
@@ -51,9 +52,16 @@ class LoadUserEndpointsAsyncTask extends AsyncTask<Void, Void, List<User>> {
         }
 
         try {
-            return usersEndpointApi.loadUsers().execute().getItems();
+            List<User> users = usersEndpointApi.loadUsers().execute().getItems();
+
+            //no users have been added yet so objectify returns null
+            //not allowed when setting a list adapter so an empty arraylist needs to be created
+            if (users == null)
+                users = new ArrayList<>();
+
+            return users;
         } catch (IOException e) {
-            Log.i("LoadUserAsync", "" + e.getMessage());
+            Log.i("LoadUsersAsync", "" + e.getMessage());
             return Collections.EMPTY_LIST;
         }
     }

@@ -9,17 +9,20 @@ import java.util.ArrayList;
 public class Groups {
 
     @Id
-    Long id;
+    String id;
     private String groupName;
     private ArrayList<String> fileUris;
     private ArrayList<String> messages;
     private ArrayList<User> users;
     private ArrayList<String> tasks;
-    private String adminUser;
+    private User adminUser;
 
-    //might need userID to make it easier to find user?
+    public Groups() {
 
-    public Groups(String groupName, String adminUser, ArrayList<User> teammates) {
+    }
+
+    public Groups(String groupName, User adminUser, ArrayList<User> teammates) {
+        setId(groupName);
         this.groupName = groupName;
         this.adminUser = adminUser;
         this.fileUris = new ArrayList<>();
@@ -28,9 +31,9 @@ public class Groups {
         this.tasks = new ArrayList<>();
     }
 
-    public long getId() { return id; }
+    public String getId() { return id; }
 
-//    public void setId(Long id) { this.id = id; }
+    public void setId(String id) { this.id = id; }
 
     public String getGroupName() {
         return groupName;
@@ -38,7 +41,7 @@ public class Groups {
 
     public void setGroupname(String groupName) { this.groupName = groupName; }
 
-    public void changeAdminUser(String adminUser) { this.adminUser = adminUser; }
+    public void changeAdminUser(User adminUser) { this.adminUser = adminUser; }
 
     public ArrayList<String> getFileUris() {
         return fileUris;
@@ -56,7 +59,7 @@ public class Groups {
         this.users = users;
     }
 
-    public String getAdminUser() {
+    public User getAdminUser() {
         return adminUser;
     }
 }
