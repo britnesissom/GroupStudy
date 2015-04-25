@@ -14,13 +14,10 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class MeetingsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String GROUP_NAME = "groupName";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
+    private String groupName;
     private String mParam2;
 
 
@@ -29,13 +26,11 @@ public class MeetingsFragment extends Fragment {
      * this fragment using the provided parameters.
      * @return A new instance of fragment MeetingsFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static Fragment newInstance() {
+    public static Fragment newInstance(String groupName) {
         Fragment fragment = new MeetingsFragment();
-        /*Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);*/
+        Bundle args = new Bundle();
+        args.putString(GROUP_NAME, groupName);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -47,8 +42,7 @@ public class MeetingsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            groupName = getArguments().getString(GROUP_NAME);
         }
     }
 

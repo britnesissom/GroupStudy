@@ -24,7 +24,7 @@ import java.util.Calendar;
 public class CalendarFragment extends Fragment implements View.OnClickListener {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    public static final String ARG_MENU_CHOICE_NUM = "menu_number";
+    public static final String GROUP_NAME = "groupName";
 
     static TextView users; //**maybe shouldnt be static
     TextView eventDate;
@@ -34,23 +34,20 @@ public class CalendarFragment extends Fragment implements View.OnClickListener {
     ArrayList descriptionList = new ArrayList();
     FragmentManager manager;
 
-    // TODO: Rename and change types of parameters
-    private String menuChoice;
-
+    private String groupName;
     //private OnFragmentInteractionListener mListener;
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment MainPageFragment.
+     * @return A new instance of fragment CalendarFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static Fragment newInstance() {
+    public static Fragment newInstance(String groupName) {
         Fragment fragment = new CalendarFragment();
-        /*Bundle args = new Bundle();
-        args.putString(ARG_MENU_CHOICE_NUM, menuChoiceNum);
-        fragment.setArguments(args);*/
+        Bundle args = new Bundle();
+        args.putString(GROUP_NAME, groupName);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -62,7 +59,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            menuChoice = getArguments().getString(ARG_MENU_CHOICE_NUM);
+            groupName = getArguments().getString(GROUP_NAME);
         }
     }
 

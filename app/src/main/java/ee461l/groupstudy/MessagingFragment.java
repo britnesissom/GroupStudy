@@ -17,17 +17,15 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class MessagingFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    TextView users;
+    private static final String GROUP_NAME = "groupName";
+    private static final String USERNAME = "username";
+    private TextView users;
     private EditText textMessage;
     private TextView displayMessage;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String groupName;
+    private String username;
 
 
     /**
@@ -36,13 +34,12 @@ public class MessagingFragment extends Fragment {
 
      * @return A new instance of fragment MessagingFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static Fragment newInstance() {
+    public static Fragment newInstance(String groupName, String username) {
         Fragment fragment = new MessagingFragment();
-     /*   Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);*/
+        Bundle args = new Bundle();
+        args.putString(GROUP_NAME, groupName);
+        args.putString(USERNAME, username);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -54,8 +51,8 @@ public class MessagingFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            groupName = getArguments().getString(GROUP_NAME);
+            username = getArguments().getString(USERNAME);
         }
     }
 

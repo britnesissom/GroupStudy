@@ -43,13 +43,12 @@ public class GroupsListViewAdapter extends BaseAdapter {
         Button groupButton = (Button) v.findViewById(R.id.groupButton);
         groupButton.setText(groups.get(position).getGroupName());
 
-        //when button is clicked, open file in document viewer program
+        //when button is clicked, open home page for group
         groupButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
 
-                //open fragment for group
             }
         });
         return v;

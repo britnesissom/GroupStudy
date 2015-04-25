@@ -38,7 +38,7 @@ public class NavDrawerGroups extends AppCompatActivity {
 
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame,
-                new GroupHomePageFragment()).commit();
+                GroupHomePageFragment.newInstance(groupName, username)).commit();
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -77,9 +77,6 @@ public class NavDrawerGroups extends AppCompatActivity {
         if (savedInstanceState == null) {
             selectItem(0);
         }
-
-        //to test that the google endpoints module is working
-        //new SendLoginEndpointsAsyncTask().execute(new Pair<Context, String>(this, "Manfred"));
     }
 
     @Override
@@ -117,8 +114,8 @@ public class NavDrawerGroups extends AppCompatActivity {
 
         //go to selected activity
         switch (position) {
-            case 0: //go to home page
-                fragment = AppHomePageFragment.newInstance(username);
+            case 0: //go to group home page
+                fragment = GroupHomePageFragment.newInstance(groupName, username);
                 /*args = new Bundle();
                 args.putInt(MainPageFragment.ARG_MENU_CHOICE_NUM, position);*/
                 break;
@@ -126,16 +123,16 @@ public class NavDrawerGroups extends AppCompatActivity {
                 Intent intent = new Intent(this, NavDrawerHomePage.class);
                 startActivity(intent);
             case 2: //go to calendar
-                fragment = CalendarFragment.newInstance();
+                fragment = CalendarFragment.newInstance(groupName);
                 break;
             case 3: //go to messages
-                fragment = MessagingFragment.newInstance();
+                fragment = MessagingFragment.newInstance(groupName, username);
                 break;
             case 4: //go to files
-                fragment = FileSharingFragment.newInstance();
+                fragment = FileSharingFragment.newInstance(groupName);
                 break;
             case 5: //go to meetings
-                fragment = MeetingsFragment.newInstance();
+                fragment = MeetingsFragment.newInstance(groupName);
                 break;
             case 6: //view info about the app
                 fragment = AboutFragment.newInstance();

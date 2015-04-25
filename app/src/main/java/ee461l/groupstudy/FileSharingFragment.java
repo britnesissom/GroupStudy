@@ -43,9 +43,12 @@ import java.util.List;
  */
 public class FileSharingFragment extends Fragment {
 
+    private static final String GROUP_NAME = "groupName";
+
     private TextView users;
     private ListView files;
     private List<File> filesFromServer;
+    private String groupName;
     private static final String TAG = "FileSharingFragment";
 
     // A request code's purpose is to match the result of a "startActivityForResult" with
@@ -58,11 +61,11 @@ public class FileSharingFragment extends Fragment {
 
      * @return A new instance of fragment FileSharingFragment.
      */
-    public static Fragment newInstance() {
+    public static Fragment newInstance(String groupName) {
         Fragment fragment = new FileSharingFragment();
-        /*Bundle args = new Bundle();
-        args.putString(DRIVE_ID, driveId);
-        fragment.setArguments(args);*/
+        Bundle args = new Bundle();
+        args.putString(GROUP_NAME, groupName);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -75,6 +78,7 @@ public class FileSharingFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         if (getArguments() != null) {
+            groupName = getArguments().getString(GROUP_NAME);
         }
     }
 

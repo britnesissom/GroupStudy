@@ -26,10 +26,11 @@ public class GroupHomePageFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String USERNAME = "username";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String GROUP_NAME = "groupName";
 
     // TODO: Rename and change types of parameters
     private String username;
+    private String groupName;
     private Groups group;
 
 
@@ -40,10 +41,11 @@ public class GroupHomePageFragment extends Fragment {
      * @return A new instance of fragment GroupHomePageFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GroupHomePageFragment newInstance(String username) {
+    public static GroupHomePageFragment newInstance(String groupName, String username) {
         GroupHomePageFragment fragment = new GroupHomePageFragment();
         Bundle args = new Bundle();
         args.putString(USERNAME, username);
+        args.putString(GROUP_NAME, groupName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,6 +61,7 @@ public class GroupHomePageFragment extends Fragment {
 
         if (getArguments() != null) {
             username = getArguments().getString(USERNAME);
+            groupName = getArguments().getString(GROUP_NAME);
         }
 
         LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(), new OnRetrieveSingleGroupTaskCompleted() {
@@ -67,6 +70,7 @@ public class GroupHomePageFragment extends Fragment {
                 group = g;
             }
         });
+        lsgat.execute(groupName);
     }
 
     //will display most recent messages and next three upcoming tasks
@@ -78,25 +82,5 @@ public class GroupHomePageFragment extends Fragment {
         getActivity().setTitle(group.getGroupName() + " Home");
 
         return rootView;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(
-            Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.home_page_add_group, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // handle item selection
-        switch (item.getItemId()) {
-            case R.id.create_group:
-                Intent intent = new Intent(getActivity(), AddGroupActivity.class);
-                intent.putExtra("username", username);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 }
