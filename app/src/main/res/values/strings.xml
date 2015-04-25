@@ -53,4 +53,10 @@
     <!-- Calendar -->
     <string name="addEvent">Add Event</string>
 
+    <!-- Message Fragment -->
+    <string name="edit_message"></string>
+    <string name="display_message"></string>
+    <string name="hint">type a message...</string>
+    <string name="button">SEND</string>
+
 </resources>

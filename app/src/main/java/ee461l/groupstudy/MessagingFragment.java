@@ -3,9 +3,11 @@ package ee461l.groupstudy;
 
 import android.os.Bundle;
 import android.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 
@@ -20,6 +22,8 @@ public class MessagingFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     TextView users;
+    private EditText textMessage;
+    private TextView displayMessage;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -61,7 +65,17 @@ public class MessagingFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_messaging, container, false);
         users = (TextView) rootView.findViewById(R.id.users);
+        textMessage = (EditText) rootView.findViewById(R.id.edit_message);
+        displayMessage = (TextView) rootView.findViewById(R.id.display_message);
         getActivity().setTitle("Messaging");
+
+        textMessage.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                displayMessage.setText(textMessage.getText().toString());
+                return false;
+            }
+        });
         return rootView;
     }
 
