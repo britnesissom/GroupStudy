@@ -9,13 +9,10 @@
     <!--login_screen.xml-->
     <string name="create_account">Create Account</string>
 
-    <!--create_new_account.xml-->
+    <!--create_new_account.xml/login screen-->
     <string name="enter_username">Enter username</string>
     <string name="enter_password">Enter password</string>
     <string name="confirm_password">Re-enter password</string>
-
-    <!--activity_main_page-->
-    <string name="hello_world">Hello world!</string>
 
     <!-- Group Nav Drawer Menu Items -->
     <string-array name="nav_drawer_group_items">
@@ -40,6 +37,9 @@
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_closed">Drawer closed</string>
 
+    <!--App Home Page-->
+    <string name="groups">Groups</string>
+
     <!-- Content Description -->
     <string name="desc_list_item_icon">Item Icon</string>
     <string name="title_activity_nav_drawer">NavDrawerActivity</string>
@@ -53,7 +53,10 @@
     <!-- Calendar -->
     <string name="addEvent">Add Event</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Message Fragment -->
+    <string name="edit_message"></string>
+    <string name="display_message"></string>
+    <string name="hint">type a message...</string>
+    <string name="button">SEND</string>
 
 </resources>
