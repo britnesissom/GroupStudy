@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 
 import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 
 /**
@@ -52,6 +53,7 @@ public class AppHomePageFragment extends Fragment {
     private ListView groupsListView;
     private String username;
     private GroupsListViewAdapter adapter;
+    private User user;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -86,14 +88,15 @@ public class AppHomePageFragment extends Fragment {
 
         groups = new ArrayList<>();
 
-        LoadGroupsEndpointsAsyncTask lgeat = new LoadGroupsEndpointsAsyncTask(getActivity(),
-                new OnRetrieveGroupsTaskCompleted() {
+        //retrieves a single user so their groups can be retrieved and viewed in home page
+        LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(getActivity(),
+                new OnRetrieveSingleUserTaskCompleted() {
             @Override
-            public void onRetrieveGroupsCompleted(List<Groups> groupsList) {
-                groups = groupsList;
+            public void onRetrieveUserCompleted(User u) {
+                user = u;
             }
         });
-        lgeat.execute();
+        lsuat.execute(username);
     }
 
     @Override
@@ -148,19 +151,23 @@ public class AppHomePageFragment extends Fragment {
         }
     }
 
-    private class LoadGroupsEndpointsAsyncTask extends AsyncTask<Void, Void, List<Groups>> {
-        private GroupstudyEndpoint groupsEndpointApi = null;
+    /**
+     * Created by britne on 4/11/15.
+     */
+    private class LoadSingleUserAsyncTask extends AsyncTask<String, Void, User> {
+        private static final String TAG = "LoadSingleUserAsync";
+        private GroupstudyEndpoint usersEndpointApi = null;
         private Context context;
-        private OnRetrieveGroupsTaskCompleted listener;
+        private OnRetrieveSingleUserTaskCompleted listener;
 
-        LoadGroupsEndpointsAsyncTask(Context context, OnRetrieveGroupsTaskCompleted listener) {
+        LoadSingleUserAsyncTask(Context context, OnRetrieveSingleUserTaskCompleted listener) {
             this.context = context;
             this.listener = listener;
         }
 
         @Override
-        protected List<Groups> doInBackground(Void... params) {
-            if(groupsEndpointApi == null) {  // Only do this once
+        protected User doInBackground(String... username) {
+            if(usersEndpointApi == null) {  // Only do this once
                 GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                         new AndroidJsonFactory(), null)
                         // options for running against local devappserver
@@ -175,30 +182,24 @@ public class AppHomePageFragment extends Fragment {
                         });
                 // end options for devappserver
 
-                groupsEndpointApi = builder.build();
+                usersEndpointApi = builder.build();
             }
 
             try {
-                List<Groups> groups = groupsEndpointApi.loadGroups().execute().getItems();
-                Log.i("LoadGroupsAsync", "groups retrieved");
-
-                //no groups have been added yet so objectify returns null
-                //not allowed when setting a list adapter so an empty arraylist needs to be created
-                if (groups == null)
-                    groups = new ArrayList<>();
-
-                return groups;
+                User user = usersEndpointApi.retrieveSingleUser(username[0]).execute();
+                Log.i(TAG, "user retrieved");
+                return user;
             } catch (IOException e) {
-                Log.i("LoadGroupsAsync", "" + e.getMessage());
-                return Collections.EMPTY_LIST;
+                Log.i(TAG, "" + e.getMessage());
+                return null;
             }
         }
 
         @Override
-        protected void onPostExecute(List<Groups> result) {
-            groups.addAll(result);
+        protected void onPostExecute(User result) {
+            groups.addAll(result.getListOfGroups());
             adapter.notifyDataSetChanged();
-            listener.onRetrieveGroupsCompleted(result);
+            listener.onRetrieveUserCompleted(result);
         }
     }
 }

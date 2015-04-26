@@ -3,6 +3,7 @@ package ee461l.groupstudyendpoints;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 
+import java.util.ArrayList;
 
 
 /**
@@ -17,6 +18,7 @@ public class User {
     private String username;
     private String password;
     private boolean adminUser;
+    private ArrayList<Groups> listOfGroups;
 
     public User() {
 
@@ -26,7 +28,20 @@ public class User {
         setUsername(username);
         setPassword(password);
         setId(username);
+        listOfGroups = new ArrayList<>();
         this.adminUser = false;
+    }
+
+    public void addGroup(Groups group) {
+        listOfGroups.add(group);
+    }
+
+    public ArrayList<Groups> getListOfGroups() {
+        return listOfGroups;
+    }
+
+    public void setListOfGroups(ArrayList<Groups> listOfGroups) {
+        this.listOfGroups = listOfGroups;
     }
 
     public String getId() { return id; }

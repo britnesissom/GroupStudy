@@ -46,8 +46,21 @@ public class GroupstudyEndpoint {
 */
         Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
                 newGroup.getGroup().getUsers());
+        updateUsersGroups(newGroup.getGroup().getAdminUser().getId(), group);
         OfyService.ofy().save().entity(group).now();
         return group;
+    }
+
+    /*
+    adds a new group for a specific user so their home page is updated to
+    include the new group
+     */
+    @ApiMethod(name = "updateUsersGroups")
+    public User updateUsersGroups(@Named("adminUsername") String username, Groups group) {
+        User u = OfyService.ofy().load().type(User.class).id(username).now();
+        u.addGroup(group);
+        OfyService.ofy().save().entity(u).now();
+        return u;
     }
 
     /**
