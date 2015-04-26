@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,6 +18,7 @@ import android.widget.ListView;
 
 public class NavDrawerGroups extends AppCompatActivity {
 
+    private static final String TAG = "NavDrawerGroups";
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private String[] navMenuTitles;
@@ -31,6 +33,8 @@ public class NavDrawerGroups extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nav_drawer_layout);
+
+        Log.i(TAG, "NavDrawerGroup opened");
 
         //default view when group is opened is list of tasks?
         groupName = getIntent().getStringExtra("groupName");

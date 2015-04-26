@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
@@ -77,7 +78,17 @@ public class CreateNewAccountActivity extends AppCompatActivity {
                 user = userLogin;
             }
         });
-        lsuat.execute(username.getText().toString());
+
+        //fix this because it defeats purpose of async task
+        try {
+            user = lsuat.execute(username.getText().toString()).get();
+        }
+        catch(InterruptedException e) {
+            Log.e(TAG, "InterruptedException: " + e.getMessage());
+        }
+        catch(ExecutionException e) {
+            Log.e(TAG, "ExecutionException: " + e.getMessage());
+        }
 
         //if user doesn't exist, add new user to list of users
         //else, tell them to choose a new name
@@ -111,6 +122,7 @@ public class CreateNewAccountActivity extends AppCompatActivity {
         createPassword.setText("");
         confirmPassword.setText("");
     }
+/*
 
     private boolean checkIfUserExists(String user) {
         for (int i = 0; i < users.size(); i++) {
@@ -119,5 +131,6 @@ public class CreateNewAccountActivity extends AppCompatActivity {
         }
         return false;
     }
+*/
 
 }

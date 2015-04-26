@@ -150,11 +150,4 @@ public class NavDrawerHomePage extends AppCompatActivity {
         mTitle = title;
         getSupportActionBar().setTitle(mTitle);
     }
-
-    //changes to group specific nav drawer
-    public void newNavDrawerActivity(View view) {
-        Intent intent = new Intent(this, NavDrawerGroups.class);
-        intent.putExtra("username", username);
-        startActivity(intent);
-    }
 }

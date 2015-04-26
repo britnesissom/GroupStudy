@@ -22,6 +22,7 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
  * Created by britne on 4/11/15.
  */
 class LoadSingleGroupAsyncTask extends AsyncTask<String, Void, Groups> {
+    private static final String TAG = "LoadSingleGroupAsync";
     private static GroupstudyEndpoint groupEndpointApi = null;
     private Context context;
     private OnRetrieveSingleGroupTaskCompleted listener;
@@ -53,10 +54,10 @@ class LoadSingleGroupAsyncTask extends AsyncTask<String, Void, Groups> {
 
         try {
             Groups group = groupEndpointApi.retrieveSingleGroup(groupName[0]).execute();
-            Log.i("LoadSingleGroup", "group retrieved");
+            Log.i(TAG, "group retrieved");
             return group;
         } catch (IOException e) {
-            Log.i("LoadSingleGroup", "" + e.getMessage());
+            Log.i(TAG, "Error: " + e.getMessage());
             return null;
         }
     }

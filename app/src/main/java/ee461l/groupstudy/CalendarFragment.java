@@ -25,6 +25,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String GROUP_NAME = "groupName";
+    private static final String TAG = "CalendarFragment";
 
     static TextView users; //**maybe shouldnt be static
     TextView eventDate;

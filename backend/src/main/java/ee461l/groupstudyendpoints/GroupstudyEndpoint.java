@@ -54,7 +54,8 @@ public class GroupstudyEndpoint {
     public Groups retrieveSingleGroup(@Named("groupName") String groupName) {
 
         //will return null if group does not exist
-        return OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        return group;
     }
 
     //loads the list of groups in the app

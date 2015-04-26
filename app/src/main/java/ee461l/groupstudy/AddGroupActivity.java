@@ -23,13 +23,16 @@ public class AddGroupActivity extends AppCompatActivity {
     private EditText teammates;
     private List<User> users;
     private User adminUser;
+    private String user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group);
 
-        String admin = getIntent().getStringExtra("username");
+        Log.i(TAG, "AddGroup created");
+
+        user = getIntent().getStringExtra("username");
 
         //retrieves user to set as admin
         LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
@@ -38,7 +41,7 @@ public class AddGroupActivity extends AppCompatActivity {
                 adminUser = user;
             }
         });
-        lsuat.execute(admin);
+        lsuat.execute(user);
 
         groupName = (EditText) findViewById(R.id.group_name);
         teammates = (EditText) findViewById(R.id.teammates);
@@ -53,56 +56,20 @@ public class AddGroupActivity extends AppCompatActivity {
         lueat.execute();
     }
 
-    /*
-    adds listener to spinner to retrieve the selection for each department
-    spinner and use it to pick the correct class
-     */
-    //this is for if we have time to create dynamic spinners that retrieve a list of people in that class
-
-    /*public void addListenerOnSpinnerSelection() {
-        departmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                //if spinner hasn't initialized yet then don't try to get selected item
-                //because it will be null
-                if (initializedView == false) {
-                    initializedView = true;
-                } else {
-                    if (departmentSpinner.getSelectedItem().toString().equals("Electrical Engineering")) {
-                        populateClassSpinner("ee");
-                    } else if (departmentSpinner.getSelectedItem().toString().equals("Mathematics")) {
-                        populateClassSpinner("math");
-                    }
-                }
-            }
-
-            //option if user has just opened app or never actually chooses a type
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }*/
-
     public void createGroup(View view) {
+        //needs to be called here again b/c if 2 groups are created in a row
+        //there is no username to pass to the async task
+
         String delimiters = ",[ ]*";
         String nameOfGroup = groupName.getText().toString();
         String usernames = teammates.getText().toString();
         String[] usernamesArray = teammates.getText().toString().split(delimiters);
         ArrayList<User> listOfUsers = getUsersFromArray(usernamesArray);
-        Log.i(TAG,"" + usernames);
+
+        Log.i(TAG, "CreateGroup async about to be called");
         CreateGroupEndpointsAsyncTask cgeat = new CreateGroupEndpointsAsyncTask(this, nameOfGroup,
                 adminUser, listOfUsers);
         cgeat.execute();
-
-        //pass name of group and username to next activity so if user creates another group
-        //the app knows who the admin should be
-        Intent intent = new Intent(this, NavDrawerGroups.class);
-        intent.putExtra("group name", nameOfGroup);
-        intent.putExtra("username", getIntent().getStringExtra("username"));
-        startActivity(intent);
     }
 
     //group needs arraylist of users not just their usernames

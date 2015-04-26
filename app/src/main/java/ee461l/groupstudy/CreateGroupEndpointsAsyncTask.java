@@ -1,6 +1,7 @@
 package ee461l.groupstudy;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -22,7 +23,9 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
 /**
  * Created by britne on 4/11/15.
  */
-class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Void> {
+class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Groups> {
+
+    private static final String TAG = "CreateGroupAsync";
     private static GroupstudyEndpoint groupEndpointApi = null;
     private Context context;
     private GroupWrapperEntity groupWrapper;
@@ -39,7 +42,7 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Groups doInBackground(Void... params) {
         if(groupEndpointApi == null) {  // Only do this once
             GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
@@ -60,15 +63,24 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Void> {
 
         //createUser(name, password)
         try {
-            groupEndpointApi.createGroup(groupWrapper).execute();
+            Groups group = groupEndpointApi.createGroup(groupWrapper).execute();
+            Log.i(TAG, "admin name: " + group.getAdminUser().getUsername());
+            return group;
         } catch (IOException e) {
-            Log.i("CreateGroupAsync", "" + e.getMessage());
+            Log.i(TAG, "" + e.getMessage());
         }
 
         return null;
     }
 
     @Override
-    protected void onPostExecute(Void result){
+    protected void onPostExecute(Groups result) {
+
+        //pass name of group and username to next activity so if user creates another group
+        //the app knows who the admin should be
+        Intent intent = new Intent(context, NavDrawerGroups.class);
+        intent.putExtra("group name", result.getGroupName());
+        intent.putExtra("username", result.getAdminUser().getUsername());
+        context.startActivity(intent);
     }
 }

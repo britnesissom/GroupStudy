@@ -3,6 +3,7 @@ package ee461l.groupstudy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,12 +12,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 
 public class LoginScreenActivity extends AppCompatActivity {
 
+    private static final String TAG = "LoginScreen";
     private EditText username;
     private EditText password;
     private User user;
@@ -64,7 +67,17 @@ public class LoginScreenActivity extends AppCompatActivity {
                 user = userLogin;
             }
         });
-        lsuat.execute(username.getText().toString());
+
+        //defeats purpose of async task
+        try {
+            user = lsuat.execute(username.getText().toString()).get();
+        }
+        catch(InterruptedException e) {
+            Log.e(TAG, "InterruptedException: " + e.getMessage());
+        }
+        catch(ExecutionException e) {
+            Log.e(TAG, "ExecutionException: " + e.getMessage());
+        }
 
         //username, password combo is correct so log in the user
         if (user != null && user.getPassword().equals(passwordText)) {

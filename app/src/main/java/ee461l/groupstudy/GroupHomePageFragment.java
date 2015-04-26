@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.util.concurrent.ExecutionException;
+
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 
@@ -25,6 +27,7 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 public class GroupHomePageFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String TAG = "GroupHomePage";
     private static final String USERNAME = "username";
     private static final String GROUP_NAME = "groupName";
 
@@ -47,6 +50,8 @@ public class GroupHomePageFragment extends Fragment {
         args.putString(USERNAME, username);
         args.putString(GROUP_NAME, groupName);
         fragment.setArguments(args);
+
+        Log.i(TAG, "Group home fragment instantiated");
         return fragment;
     }
 
@@ -59,6 +64,8 @@ public class GroupHomePageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+        Log.i(TAG, "Group home fragment created");
+
         if (getArguments() != null) {
             username = getArguments().getString(USERNAME);
             groupName = getArguments().getString(GROUP_NAME);
@@ -70,7 +77,16 @@ public class GroupHomePageFragment extends Fragment {
                 group = g;
             }
         });
-        lsgat.execute(groupName);
+
+        try {
+            group = lsgat.execute(groupName).get();
+        }
+        catch (InterruptedException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        catch (ExecutionException e) {
+            Log.e(TAG, e.getMessage());
+        }
     }
 
     //will display most recent messages and next three upcoming tasks
@@ -80,6 +96,8 @@ public class GroupHomePageFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_group_home_page, container, false);
         getActivity().setTitle(group.getGroupName() + " Home");
+        Log.i(TAG, "Group home fragment open");
+        Log.i(TAG, "admin username: " + group.getAdminUser().getUsername());
 
         return rootView;
     }

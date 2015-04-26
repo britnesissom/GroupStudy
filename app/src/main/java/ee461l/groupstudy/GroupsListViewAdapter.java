@@ -1,6 +1,8 @@
 package ee461l.groupstudy;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +22,17 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 public class GroupsListViewAdapter extends BaseAdapter {
     private List<Groups> groups;
     private Context context;
+    private int layoutResourceId;
+    private String groupName;
 
-    public GroupsListViewAdapter(Context context, List<Groups> groups) {
+    static class ViewHolder {
+        Button groupButton;
+    }
+
+    public GroupsListViewAdapter(Context context, int layoutResourceId, List<Groups> groups) {
         this.context = context;
         this.groups = groups;
+        this.layoutResourceId = layoutResourceId;
     }
 
     @Override
@@ -33,25 +42,51 @@ public class GroupsListViewAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View v;
+        ViewHolder v;
 
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        v = inflater.inflate(R.layout.home_page_groups_list_item, null);
+        if (convertView == null) {
+            // inflate the layout
+            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+            convertView = inflater.inflate(layoutResourceId, parent, false);
+
+            // well set up the ViewHolder
+            v = new ViewHolder();
+            v.groupButton = (Button) convertView.findViewById(R.id.groupButton);
+
+            // store the holder with the view.
+            convertView.setTag(v);
+        }
+        else {
+            // we've just avoided calling findViewById() on resource every time
+            // just use the viewHolder
+            v = (ViewHolder) convertView.getTag();
+        }
+
+        Groups group = groups.get(position);
+
+        // assign values if the object is not null
+        if(group != null) {
+            // get the Button from the ViewHolder and then set the text (group name)
+            // and tag (item ID) values
+            v.groupButton.setText(group.getGroupName());
+            groupName = group.getGroupName();
+            v.groupButton.setTag(group.getId());
+
+            v.groupButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, NavDrawerGroups.class);
+                    intent.putExtra("groupName", groupName);
+                    context.startActivity(intent);
+                }
+            });
+        }
 
         //load Button for single file
-        Button groupButton = (Button) v.findViewById(R.id.groupButton);
-        groupButton.setText(groups.get(position).getGroupName());
+        /*Button groupButton = (Button) v.findViewById(R.id.groupButton);
+        groupButton.setText(groups.get(position).getGroupName());*/
 
-        //when button is clicked, open home page for group
-        groupButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-        return v;
+        return convertView;
     }
 
     @Override

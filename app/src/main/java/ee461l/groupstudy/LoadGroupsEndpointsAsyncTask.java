@@ -22,13 +22,16 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
  * Created by britne on 4/11/15.
  */
 class LoadGroupsEndpointsAsyncTask extends AsyncTask<Void, Void, List<Groups>> {
+    private static final String TAG = "LoadGroupsAsync";
     private static GroupstudyEndpoint groupsEndpointApi = null;
     private Context context;
     private OnRetrieveGroupsTaskCompleted listener;
+    private GroupsListViewAdapter adapter;
 
-    LoadGroupsEndpointsAsyncTask(Context context, OnRetrieveGroupsTaskCompleted listener) {
+    LoadGroupsEndpointsAsyncTask(GroupsListViewAdapter adapter, Context context, OnRetrieveGroupsTaskCompleted listener) {
         this.context = context;
         this.listener = listener;
+        this.adapter = adapter;
     }
 
     @Override
@@ -53,7 +56,7 @@ class LoadGroupsEndpointsAsyncTask extends AsyncTask<Void, Void, List<Groups>> {
 
         try {
             List<Groups> groups = groupsEndpointApi.loadGroups().execute().getItems();
-            Log.i("LoadGroupsAsync", "groups retrieved");
+            Log.i(TAG, "groups retrieved");
 
             //no groups have been added yet so objectify returns null
             //not allowed when setting a list adapter so an empty arraylist needs to be created
@@ -62,13 +65,14 @@ class LoadGroupsEndpointsAsyncTask extends AsyncTask<Void, Void, List<Groups>> {
 
             return groups;
         } catch (IOException e) {
-            Log.i("LoadGroupsAsync", "" + e.getMessage());
+            Log.i(TAG, "" + e.getMessage());
             return Collections.EMPTY_LIST;
         }
     }
 
     @Override
     protected void onPostExecute(List<Groups> result) {
+        adapter.notifyDataSetChanged();
         listener.onRetrieveGroupsCompleted(result);
     }
 }
