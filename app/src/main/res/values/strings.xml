@@ -17,6 +17,7 @@
     <!-- Group Nav Drawer Menu Items -->
     <string-array name="nav_drawer_group_items">
         <item >Home</item>
+        <item >Groups</item>
         <item >Calendar</item>
         <item >Messages</item>
         <item >Files</item>

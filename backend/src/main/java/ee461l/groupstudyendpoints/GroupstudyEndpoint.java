@@ -18,6 +18,7 @@ import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.inject.Named;
 
@@ -28,6 +29,8 @@ import javax.inject.Named;
         namespace = @ApiNamespace(ownerDomain = "groupstudyEndpoints.ee461l",
                 ownerName = "groupstudyEndpoints.ee461l", packagePath = ""))
 public class GroupstudyEndpoint {
+
+    private static final Logger LOGGER = Logger.getLogger(GroupstudyEndpoint.class.getName());
 
     public GroupstudyEndpoint() {
 
@@ -52,9 +55,9 @@ public class GroupstudyEndpoint {
      */
     @ApiMethod(name = "retrieveSingleGroup")
     public Groups retrieveSingleGroup(@Named("groupName") String groupName) {
-
         //will return null if group does not exist
         Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        LOGGER.info(group.getAdminUser().getUsername());
         return group;
     }
 

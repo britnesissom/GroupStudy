@@ -125,6 +125,7 @@ public class NavDrawerGroups extends AppCompatActivity {
                 break;
             case 1: //go to app's home page not group home page
                 Intent intent = new Intent(this, NavDrawerHomePage.class);
+                intent.putExtra("username", username);
                 startActivity(intent);
             case 2: //go to calendar
                 fragment = CalendarFragment.newInstance(groupName);

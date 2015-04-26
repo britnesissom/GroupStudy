@@ -4,16 +4,18 @@
 
     <TextView
         android:id="@+id/display_message"
-        android:layout_width="match_parent" android:layout_height="match_parent"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
     <EditText android:id="@+id/edit_message"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:hint="@+id/hint"
         android:layout_gravity="start|bottom" />
-    <Button android:layout_height="wrap_content"
+    <Button
+        android:id="@+id/sendButton"
+        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:text="@+id/button"
-        android:layout_gravity="end|bottom"
-        android:onClick="sendMessage"/>
+        android:layout_gravity="end|bottom"/>
 
 </FrameLayout>
