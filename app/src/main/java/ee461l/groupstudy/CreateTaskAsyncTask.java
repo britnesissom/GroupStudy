@@ -20,7 +20,7 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 /**
  * Created by RyanMcClure on 4/27/15.
  */
-public class CreateTaskAsyncTask extends AsyncTask<String, Void, Groups> { //first String is task
+public class CreateTaskAsyncTask extends AsyncTask<String, Void, Void> { //first String is task
 
     private static final String TAG = "CreateTaskAsync";
     private static GroupstudyEndpoint groupEndpointApi = null;
@@ -33,7 +33,7 @@ public class CreateTaskAsyncTask extends AsyncTask<String, Void, Groups> { //fir
     }
 
     @Override
-    protected Groups doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         if(groupEndpointApi == null) {  // Only do this once
             GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)

@@ -35,6 +35,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener {
     ArrayList timeList = new ArrayList();
     ArrayList descriptionList = new ArrayList();
     FragmentManager manager;
+    boolean dateCancel = false;
 
     private String groupName;
     //private OnFragmentInteractionListener mListener;
@@ -130,25 +131,42 @@ public class CalendarFragment extends Fragment implements View.OnClickListener {
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                // get user input and set it to result
-                                descriptionList.add(userInput.getText().toString());
-                                int index = descriptionList.indexOf(userInput.getText().toString());
-                                if (index == 0) {
-                                    users.setText(dateList.get(index).toString() + " "
-                                            + timeList.get(index).toString() + ": " +
-                                            descriptionList.get(index).toString());
+                                if (dateCancel) {
+                                    // already removed date and time
+                                } else if (dateList.size() > timeList.size()) {
+                                    //date not canceled but time was
+                                    dateList.remove(dateList.size() - 1);
                                 } else {
-                                    users.append("\n" + dateList.get(index).toString());
-                                    users.append(" " + timeList.get(index).toString() + ": ");
-                                    users.append(descriptionList.get(index).toString());
+                                    // get user input and set it to result
+                                    descriptionList.add(userInput.getText().toString());
+                                    int index = descriptionList.indexOf(userInput.getText().toString());
+                                    if (index == 0) {
+                                        users.setText(dateList.get(index).toString() + " "
+                                                + timeList.get(index).toString() + ": " +
+                                                descriptionList.get(index).toString());
+                                    } else {
+                                        users.append("\n" + dateList.get(index).toString());
+                                        users.append(" " + timeList.get(index).toString() + ": ");
+                                        users.append(descriptionList.get(index).toString());
+                                    }
+                                    CreateTaskAsyncTask ctat = new CreateTaskAsyncTask(getActivity(), groupName);
+                                    ctat.execute(dateList.get(index).toString() + " " + timeList.get(index).toString() + ": " + descriptionList.get(index).toString());
                                 }
                             }
                         })
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                dateList.remove(dateList.size() - 1);
-                                timeList.remove(timeList.size() - 1);
+                                if (dateCancel) {
+                                    // already removed date and time
+                                } else if (dateList.size() > timeList.size()) {
+                                    //date not canceled but time was
+                                    dateList.remove(dateList.size() - 1);
+                                } else if (dateList.size() == timeList.size()) {
+                                    //date not canceled, time not canceled
+                                    dateList.remove(dateList.size() - 1);
+                                    timeList.remove(timeList.size() - 1);
+                                }
                                 dialog.cancel();
                             }
                         });
@@ -156,10 +174,14 @@ public class CalendarFragment extends Fragment implements View.OnClickListener {
         // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
 
+        //initialize each time
+        dateCancel = false;
+
         // show all of them
-        alertDialog.show();
-        timeDialog.show();
-        dialog.show();
+        alertDialog.show(); //description
+                            //location
+        timeDialog.show(); //time
+        dialog.show();  //date
 
     }
 
@@ -195,20 +217,27 @@ public class CalendarFragment extends Fragment implements View.OnClickListener {
             int mMinute = minute;
             boolean AM = false;
 
-            if (mHour < 12){
-                AM = true;
+            if(dateList.size() == timeList.size()){
+                // a date wasn't added, it was canceled
+                dateCancel = true;
             } else {
-                mHour -= 12;
+                if (mHour < 12) {
+                    AM = true;
+                }
+                if (mHour == 12) {
+                    //don't change it
+                } else {
+                    mHour -= 12;
+                }
+                if (AM) {
+                    eventTime.setText(new StringBuilder()
+                            .append(mHour).append(":").append(mMinute).append("am"));
+                } else {
+                    eventTime.setText(new StringBuilder()
+                            .append(mHour).append(":").append(mMinute).append("pm"));
+                }
+                timeList.add(eventTime.getText().toString());
             }
-            if(AM) {
-                eventTime.setText(new StringBuilder()
-                        .append(mHour).append(":").append(mMinute).append("am"));
-            } else {
-                eventTime.setText(new StringBuilder()
-                        .append(mHour).append(":").append(mMinute).append("pm"));
-            }
-            timeList.add(eventTime.getText().toString());
-
         }
 
 
