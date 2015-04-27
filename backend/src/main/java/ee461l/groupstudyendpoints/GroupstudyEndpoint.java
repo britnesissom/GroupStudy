@@ -16,6 +16,7 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.cmd.Query;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -41,12 +42,34 @@ public class GroupstudyEndpoint {
      */
     @ApiMethod(name = "createGroup")
     public Groups createGroup(GroupWrapperEntity newGroup) {
-    /*    User testAdminUser = new User("Abraham", "1234");
-        Groups groups = new Groups("GroupStudy", testAdminUser);
-*/
         Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
                 newGroup.getGroup().getUsers());
         updateUsersGroups(newGroup.getGroup().getAdminUser().getId(), group);
+        OfyService.ofy().save().entity(group).now();
+        return group;
+    }
+
+    /**
+     * An endpoint that adds a task to a specific group
+     */
+    @ApiMethod(name = "createTask")
+    public Groups createTask(@Named("groupName") String groupName, @Named("task") String task) {
+        //will return null if group does not exist
+        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        group.addTask(task);
+        OfyService.ofy().save().entity(group).now();
+        return group;
+    }
+
+    /**
+     * An endpoint that adds a task to a specific group
+     */
+    @ApiMethod(name = "addFile")
+    public Groups addFile(@Named("groupName") String groupName, @Named("file") String file) {
+        byte[] fileBytes = file.getBytes(Charset.forName("UTF-8"));
+        //will return null if group does not exist
+        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        group.addFile(fileBytes);
         OfyService.ofy().save().entity(group).now();
         return group;
     }

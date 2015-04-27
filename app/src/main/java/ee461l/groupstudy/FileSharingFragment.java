@@ -1,8 +1,6 @@
 package ee461l.groupstudy;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -18,6 +16,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
+import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -29,12 +33,17 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -168,35 +177,87 @@ public class FileSharingFragment extends Fragment {
             if (resultData != null) {
                 androidUri = resultData.getData();
 
-                try {
-                    InputStream fileInputStream = getActivity().getContentResolver().openInputStream(androidUri);
-                    String uriString = fileInputStream.toString();
+
+                    //InputStream fileInputStream = getActivity().getContentResolver().openInputStream(androidUri);
+                    //String uriString = fileInputStream.toString();
                     Log.i(TAG, "Android Uri: " + androidUri.toString());
-                    Log.i(TAG, "String uri: " + uriString);
+                    //Log.i(TAG, "String uri: " + uriString);
 
                     //begin sending file to server
-                    SendFileToServer sendFile = new SendFileToServer();
-                    sendFile.execute(uriString);
-                }
-                catch(FileNotFoundException e) {
+                    SendFileToGroupEndpoint sendFile = new SendFileToGroupEndpoint();
+                    sendFile.execute(androidUri);
+
+                /*catch(FileNotFoundException e) {
                     Log.i(TAG, "file not found");
                     e.printStackTrace();
-                }
+                }*/
             }
             // END_INCLUDE (parse_open_document_response)
         }
     }
 
-    private class SendFileToServer extends AsyncTask<String, Void, String> {
+    //convert file to byte array then save it as entity in group
+    private class SendFileToGroupEndpoint extends AsyncTask<Uri, Void, Void> {
+        private GroupstudyEndpoint groupEndpointApi = null;
 
+        //need to open endpoint for saving
+        //convert file to byte array to save
+        //save file to arraylist for files in specific group
         @Override
-        protected String doInBackground(String... uri) {
+        protected Void doInBackground(Uri... uri) {
+            if(groupEndpointApi == null) {  // Only do this once
+                GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
+                        new AndroidJsonFactory(), null)
+                        // options for running against local devappserver
+                        // - 10.0.2.2 is localhost's IP address in Android emulator
+                        // - turn off compression when running against local devappserver
+                        .setRootUrl("https://groupstudy-ee-461l.appspot.com/_ah/api")
+                        .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                            @Override
+                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                                abstractGoogleClientRequest.setDisableGZipContent(true);
+                            }
+                        });
+                // end options for devappserver
 
-            String responseString;
+                groupEndpointApi = builder.build();
+            }
 
+            String responseString = "";
+
+            File file = new File(uri[0].getPath());
+
+            Log.i(TAG, "file length: " + file.length());
+
+            InputStream fileInputStream = null;
+            byte[] bFile = new byte[(int) file.length()];
+
+            try
+            {
+                //convert file into array of bytes
+                fileInputStream = new BufferedInputStream(new FileInputStream(file));
+                int i = fileInputStream.read(bFile);
+                fileInputStream.close();
+
+                Log.i(TAG, "inputStream length: " + i);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            //createUser(name, password)
+            try {
+                String fileBytes = new String(bFile, "UTF-8");
+                groupEndpointApi.addFile(groupName, fileBytes).execute();
+                Log.i(TAG, "file added to group");
+
+            } catch (IOException e) {
+                Log.i(TAG, "" + e.getMessage());
+            }
             //need to add group name after ".com"
             //so we know where the file is saved
-            String serverUrl = "http://groupstudy-ee-461l.appspot.com";
+            /*String serverUrl = "http://groupstudy-ee-461l.appspot.com";
 
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httppost = new HttpPost(serverUrl);
@@ -227,25 +288,14 @@ public class FileSharingFragment extends Fragment {
                 responseString = e.toString();
             } catch (IOException e) {
                 responseString = e.toString();
-            }
-
-            return responseString;
-
+            }*/
+            return null;
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            Log.e(TAG, "Response from server: " + result);
-
-            new AlertDialog.Builder(getActivity())
-                    .setTitle("Success!")
-                    .setMessage("File uploaded!")
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            //go back to ingredients screen
-                        }
-                    })
-                    .show();
+        protected void onPostExecute(Void result) {
+            Toast.makeText(getActivity().getApplicationContext(), "File uploaded!",
+                    Toast.LENGTH_LONG).show();
 
             super.onPostExecute(result);
         }
