@@ -23,6 +23,7 @@ import java.util.Calendar;
 
 public class CalendarFragment extends Fragment implements View.OnClickListener {
 
+    //why tf isn't it working
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String GROUP_NAME = "groupName";
     private static final String TAG = "CalendarFragment";
