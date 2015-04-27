@@ -23,7 +23,7 @@ public class RetrieveFilesFromServer {
 
     private List<File> files;
     private static final String TAG = "RetrieveFilesFromServer";
-    private String url = "http://groupstudy-ee-461l.appspot.com/";
+    private String url = "http://groupstudy-461l.appspot.com/";
     private String groupName;
 
     public RetrieveFilesFromServer(String groupName) {
