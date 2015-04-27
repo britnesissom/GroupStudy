@@ -211,7 +211,7 @@ public class FileSharingFragment extends Fragment {
                         // options for running against local devappserver
                         // - 10.0.2.2 is localhost's IP address in Android emulator
                         // - turn off compression when running against local devappserver
-                        .setRootUrl("https://groupstudy-ee-461l.appspot.com/_ah/api")
+                        .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
                         .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                             @Override
                             public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
@@ -257,7 +257,7 @@ public class FileSharingFragment extends Fragment {
             }
             //need to add group name after ".com"
             //so we know where the file is saved
-            /*String serverUrl = "http://groupstudy-ee-461l.appspot.com";
+            /*String serverUrl = "http://groupstudy-461l.appspot.com";
 
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httppost = new HttpPost(serverUrl);

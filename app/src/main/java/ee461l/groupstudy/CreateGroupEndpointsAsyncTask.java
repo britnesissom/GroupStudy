@@ -49,7 +49,7 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Groups> {
                     // options for running against local devappserver
                     // - 10.0.2.2 is localhost's IP address in Android emulator
                     // - turn off compression when running against local devappserver
-                    .setRootUrl("https://groupstudy-ee-461l.appspot.com/_ah/api")
+                    .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
                     .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                         @Override
                         public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
