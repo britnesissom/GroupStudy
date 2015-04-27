@@ -40,6 +40,8 @@ public class NavDrawerGroups extends AppCompatActivity {
         groupName = getIntent().getStringExtra("groupName");
         username = getIntent().getStringExtra("username");
 
+        
+
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame,
                 GroupHomePageFragment.newInstance(groupName, username)).commit();

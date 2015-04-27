@@ -79,6 +79,7 @@ public class GroupHomePageFragment extends Fragment {
         });
 
         try {
+            Log.i(TAG, "group name: " + groupName);
             group = lsgat.execute(groupName).get();
         }
         catch (InterruptedException e) {
