@@ -44,8 +44,8 @@ public class GroupstudyEndpoint {
     public Groups createGroup(GroupWrapperEntity newGroup) {
         Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
                 newGroup.getGroup().getUsers());
-        updateUsersGroups(newGroup.getGroup().getAdminUser().getId(), group);
         OfyService.ofy().save().entity(group).now();
+        updateUsersGroups(newGroup.getGroup().getAdminUser().getId(), group);
         return group;
     }
 
@@ -62,7 +62,7 @@ public class GroupstudyEndpoint {
     }
 
     /**
-     * An endpoint that adds a task to a specific group
+     * An endpoint that adds a file to a specific group
      */
     @ApiMethod(name = "addFile")
     public Groups addFile(@Named("groupName") String groupName, @Named("file") String file) {
@@ -81,6 +81,8 @@ public class GroupstudyEndpoint {
     @ApiMethod(name = "updateUsersGroups")
     public User updateUsersGroups(@Named("adminUsername") String username, Groups group) {
         User u = OfyService.ofy().load().type(User.class).id(username).now();
+        LOGGER.info("user's groups size: " + u.getListOfGroups().size());
+        LOGGER.info("updateUsersGroups group name: " + group.getGroupName());
         u.addGroup(group);
         OfyService.ofy().save().entity(u).now();
         return u;

@@ -16,6 +16,9 @@ import java.util.List;
 /**
  * Created by britne on 4/21/15.
  */
+/*
+make sure when retrieving file to convert the string to a byte array then read it in!!
+ */
 public class RetrieveFilesFromServer {
 
     private List<File> files;

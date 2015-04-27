@@ -11,9 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.parse.Parse;
-import com.parse.ParseInstallation;
-
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 

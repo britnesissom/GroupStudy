@@ -1,9 +1,15 @@
 package ee461l.groupstudyendpoints;
 
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
+import com.googlecode.objectify.annotation.Load;
+import com.googlecode.objectify.annotation.OnLoad;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 
 /**
@@ -13,12 +19,21 @@ import java.util.ArrayList;
 @Entity
 public class User {
 
+    private static final Logger LOGGER = Logger.getLogger(User.class.getName());
+
     @Id
     String id;
     private String username;
     private String password;
     private boolean adminUser;
-    private ArrayList<Groups> listOfGroups;
+
+    //why does adding this break objectify? something to do with entities containing
+    //each other I assume
+    @Load
+    private transient ArrayList<Ref<Groups>> listOfGroups;
+
+    @Ignore
+    private ArrayList<Groups> groupsToReturn;
 
     public User() {
 
@@ -29,18 +44,35 @@ public class User {
         setPassword(password);
         setId(username);
         listOfGroups = new ArrayList<>();
+        groupsToReturn = new ArrayList<>();
         this.adminUser = false;
     }
 
+    @OnLoad
+    public void deRef() {
+        if (listOfGroups != null) {
+            for (Ref<Groups> group : listOfGroups) {
+                if (group.isLoaded()) {
+                    groupsToReturn.add(group.get());
+                }
+            }
+        }
+    }
+
     public void addGroup(Groups group) {
-        listOfGroups.add(group);
+        Ref<Groups> g = Ref.create(Key.create(Groups.class, group.getId()));
+        //Ref<Groups> g = Ref.create(group);
+        LOGGER.info("Key: " + g.get().getGroupName());
+        LOGGER.info("listOfGroups size: " + listOfGroups.size());
+        listOfGroups.add(g);
+        LOGGER.info("group added!");
     }
 
     public ArrayList<Groups> getListOfGroups() {
-        return listOfGroups;
+        return groupsToReturn;
     }
 
-    public void setListOfGroups(ArrayList<Groups> listOfGroups) {
+    public void setListOfGroups(ArrayList<Ref<Groups>> listOfGroups) {
         this.listOfGroups = listOfGroups;
     }
 

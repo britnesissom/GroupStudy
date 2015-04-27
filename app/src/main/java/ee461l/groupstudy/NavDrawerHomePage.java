@@ -37,7 +37,7 @@ public class NavDrawerHomePage extends AppCompatActivity {
         //default view when app is loaded is the home page
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame,
-                new AppHomePageFragment()).commit();
+                AppHomePageFragment.newInstance(username)).commit();
 
         mTitle = mDrawerTitle = getTitle();
 

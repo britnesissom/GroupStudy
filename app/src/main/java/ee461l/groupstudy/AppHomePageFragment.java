@@ -88,6 +88,15 @@ public class AppHomePageFragment extends Fragment {
 
         groups = new ArrayList<>();
 
+        /*LoadGroupsEndpointsAsyncTask lsuat = new LoadGroupsEndpointsAsyncTask(adapter, getActivity(),
+                new OnRetrieveGroupsTaskCompleted() {
+                    @Override
+                    public void onRetrieveGroupsCompleted(List<Groups> u) {
+                        groups = u;
+                    }
+                });
+        lsuat.execute();*/
+
         //retrieves a single user so their groups can be retrieved and viewed in home page
         LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(getActivity(),
                 new OnRetrieveSingleUserTaskCompleted() {
@@ -188,6 +197,9 @@ public class AppHomePageFragment extends Fragment {
             try {
                 User user = usersEndpointApi.retrieveSingleUser(username[0]).execute();
                 Log.i(TAG, "user retrieved");
+
+                if (user.getListOfGroups() != null && user.getListOfGroups().size() > 0)
+                    Log.i(TAG, "user's groups: " + user.getListOfGroups().get(0).getGroupName());
                 return user;
             } catch (IOException e) {
                 Log.i(TAG, "" + e.getMessage());
@@ -197,7 +209,13 @@ public class AppHomePageFragment extends Fragment {
 
         @Override
         protected void onPostExecute(User result) {
-            groups.addAll(result.getListOfGroups());
+
+            if (result.getListOfGroups() == null)
+                groups.addAll(new ArrayList<Groups>());
+            else {
+                groups.addAll(result.getListOfGroups());
+            }
+
             adapter.notifyDataSetChanged();
             listener.onRetrieveUserCompleted(result);
         }

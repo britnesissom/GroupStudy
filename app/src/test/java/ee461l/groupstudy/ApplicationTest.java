@@ -6,9 +6,10 @@ import android.test.ApplicationTestCase;
 
 import org.junit.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import ee461l.groupstudyendpoints.userEndpoint.model.User;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
@@ -18,6 +19,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     List<User> users;
+    User testUser;
 
     @Override
     @Before
@@ -25,13 +27,6 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         new CreateUserEndpointsAsyncTask(getContext()).execute("John","123");
         new CreateUserEndpointsAsyncTask(getContext()).execute("Sue","1234");
         new CreateUserEndpointsAsyncTask(getContext()).execute("Frank","12345");
-
-        new LoadGroupsEndpointsAsyncTask(getContext(), new OnRetrieveUsersTaskCompleted() {
-            @Override
-            public void onTaskCompleted(List<User> list) {
-                users = list;
-            }
-        });
     }
 
     @org.junit.Test
@@ -41,6 +36,15 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         //assertEquals("John", users.contains("John"));
         //assertEquals("Sue", users.getUser("Sue").getUsername());
         //assertEquals("Frank", users.getUser("Frank").getUsername());
+        LoadSingleUserAsyncTask l = new LoadSingleUserAsyncTask(getContext(), new OnRetrieveSingleUserTaskCompleted() {
+            @Override
+            public void onRetrieveUserCompleted(User user) {
+                testUser = user;
+            }
+        });
+        l.execute("John");
+
+        new CreateGroupEndpointsAsyncTask(getContext(), "test", testUser, new ArrayList<User>()).execute();
 
     }
 

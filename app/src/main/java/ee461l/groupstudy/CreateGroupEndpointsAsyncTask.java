@@ -63,6 +63,7 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Groups> {
 
         //createUser(name, password)
         try {
+            //not creating group, likely due to the User class
             Groups group = groupEndpointApi.createGroup(groupWrapper).execute();
             Log.i(TAG, "admin name: " + group.getAdminUser().getUsername());
             return group;

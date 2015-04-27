@@ -12,13 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.parse.Parse;
-import com.parse.ParseException;
-import com.parse.ParseInstallation;
-import com.parse.ParsePush;
-import com.parse.SaveCallback;
-
-
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MessagingFragment#newInstance} factory method to
@@ -63,21 +56,6 @@ public class MessagingFragment extends Fragment implements View.OnClickListener 
             groupName = getArguments().getString(GROUP_NAME);
             username = getArguments().getString(USERNAME);
         }
-
-        Parse.initialize(getActivity(), "M6QxmQuT1rUWfZsgpOSqyfVnHkn1pXrqwlPynKNU",
-                "tjOSTknSR78aNXu2jxYmrLqH218WMDkzjxD2lTW2");
-        ParseInstallation.getCurrentInstallation().saveInBackground();
-
-        ParsePush.subscribeInBackground("", new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
-                } else {
-                    Log.e("com.parse.push", "failed to subscribe for push", e);
-                }
-            }
-        });
     }
 
     @Override

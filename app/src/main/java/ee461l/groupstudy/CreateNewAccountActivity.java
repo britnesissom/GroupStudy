@@ -92,8 +92,8 @@ public class CreateNewAccountActivity extends AppCompatActivity {
 
         //if user doesn't exist, add new user to list of users
         //else, tell them to choose a new name
-        if (user != null) {
-            Log.i(TAG, "user exists");
+        if (user == null) {
+            Log.i(TAG, "user does not exist");
             //be sure to change to NavDrawerHomePage!
             //makes sure the inputted passwords are the same
             //makes sure user doesn't already exist
@@ -104,6 +104,7 @@ public class CreateNewAccountActivity extends AppCompatActivity {
                 cueat.execute(usernameText, createPassword.getText().toString());
 
                 Intent intent = new Intent(this, NavDrawerHomePage.class);
+                intent.putExtra("username", usernameText);
                 startActivity(intent);
             } else {
                 Toast.makeText(getApplicationContext(), "Passwords do not match",
