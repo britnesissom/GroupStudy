@@ -82,6 +82,7 @@ public class MessagingFragment extends Fragment implements View.OnClickListener 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 displayMessage.setText(textMessage.getText().toString());
+
                 /*try {
                     //groupEndpointApi.addMessages(groupName,textMessage.toString());
                     Log.i(TAG, "group retrieved");
