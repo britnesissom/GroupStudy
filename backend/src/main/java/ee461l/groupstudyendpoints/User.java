@@ -7,6 +7,7 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.OnLoad;
+import com.googlecode.objectify.annotation.OnSave;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -33,7 +34,7 @@ public class User {
     private transient ArrayList<Ref<Groups>> listOfGroups;
 
     @Ignore
-    private ArrayList<Groups> groupsToReturn;
+    private ArrayList<Groups> groupsToReturn = new ArrayList<>();
 
     public User() {
 
@@ -48,15 +49,20 @@ public class User {
         this.adminUser = false;
     }
 
-    @OnLoad
+    //@OnLoad
     public void deRef() {
         if (listOfGroups != null) {
-            for (Ref<Groups> group : listOfGroups) {
-                if (group.isLoaded()) {
-                    groupsToReturn.add(group.get());
+            groupsToReturn = new ArrayList<>();
+            for (int i = 0; i < listOfGroups.size(); i++) {
+                if (listOfGroups.get(i).isLoaded()) {
+                    //LOGGER.info("group ref: " + listOfGroups.get(i).getValue());
+                    groupsToReturn.add(listOfGroups.get(i).get());
+                    //LOGGER.info("Group name with getValue: " + listOfGroups.get(i).getValue().getGroupName());
+                    LOGGER.info("Group name w/o getValue: " + listOfGroups.get(i).get().getGroupName());
                 }
             }
         }
+        //LOGGER.info("deref groupsToReturn size: " + groupsToReturn.size());
     }
 
     public void addGroup(Groups group) {
@@ -65,10 +71,15 @@ public class User {
         LOGGER.info("Key: " + g.get().getGroupName());
         LOGGER.info("listOfGroups size: " + listOfGroups.size());
         listOfGroups.add(g);
+        /*LOGGER.info("groupsToReturn size before add: " + groupsToReturn.size());
+        groupsToReturn.add(group);
+        LOGGER.info("groupsToReturn size: " + groupsToReturn.size());*/
         LOGGER.info("group added!");
     }
 
     public ArrayList<Groups> getListOfGroups() {
+        LOGGER.info("groupsToReturn size: " + groupsToReturn.size());
+        deRef();
         return groupsToReturn;
     }
 

@@ -225,7 +225,9 @@ public class FileSharingFragment extends Fragment {
 
             String responseString = "";
 
-            File file = new File(uri[0].getPath());
+            File file = new File(uri[0].toString());
+
+            Log.i(TAG, "file path: " + file.getAbsolutePath());
 
             Log.i(TAG, "file length: " + file.length());
 

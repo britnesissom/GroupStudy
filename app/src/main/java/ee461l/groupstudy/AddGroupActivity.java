@@ -137,6 +137,9 @@ public class AddGroupActivity extends AppCompatActivity {
             group.setGroupName(groupName);
             group.setAdminUser(adminUser);
             group.setUsers(teammates);
+            group.setFiles(new ArrayList<String>());
+            group.setMessages(new ArrayList<String>());
+            group.setTasks(new ArrayList<String>());
             groupWrapper.setGroup(group);
         }
 

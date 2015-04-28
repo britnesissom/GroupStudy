@@ -196,10 +196,12 @@ public class AppHomePageFragment extends Fragment {
 
             try {
                 User user = usersEndpointApi.retrieveSingleUser(username[0]).execute();
-                Log.i(TAG, "user retrieved");
+                Log.i(TAG, "user retrieved and name: " + user.getUsername());
+                Log.i(TAG, "user's groups size: " + user.getListOfGroups().size());
 
                 if (user.getListOfGroups() != null && user.getListOfGroups().size() > 0)
                     Log.i(TAG, "user's groups: " + user.getListOfGroups().get(0).getGroupName());
+
                 return user;
             } catch (IOException e) {
                 Log.i(TAG, "" + e.getMessage());

@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/zpoBFk96y5StjRY2P0BEFWK1lFc\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/5iS7bdp6pBZNlcfMRkxV60Vf44g\"",
  "discoveryVersion": "v1",
  "id": "groupstudyEndpoint:v1",
  "name": "groupstudyEndpoint",
@@ -122,8 +122,7 @@
     "files": {
      "type": "array",
      "items": {
-      "type": "string",
-      "format": "byte"
+      "type": "string"
      }
     },
     "groupName": {

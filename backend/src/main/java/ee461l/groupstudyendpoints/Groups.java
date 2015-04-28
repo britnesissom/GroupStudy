@@ -11,7 +11,7 @@ public class Groups {
     @Id
     String id;
     private String groupName;
-    private ArrayList<byte[]> files;
+    private ArrayList<String> files;
     private ArrayList<String> messages;
     private ArrayList<User> users;
     private ArrayList<String> tasks;
@@ -31,11 +31,23 @@ public class Groups {
         this.tasks = new ArrayList<>();
     }
 
+    public void setFiles(ArrayList<String> files) {
+        this.files = files;
+    }
+
+    public void setMessages(ArrayList<String> messages) {
+        this.messages = messages;
+    }
+
+    public void setTasks(ArrayList<String> tasks) {
+        this.tasks = tasks;
+    }
+
     public void addTask(String task) {
         tasks.add(task);
     }
 
-    public void addFile(byte[] file) {
+    public void addFile(String file) {
         files.add(file);
     }
 
@@ -51,7 +63,7 @@ public class Groups {
 
     public void changeAdminUser(User adminUser) { this.adminUser = adminUser; }
 
-    public ArrayList<byte[]> getFiles() {
+    public ArrayList<String> getFiles() {
         return files;
     }
 

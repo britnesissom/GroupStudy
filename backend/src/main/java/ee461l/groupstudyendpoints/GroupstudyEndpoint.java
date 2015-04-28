@@ -66,10 +66,10 @@ public class GroupstudyEndpoint {
      */
     @ApiMethod(name = "addFile")
     public Groups addFile(@Named("groupName") String groupName, @Named("file") String file) {
-        byte[] fileBytes = file.getBytes(Charset.forName("UTF-8"));
+        //byte[] fileBytes = file.getBytes(Charset.forName("UTF-8"));
         //will return null if group does not exist
         Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
-        group.addFile(fileBytes);
+        group.addFile(file);
         OfyService.ofy().save().entity(group).now();
         return group;
     }
@@ -177,8 +177,9 @@ public class GroupstudyEndpoint {
     //loads the single user in the app
     @ApiMethod(name = "retrieveSingleUser")
     public User retrieveSingleUser(@Named("username") String username) {
-
         //will return null if user is not found
-        return OfyService.ofy().load().type(User.class).id(username).now();
+        User user = OfyService.ofy().load().type(User.class).id(username).now();
+        LOGGER.info("user's group size: " + user.getListOfGroups().size());
+        return user;
     }
 }
