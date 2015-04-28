@@ -50,7 +50,7 @@ public class GroupstudyEndpoint {
     }
 
     /**
-     * An endpoint that adds a task to a specific group
+     * An endpoint that adds a task to a specific group's calendar
      */
     @ApiMethod(name = "createTask")
     public Groups createTask(@Named("groupName") String groupName, @Named("task") String task) {
