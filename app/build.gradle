@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        testInstrumentationRunner "ee461l.groupstudy.test/android.test.InstrumentationTestRunner"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
         applicationId "ee461l.groupstudy"
         minSdkVersion 19
         targetSdkVersion 21
