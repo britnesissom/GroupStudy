@@ -19,7 +19,7 @@
 package ee461l.groupstudyendpoints.groupstudyEndpoint.model;
 
 /**
- * Model definition for GroupWrapperEntity.
+ * Model definition for FilesEntity.
  *
  * <p> This is the Java data model class that specifies how to parse/serialize into the JSON that is
  * transmitted over HTTP when working with the groupstudyEndpoint. For a detailed explanation see:
@@ -29,37 +29,79 @@ package ee461l.groupstudyendpoints.groupstudyEndpoint.model;
  * @author Google, Inc.
  */
 @SuppressWarnings("javadoc")
-public final class GroupWrapperEntity extends com.google.api.client.json.GenericJson {
+public final class FilesEntity extends com.google.api.client.json.GenericJson {
 
   /**
    * The value may be {@code null}.
    */
   @com.google.api.client.util.Key
-  private Groups group;
+  private java.lang.String fileContents;
+
+  /**
+   * The value may be {@code null}.
+   */
+  @com.google.api.client.util.Key
+  private java.lang.String fileName;
+
+  /**
+   * The value may be {@code null}.
+   */
+  @com.google.api.client.util.Key
+  private java.lang.String id;
 
   /**
    * @return value or {@code null} for none
    */
-  public Groups getGroup() {
-    return group;
+  public java.lang.String getFileContents() {
+    return fileContents;
   }
 
   /**
-   * @param group group or {@code null} for none
+   * @param fileContents fileContents or {@code null} for none
    */
-  public GroupWrapperEntity setGroup(Groups group) {
-    this.group = group;
+  public FilesEntity setFileContents(java.lang.String fileContents) {
+    this.fileContents = fileContents;
+    return this;
+  }
+
+  /**
+   * @return value or {@code null} for none
+   */
+  public java.lang.String getFileName() {
+    return fileName;
+  }
+
+  /**
+   * @param fileName fileName or {@code null} for none
+   */
+  public FilesEntity setFileName(java.lang.String fileName) {
+    this.fileName = fileName;
+    return this;
+  }
+
+  /**
+   * @return value or {@code null} for none
+   */
+  public java.lang.String getId() {
+    return id;
+  }
+
+  /**
+   * @param id id or {@code null} for none
+   */
+  public FilesEntity setId(java.lang.String id) {
+    this.id = id;
     return this;
   }
 
   @Override
-  public GroupWrapperEntity set(String fieldName, Object value) {
-    return (GroupWrapperEntity) super.set(fieldName, value);
+  public FilesEntity set(String fieldName, Object value) {
+    return (FilesEntity) super.set(fieldName, value);
   }
 
   @Override
-  public GroupWrapperEntity clone() {
-    return (GroupWrapperEntity) super.clone();
+  public FilesEntity clone() {
+    return (FilesEntity) super.clone();
   }
 
 }

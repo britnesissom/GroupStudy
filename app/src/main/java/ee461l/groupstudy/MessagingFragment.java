@@ -82,11 +82,20 @@ public class MessagingFragment extends Fragment implements View.OnClickListener 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 displayMessage.setText(textMessage.getText().toString());
+
                 /*try {
                     //groupEndpointApi.addMessages(groupName,textMessage.toString());
                     Log.i(TAG, "group retrieved");
                 } catch (IOException e) {
                     Log.i(TAG, "Error: " + e.getMessage() + "Loading group was unsuccessful.");
+=======
+
+                /*try {
+                    //groupEndpointApi.addMessages(groupName,textMessage.toString());
+                    Log.d(TAG, "group retrieved");
+                } catch (IOException e) {
+                    Log.d(TAG, "Error: " + e.getMessage() + "Loading group was unsuccessful.");
+>>>>>>> 6a10d48fe8a7462a9e6a9d6e0edb02f475f92b6f
                 }*/
 
                 return false;

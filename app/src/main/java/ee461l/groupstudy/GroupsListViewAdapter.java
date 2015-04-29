@@ -83,8 +83,8 @@ public class GroupsListViewAdapter extends BaseAdapter {
         }
 
         //load Button for single file
-        /*Button groupButton = (Button) v.findViewById(R.id.groupButton);
-        groupButton.setText(groups.get(position).getGroupName());*/
+        /*Button fileButton = (Button) v.findViewById(R.id.fileButton);
+        fileButton.setText(groups.get(position).getGroupName());*/
 
         return convertView;
     }

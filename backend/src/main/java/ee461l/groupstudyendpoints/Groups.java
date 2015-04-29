@@ -1,5 +1,6 @@
 package ee461l.groupstudyendpoints;
 
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -54,6 +55,7 @@ public class Groups {
     @OnLoad
     private void deRefFiles() {
         if (files != null && files.size() != 0) {
+
             filesToReturn = new ArrayList<>();
             for (int i = 0; i < files.size(); i++) {
                 if (files.get(i).isLoaded()) {
@@ -61,6 +63,7 @@ public class Groups {
                     filesToReturn.add(files.get(i).get());
                     //LOGGER.info("Group name with getValue: " + listOfGroups.get(i).getValue().getGroupName());
                     LOGGER.info("File name: " + files.get(i).get().getFileName());
+                    LOGGER.info("File name w/o getValue: " + files.get(i).get().getFileName());
                 }
             }
         }

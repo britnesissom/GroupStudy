@@ -27,8 +27,14 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,7 +110,7 @@ public class FileSharingFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_file_sharing, container, false);
         getActivity().setTitle("Files");
 
-        files = (ListView) rootView.findViewById(R.id.usersInGroup);
+        files = (ListView) rootView.findViewById(R.id.filesInGroup);
         adapter = new FileListViewAdapter(getActivity(), R.layout.file_list_item, filesFromServer);
 
         files.setAdapter(adapter);
@@ -178,7 +184,6 @@ public class FileSharingFragment extends Fragment {
             if (resultData != null) {
                 androidUri = resultData.getData();
 
-
                 //InputStream fileInputStream = getActivity().getContentResolver().openInputStream(androidUri);
                 //String uriString = fileInputStream.toString();
                 Log.d(TAG, "Android Uri: " + androidUri.toString());
@@ -187,6 +192,7 @@ public class FileSharingFragment extends Fragment {
                 //begin sending file to server
                 SendFileToGroupEndpoint sendFile = new SendFileToGroupEndpoint(getActivity());
                 sendFile.execute(androidUri);
+
 
                 /*catch(FileNotFoundException e) {
                     Log.d(TAG, "file not found");
@@ -234,6 +240,7 @@ public class FileSharingFragment extends Fragment {
                 groupEndpointApi = builder.build();
             }
 
+            //File file = new File(uri[0].toString());
             try {
                 String path = FileUtils.getPath(context, uri[0]);
                 Log.d(TAG, "file path: " + path);
@@ -260,6 +267,15 @@ public class FileSharingFragment extends Fragment {
 
                 groupEndpointApi.addFile(groupName, fe).execute();
 
+                //String fileBytes = new String(bFile);
+
+                //Byte[] fileBytes = new Byte[bFile.length];
+                /*i = 0;
+                for (byte b : bFile)
+                    fileBytes[i++] = b; //Autoboxing*/
+
+                //FileWrapperEntity fwe = new FileWrapperEntity();
+                //fwe.setFileInfo(groupName, fileBytes);
                 Log.d(TAG, "file added to group");
             }
             catch(IOException e) {

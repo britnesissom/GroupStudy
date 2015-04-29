@@ -458,7 +458,7 @@ public class FileUtils {
         @Override
         public boolean accept(File file) {
             final String fileName = file.getName();
-            // Return users only (not directories) and skip hidden users
+            // Return files only (not directories) and skip hidden files
             return file.isFile() && !fileName.startsWith(HIDDEN_PREFIX);
         }
     };

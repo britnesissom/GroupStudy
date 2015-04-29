@@ -66,7 +66,7 @@ public class LoginScreenActivity extends AppCompatActivity {
             public void onRetrieveUserCompleted(User userLogin) {
                 user = userLogin;
             }
-        });
+        }, TAG);
 
         //defeats purpose of async task
         try {
