@@ -219,6 +219,11 @@ public class FileSharingFragment extends Fragment {
             this.context = context;
         }
 
+        @Override
+        protected void onPreExecute() {
+            Toast.makeText(getActivity(), "File uploading...", Toast.LENGTH_LONG).show();
+        }
+
         //need to open endpoint for saving
         //convert file to byte array to save
         //save file to arraylist for files in specific group
@@ -247,8 +252,6 @@ public class FileSharingFragment extends Fragment {
 
             //File file = new File(uri[0].toString());
             try {
-                Toast.makeText(getActivity(), "File uploading...", Toast.LENGTH_LONG).show();
-
                 String path = FileUtils.getPath(context, uri[0]);
                 Log.d(TAG, "file path: " + path);
                 File file = new File(path);

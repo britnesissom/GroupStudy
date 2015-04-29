@@ -40,9 +40,17 @@ public class GroupstudyEndpoint {
      */
     @ApiMethod(name = "createGroup")
     public Groups createGroup(GroupWrapperEntity newGroup) {
-        Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
-                newGroup.getGroup().getUsers());
+        LOGGER.info("createGroup reached");
+        Groups group = new Groups();
+        group.setId(newGroup.getGroup().getId());
+        group.setGroupName(newGroup.getGroup().getGroupName());
+        group.setAdminUser(newGroup.getGroup().getAdminUser());
+        group.setUsers(newGroup.getGroup().getUsers());
+        LOGGER.info("group instantiated");
+        /*Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
+                newGroup.getGroup().getUsers());*/
         OfyService.ofy().save().entity(group).now();
+        LOGGER.info("group saved to store");
         updateUsersGroups(newGroup.getGroup().getAdminUser().getId(), group);
         return group;
     }
@@ -91,14 +99,26 @@ public class GroupstudyEndpoint {
     adds a new group for a specific user so their home page is updated to
     include the new group
      */
-    @ApiMethod(name = "updateUsersGroups")
-    public User updateUsersGroups(@Named("adminUsername") String username, Groups group) {
+    /*@ApiMethod(name = "updateUsersGroups")
+    public Groups updateUsersGroups(@Named("adminUsername") String username, GroupWrapperEntity group) {
         User u = OfyService.ofy().load().type(User.class).id(username).now();
+        Groups g = OfyService.ofy().load().type(Groups.class).id(group.getGroup().getGroupName()).now();
+        LOGGER.info("user's groups size: " + u.getListOfGroups().size());
+        LOGGER.info("updateUsersGroups group name: " + g.getGroupName());
+        u.addGroup(g);
+        OfyService.ofy().save().entity(u).now();
+        return g;
+    }*/
+
+    @ApiMethod(name = "updateUsersGroups")
+    public Groups updateUsersGroups(@Named("adminUsername") String username, Groups group) {
+        User u = OfyService.ofy().load().type(User.class).id(username).now();
+        //Groups g = OfyService.ofy().load().type(Groups.class).id(group.getGroup().getGroupName()).now();
         LOGGER.info("user's groups size: " + u.getListOfGroups().size());
         LOGGER.info("updateUsersGroups group name: " + group.getGroupName());
         u.addGroup(group);
         OfyService.ofy().save().entity(u).now();
-        return u;
+        return group;
     }
 
     /**

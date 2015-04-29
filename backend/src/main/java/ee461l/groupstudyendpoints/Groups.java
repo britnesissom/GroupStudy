@@ -20,14 +20,14 @@ public class Groups {
     private String groupName;
 
     @Load
-    private transient ArrayList<Ref<FilesEntity>> files;
+    private transient ArrayList<Ref<FilesEntity>> files = new ArrayList<>();
 
     @Ignore
-    private ArrayList<FilesEntity> filesToReturn;
+    private ArrayList<FilesEntity> filesToReturn = new ArrayList<>();
 
-    private ArrayList<String> messages;
-    private ArrayList<User> users;
-    private ArrayList<String> tasks;
+    private ArrayList<String> messages = new ArrayList<>();
+    private ArrayList<User> users = new ArrayList<>();
+    private ArrayList<String> tasks = new ArrayList<>();
     private User adminUser;
 
     public Groups() {
@@ -86,8 +86,8 @@ public class Groups {
     }
 
     public void addFile(FilesEntity file) {
-        Ref<FilesEntity> g = Ref.create(Key.create(FilesEntity.class, file.getId()));
-        LOGGER.info("Key: " + g.get().getFileName());
+        Ref<FilesEntity> g = Ref.create(file);
+        //LOGGER.info("Key: " + g.safe().getFileName());
         LOGGER.info("list of ref<files> size: " + files.size());
         files.add(g);
         LOGGER.info("file added!");
@@ -97,11 +97,17 @@ public class Groups {
 
     public void setId(String id) { this.id = id; }
 
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public void setAdminUser(User adminUser) {
+        this.adminUser = adminUser;
+    }
+
     public String getGroupName() {
         return groupName;
     }
-
-    public void setGroupname(String groupName) { this.groupName = groupName; }
 
     public void changeAdminUser(User adminUser) { this.adminUser = adminUser; }
 

@@ -136,12 +136,13 @@ public class AddGroupActivity extends AppCompatActivity {
 
             groupWrapper = new GroupWrapperEntity();
             Groups group = new Groups();
+            group.setId(groupName);
             group.setGroupName(groupName);
             group.setAdminUser(adminUser);
             group.setUsers(teammates);
-            group.setFiles(new ArrayList<FilesEntity>());
+            /*group.setFiles(new ArrayList<FilesEntity>());
             group.setMessages(new ArrayList<String>());
-            group.setTasks(new ArrayList<String>());
+            group.setTasks(new ArrayList<String>());*/
             groupWrapper.setGroup(group);
         }
 
@@ -169,6 +170,7 @@ public class AddGroupActivity extends AppCompatActivity {
             try {
                 //not creating group, likely due to the User class
                 Groups group = groupEndpointApi.createGroup(groupWrapper).execute();
+                //Groups g = groupEndpointApi.updateUsersGroups(adminUser.getUsername(), groupWrapper).execute();
                 Log.d(TAG, "admin name: " + group.getAdminUser().getUsername());
                 return group;
             } catch (IOException e) {
