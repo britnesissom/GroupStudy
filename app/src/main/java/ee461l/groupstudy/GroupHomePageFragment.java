@@ -51,7 +51,7 @@ public class GroupHomePageFragment extends Fragment {
         args.putString(GROUP_NAME, groupName);
         fragment.setArguments(args);
 
-        Log.i(TAG, "Group home fragment instantiated");
+        Log.d(TAG, "Group home fragment instantiated");
         return fragment;
     }
 
@@ -64,7 +64,7 @@ public class GroupHomePageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        Log.i(TAG, "Group home fragment created");
+        Log.d(TAG, "Group home fragment created");
 
         if (getArguments() != null) {
             username = getArguments().getString(USERNAME);
@@ -79,7 +79,7 @@ public class GroupHomePageFragment extends Fragment {
         });
 
         try {
-            Log.i(TAG, "group name: " + groupName);
+            Log.d(TAG, "group name: " + groupName);
             group = lsgat.execute(groupName).get();
         }
         catch (InterruptedException e) {
@@ -97,8 +97,8 @@ public class GroupHomePageFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_group_home_page, container, false);
         getActivity().setTitle(group.getGroupName() + " Home");
-        Log.i(TAG, "Group home fragment open");
-        Log.i(TAG, "admin username: " + group.getAdminUser().getUsername());
+        Log.d(TAG, "Group home fragment open");
+        Log.d(TAG, "admin username: " + group.getAdminUser().getUsername());
 
         return rootView;
     }

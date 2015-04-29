@@ -56,7 +56,7 @@ class LoadGroupsEndpointsAsyncTask extends AsyncTask<Void, Void, List<Groups>> {
 
         try {
             List<Groups> groups = groupsEndpointApi.loadGroups().execute().getItems();
-            Log.i(TAG, "groups retrieved");
+            Log.d(TAG, "groups retrieved");
 
             //no groups have been added yet so objectify returns null
             //not allowed when setting a list adapter so an empty arraylist needs to be created
@@ -65,7 +65,7 @@ class LoadGroupsEndpointsAsyncTask extends AsyncTask<Void, Void, List<Groups>> {
 
             return groups;
         } catch (IOException e) {
-            Log.i(TAG, "" + e.getMessage());
+            Log.d(TAG, "" + e.getMessage());
             return Collections.EMPTY_LIST;
         }
     }

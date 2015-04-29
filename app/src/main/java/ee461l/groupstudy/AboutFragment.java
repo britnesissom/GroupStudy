@@ -56,10 +56,13 @@ public class AboutFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_about, container, false);
         TextView about = (TextView) rootView.findViewById(R.id.about);
-        about.setText("GroupStudy was created by:\n");
+        about.setText("GroupStudy was created by: ");
         about.append("Abraham Chiu, Daniel James, Ryan McClure, Brit'ne Sissom, and Brian Zeff");
         about.append("\n\nIt took a very long time.");
-        about.append("\nAnd was very difficult.");
+        about.append("\nAnd was very difficult.\n\n");
+        about.append("Thank you to Paul Burke for putting aFileChooser on GitHub. It was extremely" +
+                " helpful in figuring out file management. Some of his code was used, and the" +
+                " full program can be found here: https://github.com/iPaulPro/aFileChooser");
         return rootView;
     }
 

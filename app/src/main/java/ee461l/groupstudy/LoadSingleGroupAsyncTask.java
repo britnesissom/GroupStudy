@@ -54,10 +54,10 @@ class LoadSingleGroupAsyncTask extends AsyncTask<String, Void, Groups> {
 
         try {
             Groups group = groupEndpointApi.retrieveSingleGroup(groupName[0]).execute();
-            Log.i(TAG, "group retrieved");
+            Log.d(TAG, "group retrieved");
             return group;
         } catch (IOException e) {
-            Log.i(TAG, "Error: " + e.getMessage());
+            Log.d(TAG, "Error: " + e.getMessage());
             return null;
         }
     }

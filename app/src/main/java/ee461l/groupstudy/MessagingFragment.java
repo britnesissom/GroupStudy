@@ -85,9 +85,9 @@ public class MessagingFragment extends Fragment implements View.OnClickListener 
 
                 /*try {
                     //groupEndpointApi.addMessages(groupName,textMessage.toString());
-                    Log.i(TAG, "group retrieved");
+                    Log.d(TAG, "group retrieved");
                 } catch (IOException e) {
-                    Log.i(TAG, "Error: " + e.getMessage() + "Loading group was unsuccessful.");
+                    Log.d(TAG, "Error: " + e.getMessage() + "Loading group was unsuccessful.");
                 }*/
 
                 return false;

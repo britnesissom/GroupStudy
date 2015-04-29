@@ -34,7 +34,7 @@ public class NavDrawerGroups extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nav_drawer_layout);
 
-        Log.i(TAG, "NavDrawerGroup opened");
+        Log.d(TAG, "NavDrawerGroup opened");
 
         //default view when group is opened is list of tasks?
         groupName = getIntent().getStringExtra("groupName");

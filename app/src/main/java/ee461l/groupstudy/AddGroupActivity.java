@@ -41,7 +41,7 @@ public class AddGroupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group);
 
-        Log.i(TAG, "AddGroup created");
+        Log.d(TAG, "AddGroup created");
 
         user = getIntent().getStringExtra("username");
 
@@ -77,7 +77,7 @@ public class AddGroupActivity extends AppCompatActivity {
         String[] usernamesArray = teammates.getText().toString().split(delimiters);
         ArrayList<User> listOfUsers = getUsersFromArray(usernamesArray);
 
-        Log.i(TAG, "CreateGroup async about to be called");
+        Log.d(TAG, "CreateGroup async about to be called");
         CreateGroupEndpointsAsyncTask cgeat = new CreateGroupEndpointsAsyncTask(this, nameOfGroup,
                 adminUser, listOfUsers);
         cgeat.execute();
@@ -167,10 +167,10 @@ public class AddGroupActivity extends AppCompatActivity {
             try {
                 //not creating group, likely due to the User class
                 Groups group = groupEndpointApi.createGroup(groupWrapper).execute();
-                Log.i(TAG, "admin name: " + group.getAdminUser().getUsername());
+                Log.d(TAG, "admin name: " + group.getAdminUser().getUsername());
                 return group;
             } catch (IOException e) {
-                Log.i(TAG, "" + e.getMessage());
+                Log.d(TAG, "" + e.getMessage());
             }
 
             return null;
@@ -182,7 +182,7 @@ public class AddGroupActivity extends AppCompatActivity {
             //pass name of group and username to next activity so if user creates another group
             //the app knows who the admin should be
             Intent intent = new Intent(context, NavDrawerGroups.class);
-            Log.i(TAG, "group name createGroup: " + result.getGroupName());
+            Log.d(TAG, "group name createGroup: " + result.getGroupName());
             intent.putExtra("groupName", result.getGroupName());
             intent.putExtra("username", result.getAdminUser().getUsername());
             context.startActivity(intent);

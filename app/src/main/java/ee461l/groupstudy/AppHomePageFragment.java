@@ -83,7 +83,7 @@ public class AppHomePageFragment extends Fragment {
 
         if (getArguments() != null) {
             username = getArguments().getString(USERNAME);
-            Log.i(TAG, "username passed successfully: " + username);
+            Log.d(TAG, "username passed successfully: " + username);
         }
 
         groups = new ArrayList<>();
@@ -120,7 +120,7 @@ public class AppHomePageFragment extends Fragment {
         //initialize listview and adapter to list groups on home page
         adapter = new GroupsListViewAdapter(getActivity(), R.layout.home_page_groups_list_item, groups);
         groupsListView = (ListView) rootView.findViewById(R.id.groups_list);
-        Log.i(TAG, "Setting adapter");
+        Log.d(TAG, "Setting adapter");
         groupsListView.setAdapter(adapter);
 
         //open home page for specified group when it is clicked
@@ -128,7 +128,7 @@ public class AppHomePageFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long arg3) {
-                Log.i(TAG, "item clicked");
+                Log.d(TAG, "item clicked");
                 // get the list adapter
                 GroupsListViewAdapter groupsAdapter = (GroupsListViewAdapter) parent.getAdapter();
 
@@ -196,16 +196,16 @@ public class AppHomePageFragment extends Fragment {
 
             try {
                 User user = usersEndpointApi.retrieveSingleUser(username[0]).execute();
-                Log.i(TAG, "user retrieved and name: " + user.getUsername());
-                Log.i(TAG, "user's groups size: " + user.getListOfGroups().size());
+                Log.d(TAG, "user retrieved and name: " + user.getUsername());
+                //Log.d(TAG, "user's groups size: " + user.getListOfGroups().size());
 
                 //groups = user.getListOfGroups();
                 if (user.getListOfGroups() != null && user.getListOfGroups().size() > 0)
-                    Log.i(TAG, "user's groups: " + user.getListOfGroups().get(0).getGroupName());
+                    Log.d(TAG, "user's groups: " + user.getListOfGroups().get(0).getGroupName());
 
                 return user;
             } catch (IOException e) {
-                Log.i(TAG, "" + e.getMessage());
+                Log.d(TAG, "" + e.getMessage());
                 return null;
             }
         }

@@ -93,7 +93,7 @@ public class CreateNewAccountActivity extends AppCompatActivity {
         //if user doesn't exist, add new user to list of users
         //else, tell them to choose a new name
         if (user == null) {
-            Log.i(TAG, "user does not exist");
+            Log.d(TAG, "user does not exist");
             //be sure to change to NavDrawerHomePage!
             //makes sure the inputted passwords are the same
             //makes sure user doesn't already exist
