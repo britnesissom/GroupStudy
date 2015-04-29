@@ -7,7 +7,6 @@
 package ee461l.groupstudyendpoints;
 
 import com.google.api.server.spi.config.Api;
-import com.google.api.server.spi.config.ApiClass;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Nullable;
@@ -16,7 +15,6 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.cmd.Query;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -64,10 +62,25 @@ public class GroupstudyEndpoint {
     /**
      * An endpoint that adds a file to a specific group
      */
-    @ApiMethod(name = "addFile")
+    /*@ApiMethod(name = "addFile")
     public Groups addFile(@Named("groupName") String groupName, @Named("file") String file) {
         //byte[] fileBytes = file.getBytes(Charset.forName("UTF-8"));
         //will return null if group does not exist
+        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        group.addFile(file);
+        OfyService.ofy().save().entity(group).now();
+        return group;
+    }*/
+
+    /**
+     * An endpoint that adds a file to a specific group
+     */
+    @ApiMethod(name = "addFile")
+    public Groups addFile(@Named("groupName") String groupName, FilesEntity file) {
+        //byte[] fileBytes = file.getBytes(Charset.forName("UTF-8"));
+        //will return null if group does not exist
+        //String groupName = file.getGroupName();
+        //Byte[] fileContents = file.getFile();
         Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
         group.addFile(file);
         OfyService.ofy().save().entity(group).now();

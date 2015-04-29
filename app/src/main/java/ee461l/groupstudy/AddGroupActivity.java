@@ -19,8 +19,10 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.Byte;
 
 import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.FilesEntity;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.GroupWrapperEntity;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
@@ -137,7 +139,7 @@ public class AddGroupActivity extends AppCompatActivity {
             group.setGroupName(groupName);
             group.setAdminUser(adminUser);
             group.setUsers(teammates);
-            group.setFiles(new ArrayList<String>());
+            group.setFiles(new ArrayList<FilesEntity>());
             group.setMessages(new ArrayList<String>());
             group.setTasks(new ArrayList<String>());
             groupWrapper.setGroup(group);

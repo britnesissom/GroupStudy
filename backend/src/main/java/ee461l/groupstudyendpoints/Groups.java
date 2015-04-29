@@ -1,17 +1,30 @@
 package ee461l.groupstudyendpoints;
 
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
+import com.googlecode.objectify.annotation.Load;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 @Entity
 public class Groups {
 
+    private static final Logger LOGGER = Logger.getLogger(Groups.class.getName());
+
     @Id
     String id;
     private String groupName;
-    private ArrayList<String> files;
+
+    @Load
+    private transient ArrayList<Ref<FilesEntity>> files;
+
+    @Ignore
+    private ArrayList<FilesEntity> filesToReturn;
+
     private ArrayList<String> messages;
     private ArrayList<User> users;
     private ArrayList<String> tasks;
@@ -31,8 +44,33 @@ public class Groups {
         this.tasks = new ArrayList<>();
     }
 
-    public void setFiles(ArrayList<String> files) {
+    public void deRef() {
+        if (files != null) {
+            filesToReturn = new ArrayList<>();
+            for (int i = 0; i < files.size(); i++) {
+                if (files.get(i).isLoaded()) {
+                    //LOGGER.info("group ref: " + listOfGroups.get(i).getValue());
+                    filesToReturn.add(files.get(i).get());
+                    //LOGGER.info("Group name with getValue: " + listOfGroups.get(i).getValue().getGroupName());
+                    LOGGER.info("File name w/o getValue: " + files.get(i).get().getFileName());
+                }
+            }
+        }
+        //no files have been added
+        else {
+            filesToReturn = new ArrayList<>();
+        }
+        //LOGGER.info("deref groupsToReturn size: " + groupsToReturn.size());
+    }
+
+    public void setFiles(ArrayList<Ref<FilesEntity>> files) {
         this.files = files;
+    }
+
+    public ArrayList<FilesEntity> getFiles() {
+        deRef();
+        LOGGER.info("filesToReturn size: " + filesToReturn.size());
+        return filesToReturn;
     }
 
     public void setMessages(ArrayList<String> messages) {
@@ -47,8 +85,12 @@ public class Groups {
         tasks.add(task);
     }
 
-    public void addFile(String file) {
-        files.add(file);
+    public void addFile(FilesEntity file) {
+        Ref<FilesEntity> g = Ref.create(Key.create(FilesEntity.class, file.getId()));
+        LOGGER.info("Key: " + g.get().getFileName());
+        LOGGER.info("list of ref<files> size: " + files.size());
+        files.add(g);
+        LOGGER.info("file added!");
     }
 
     public String getId() { return id; }
@@ -62,10 +104,6 @@ public class Groups {
     public void setGroupname(String groupName) { this.groupName = groupName; }
 
     public void changeAdminUser(User adminUser) { this.adminUser = adminUser; }
-
-    public ArrayList<String> getFiles() {
-        return files;
-    }
 
     public ArrayList<String> getMessages() { return messages ; }
 

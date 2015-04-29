@@ -12,6 +12,7 @@ import android.widget.Button;
 import java.io.File;
 import java.util.List;
 
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.FilesEntity;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 /**
@@ -19,7 +20,7 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
  */
 public class FileListViewAdapter extends BaseAdapter {
 
-    private List<String> files;
+    private List<FilesEntity> files;
     private Context context;
     private int layoutResourceId;
 
@@ -27,7 +28,7 @@ public class FileListViewAdapter extends BaseAdapter {
         Button fileButton;
     }
 
-    public FileListViewAdapter(Context context, int layoutResourceId, List<String> files) {
+    public FileListViewAdapter(Context context, int layoutResourceId, List<FilesEntity> files) {
         this.context = context;
         this.files = files;
         this.layoutResourceId = layoutResourceId;
@@ -60,15 +61,15 @@ public class FileListViewAdapter extends BaseAdapter {
             v = (ViewHolder) convertView.getTag();
         }
 
-        String file = files.get(position);
+        FilesEntity file = files.get(position);
 
         // assign values if the object is not null
         if(file != null) {
             // get the Button from the ViewHolder and then set the text (file name)
             // and tag (item ID) values
-            v.fileButton.setText("file name" /*file.getName()*/);
+            v.fileButton.setText(file.getFileName());
             //groupName = group.getGroupName();
-            v.fileButton.setTag("file name"/*group.getId()*/);
+            v.fileButton.setTag(file.getFileName());
 
             v.fileButton.setOnClickListener(new FileOnClickListener(context, file));
         }

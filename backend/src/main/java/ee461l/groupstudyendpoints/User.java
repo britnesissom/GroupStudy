@@ -62,6 +62,10 @@ public class User {
                 }
             }
         }
+        //user has no groups
+        else {
+            groupsToReturn = new ArrayList<>();
+        }
         //LOGGER.info("deref groupsToReturn size: " + groupsToReturn.size());
     }
 
@@ -78,8 +82,8 @@ public class User {
     }
 
     public ArrayList<Groups> getListOfGroups() {
-        LOGGER.info("groupsToReturn size: " + groupsToReturn.size());
         deRef();
+        LOGGER.info("groupsToReturn size: " + groupsToReturn.size());
         return groupsToReturn;
     }
 

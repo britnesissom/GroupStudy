@@ -38,13 +38,16 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.FilesEntity;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 /**
@@ -58,7 +61,8 @@ public class FileSharingFragment extends Fragment {
 
     private TextView users;
     private ListView files;
-    private List<String> filesFromServer;
+    private List<FilesEntity> filesFromServer;
+    private List<File> filesToView;
     private String groupName;
     private Groups group;
     private FileListViewAdapter adapter;
@@ -100,6 +104,7 @@ public class FileSharingFragment extends Fragment {
             @Override
             public void onRetrieveSingleGroupCompleted(Groups g) {
                 group = g;
+                filesFromServer = group.getFiles();
             }
         });
         lsgat.execute(groupName);
@@ -117,7 +122,6 @@ public class FileSharingFragment extends Fragment {
 
         files.setAdapter(adapter);
 
-        // implement eventDate when an item on list view is selected
         files.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int pos, long id) {
@@ -243,6 +247,8 @@ public class FileSharingFragment extends Fragment {
 
             //File file = new File(uri[0].toString());
             try {
+                Toast.makeText(getActivity(), "File uploading...", Toast.LENGTH_LONG).show();
+
                 String path = FileUtils.getPath(context, uri[0]);
                 Log.d(TAG, "file path: " + path);
                 File file = new File(path);
@@ -259,8 +265,22 @@ public class FileSharingFragment extends Fragment {
 
                 Log.d(TAG, "inputStream length: " + i);
 
-                String fileBytes = new String(bFile, "UTF-8");
-                groupEndpointApi.addFile(groupName, fileBytes).execute();
+                String fileBytes = new String(bFile, "UTF-16");
+                FilesEntity fe = new FilesEntity();
+                fe.setId(file.getName());
+                fe.setFileName(file.getName());
+                fe.setFileContents(fileBytes);
+                //String fileBytes = new String(bFile);
+
+                //Byte[] fileBytes = new Byte[bFile.length];
+                /*i = 0;
+                for (byte b : bFile)
+                    fileBytes[i++] = b; //Autoboxing*/
+
+                //FileWrapperEntity fwe = new FileWrapperEntity();
+                //fwe.setFileInfo(groupName, fileBytes);
+                groupEndpointApi.addFile(groupName, fe).execute();
+
                 Log.d(TAG, "file added to group");
             }
             catch(IOException e) {
