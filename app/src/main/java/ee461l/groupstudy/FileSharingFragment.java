@@ -1,6 +1,7 @@
 package ee461l.groupstudy;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -23,26 +24,16 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.FilesEntity;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 /**
@@ -56,8 +47,11 @@ public class FileSharingFragment extends Fragment {
 
     private TextView users;
     private ListView files;
-    private List<File> filesFromServer;
+    private List<FilesEntity> filesFromServer;
+    private List<File> filesToView;
     private String groupName;
+    private Groups group;
+    private FileListViewAdapter adapter;
     private static final String TAG = "FileSharingFragment";
 
     // A request code's purpose is to match the result of a "startActivityForResult" with
@@ -89,6 +83,18 @@ public class FileSharingFragment extends Fragment {
         if (getArguments() != null) {
             groupName = getArguments().getString(GROUP_NAME);
         }
+
+        filesFromServer = new ArrayList<>();
+
+        LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(), new OnRetrieveSingleGroupTaskCompleted() {
+            @Override
+            public void onRetrieveSingleGroupCompleted(Groups g) {
+                group = g;
+                Log.d(TAG, "group name retrieved: " + group.getGroupName());
+                filesFromServer = group.getFiles();
+            }
+        });
+        lsgat.execute(groupName);
     }
 
     @Override
@@ -96,18 +102,13 @@ public class FileSharingFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_file_sharing, container, false);
-        users = (TextView) rootView.findViewById(R.id.users);
         getActivity().setTitle("Files");
 
-        files = (ListView) rootView.findViewById(R.id.filesInGroup);
+        files = (ListView) rootView.findViewById(R.id.usersInGroup);
+        adapter = new FileListViewAdapter(getActivity(), R.layout.file_list_item, filesFromServer);
 
-        RetrieveFilesFromServer retrieval = new RetrieveFilesFromServer("groupName");
-        filesFromServer = retrieval.getFiles();
-
-        FileListViewAdapter adapter = new FileListViewAdapter(getActivity(), filesFromServer);
         files.setAdapter(adapter);
 
-        // implement eventDate when an item on list view is selected
         files.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int pos, long id) {
@@ -162,7 +163,7 @@ public class FileSharingFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        Log.i(TAG, "Received an \"Activity Result\"");
+        Log.d(TAG, "Received an \"Activity Result\"");
         // BEGIN_INCLUDE (parse_open_document_response)
         // The ACTION_OPEN_DOCUMENT intent was sent with the request code READ_REQUEST_CODE.
         // If the request code seen here doesn't match, it's the response to some other intent,
@@ -178,17 +179,17 @@ public class FileSharingFragment extends Fragment {
                 androidUri = resultData.getData();
 
 
-                    //InputStream fileInputStream = getActivity().getContentResolver().openInputStream(androidUri);
-                    //String uriString = fileInputStream.toString();
-                    Log.i(TAG, "Android Uri: " + androidUri.toString());
-                    //Log.i(TAG, "String uri: " + uriString);
+                //InputStream fileInputStream = getActivity().getContentResolver().openInputStream(androidUri);
+                //String uriString = fileInputStream.toString();
+                Log.d(TAG, "Android Uri: " + androidUri.toString());
+                //Log.d(TAG, "String uri: " + uriString);
 
-                    //begin sending file to server
-                    SendFileToGroupEndpoint sendFile = new SendFileToGroupEndpoint();
-                    sendFile.execute(androidUri);
+                //begin sending file to server
+                SendFileToGroupEndpoint sendFile = new SendFileToGroupEndpoint(getActivity());
+                sendFile.execute(androidUri);
 
                 /*catch(FileNotFoundException e) {
-                    Log.i(TAG, "file not found");
+                    Log.d(TAG, "file not found");
                     e.printStackTrace();
                 }*/
             }
@@ -199,6 +200,16 @@ public class FileSharingFragment extends Fragment {
     //convert file to byte array then save it as entity in group
     private class SendFileToGroupEndpoint extends AsyncTask<Uri, Void, Void> {
         private GroupstudyEndpoint groupEndpointApi = null;
+        private Context context;
+
+        private SendFileToGroupEndpoint(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Toast.makeText(getActivity(), "Uploading file...", Toast.LENGTH_LONG).show();
+        }
 
         //need to open endpoint for saving
         //convert file to byte array to save
@@ -223,74 +234,38 @@ public class FileSharingFragment extends Fragment {
                 groupEndpointApi = builder.build();
             }
 
-            String responseString = "";
+            try {
+                String path = FileUtils.getPath(context, uri[0]);
+                Log.d(TAG, "file path: " + path);
+                File file = new File(path);
 
-            File file = new File(uri[0].toString());
+                Log.d(TAG, "file name: " + file.getName());
+                Log.d(TAG, "file length: " + file.length());
 
-            Log.i(TAG, "file path: " + file.getAbsolutePath());
+                InputStream fileInputStream = null;
+                byte[] bFile = new byte[(int) file.length()];
 
-            Log.i(TAG, "file length: " + file.length());
-
-            InputStream fileInputStream = null;
-            byte[] bFile = new byte[(int) file.length()];
-
-            try
-            {
                 //convert file into array of bytes
                 fileInputStream = new BufferedInputStream(new FileInputStream(file));
                 int i = fileInputStream.read(bFile);
                 fileInputStream.close();
 
-                Log.i(TAG, "inputStream length: " + i);
+                Log.d(TAG, "inputStream length: " + i);
+
+                String fileBytes = new String(bFile, "UTF-16");
+                FilesEntity fe = new FilesEntity();
+                fe.setId(file.getName());
+                fe.setFileName(file.getName());
+                fe.setFileContents(fileBytes);
+
+                groupEndpointApi.addFile(groupName, fe).execute();
+
+                Log.d(TAG, "file added to group");
             }
-            catch (Exception e)
-            {
-                e.printStackTrace();
+            catch(IOException e) {
+                Log.e(TAG, e.getMessage());
             }
 
-            //createUser(name, password)
-            try {
-                String fileBytes = new String(bFile, "UTF-8");
-                groupEndpointApi.addFile(groupName, fileBytes).execute();
-                Log.i(TAG, "file added to group");
-
-            } catch (IOException e) {
-                Log.i(TAG, "" + e.getMessage());
-            }
-            //need to add group name after ".com"
-            //so we know where the file is saved
-            /*String serverUrl = "http://groupstudy-461l.appspot.com";
-
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(serverUrl);
-
-            try {
-                MultipartEntityBuilder entity = MultipartEntityBuilder.create();
-
-                File file = new File(uri[0]);
-
-                // Adding file data to http body
-                entity.addPart("file", new FileBody(file));
-                httppost.setEntity(entity.build());
-
-                // Making server call
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity r_entity = response.getEntity();
-
-                int statusCode = response.getStatusLine().getStatusCode();
-                if (statusCode == 200) {
-                    // Server response
-                    responseString = EntityUtils.toString(r_entity);
-                } else {
-                    responseString = "Error occurred! Http Status Code: "
-                            + statusCode;
-                }
-
-            } catch (ClientProtocolException e) {
-                responseString = e.toString();
-            } catch (IOException e) {
-                responseString = e.toString();
-            }*/
             return null;
         }
 

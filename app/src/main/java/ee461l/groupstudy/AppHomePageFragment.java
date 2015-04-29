@@ -199,6 +199,7 @@ public class AppHomePageFragment extends Fragment {
                 Log.i(TAG, "user retrieved and name: " + user.getUsername());
                 Log.i(TAG, "user's groups size: " + user.getListOfGroups().size());
 
+                //groups = user.getListOfGroups();
                 if (user.getListOfGroups() != null && user.getListOfGroups().size() > 0)
                     Log.i(TAG, "user's groups: " + user.getListOfGroups().get(0).getGroupName());
 

@@ -37,7 +37,7 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Groups> {
         Groups group = new Groups();
         group.setGroupName(groupName);
         group.setAdminUser(adminUser);
-        group.setUsers(teammates);
+        group.setTeammates(teammates);
         groupWrapper.setGroup(group);
     }
 
@@ -65,10 +65,10 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Groups> {
         try {
             //not creating group, likely due to the User class
             Groups group = groupEndpointApi.createGroup(groupWrapper).execute();
-            Log.i(TAG, "admin name: " + group.getAdminUser().getUsername());
+            Log.d(TAG, "admin name: " + group.getAdminUser().getUsername());
             return group;
         } catch (IOException e) {
-            Log.i(TAG, "" + e.getMessage());
+            Log.d(TAG, "" + e.getMessage());
         }
 
         return null;

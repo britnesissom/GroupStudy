@@ -1,8 +1,8 @@
 package ee461l.groupstudy;
 
 
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -11,6 +11,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.io.IOException;
+
+import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +26,8 @@ public class MessagingFragment extends Fragment implements View.OnClickListener 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String GROUP_NAME = "groupName";
     private static final String USERNAME = "username";
+    private static GroupstudyEndpoint groupEndpointApi = null;
+    private static final String TAG = "MessagingLoadGroup";
 
     private EditText textMessage;
     private TextView displayMessage;
@@ -75,6 +82,13 @@ public class MessagingFragment extends Fragment implements View.OnClickListener 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 displayMessage.setText(textMessage.getText().toString());
+                /*try {
+                    //groupEndpointApi.addMessages(groupName,textMessage.toString());
+                    Log.i(TAG, "group retrieved");
+                } catch (IOException e) {
+                    Log.i(TAG, "Error: " + e.getMessage() + "Loading group was unsuccessful.");
+                }*/
+
                 return false;
             }
         });

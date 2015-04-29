@@ -17,6 +17,7 @@ public class OfyService {
     static {
         ObjectifyService.register(User.class);
         ObjectifyService.register(Groups.class);
+        ObjectifyService.register(FilesEntity.class);
     }
 
     public static Objectify ofy() {

@@ -24,11 +24,14 @@ class LoadSingleUserAsyncTask extends AsyncTask<String, Void, User> {
     private static final String TAG = "LoadSingleUserAsync";
     private static GroupstudyEndpoint usersEndpointApi = null;
     private Context context;
+    private String activityName;
     private OnRetrieveSingleUserTaskCompleted listener;
 
-    LoadSingleUserAsyncTask(Context context, OnRetrieveSingleUserTaskCompleted listener) {
+    LoadSingleUserAsyncTask(Context context, OnRetrieveSingleUserTaskCompleted listener,
+                            String activityName) {
         this.context = context;
         this.listener = listener;
+        this.activityName = activityName;
     }
 
     @Override
@@ -52,11 +55,11 @@ class LoadSingleUserAsyncTask extends AsyncTask<String, Void, User> {
         }
 
         try {
-            User user = usersEndpointApi.retrieveSingleUser(username[0]).execute();
-            Log.i(TAG, "user retrieved");
+            User user = usersEndpointApi.retrieveSingleUser(username[0], activityName).execute();
+            Log.d(TAG, "user retrieved");
             return user;
         } catch (IOException e) {
-            Log.i(TAG, "" + e.getMessage());
+            Log.d(TAG, "" + e.getMessage());
             return null;
         }
     }

@@ -19,8 +19,10 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.Byte;
 
 import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
+import ee461l.groupstudyendpoints.groupstudyEndpoint.model.FilesEntity;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.GroupWrapperEntity;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
@@ -41,7 +43,7 @@ public class AddGroupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group);
 
-        Log.i(TAG, "AddGroup created");
+        Log.d(TAG, "AddGroup created");
 
         user = getIntent().getStringExtra("username");
 
@@ -51,7 +53,7 @@ public class AddGroupActivity extends AppCompatActivity {
             public void onRetrieveUserCompleted(User user) {
                 adminUser = user;
             }
-        });
+        }, TAG);
         lsuat.execute(user);
 
         groupName = (EditText) findViewById(R.id.group_name);
@@ -77,7 +79,7 @@ public class AddGroupActivity extends AppCompatActivity {
         String[] usernamesArray = teammates.getText().toString().split(delimiters);
         ArrayList<User> listOfUsers = getUsersFromArray(usernamesArray);
 
-        Log.i(TAG, "CreateGroup async about to be called");
+        Log.d(TAG, "CreateGroup async about to be called");
         CreateGroupEndpointsAsyncTask cgeat = new CreateGroupEndpointsAsyncTask(this, nameOfGroup,
                 adminUser, listOfUsers);
         cgeat.execute();
@@ -134,12 +136,13 @@ public class AddGroupActivity extends AppCompatActivity {
 
             groupWrapper = new GroupWrapperEntity();
             Groups group = new Groups();
+            group.setId(groupName);
             group.setGroupName(groupName);
             group.setAdminUser(adminUser);
-            group.setUsers(teammates);
-            group.setFiles(new ArrayList<String>());
+            group.setTeammates(teammates);
+            /*group.setFiles(new ArrayList<FilesEntity>());
             group.setMessages(new ArrayList<String>());
-            group.setTasks(new ArrayList<String>());
+            group.setTasks(new ArrayList<String>());*/
             groupWrapper.setGroup(group);
         }
 
@@ -167,10 +170,11 @@ public class AddGroupActivity extends AppCompatActivity {
             try {
                 //not creating group, likely due to the User class
                 Groups group = groupEndpointApi.createGroup(groupWrapper).execute();
-                Log.i(TAG, "admin name: " + group.getAdminUser().getUsername());
+                //Groups g = groupEndpointApi.updateUsersGroups(adminUser.getUsername(), groupWrapper).execute();
+                Log.d(TAG, "admin name: " + group.getAdminUser().getUsername());
                 return group;
             } catch (IOException e) {
-                Log.i(TAG, "" + e.getMessage());
+                Log.d(TAG, "" + e.getMessage());
             }
 
             return null;
@@ -182,7 +186,7 @@ public class AddGroupActivity extends AppCompatActivity {
             //pass name of group and username to next activity so if user creates another group
             //the app knows who the admin should be
             Intent intent = new Intent(context, NavDrawerGroups.class);
-            Log.i(TAG, "group name createGroup: " + result.getGroupName());
+            Log.d(TAG, "group name createGroup: " + result.getGroupName());
             intent.putExtra("groupName", result.getGroupName());
             intent.putExtra("username", result.getAdminUser().getUsername());
             context.startActivity(intent);

@@ -62,13 +62,18 @@ public class User {
                 }
             }
         }
+        //user has no groups
+        else {
+            groupsToReturn = new ArrayList<>();
+        }
         //LOGGER.info("deref groupsToReturn size: " + groupsToReturn.size());
     }
 
     public void addGroup(Groups group) {
-        Ref<Groups> g = Ref.create(Key.create(Groups.class, group.getId()));
+        LOGGER.info("User class before ref created");
+        Ref<Groups> g = Ref.create(group);
         //Ref<Groups> g = Ref.create(group);
-        LOGGER.info("Key: " + g.get().getGroupName());
+        //LOGGER.info("Key: " + g.safe().getGroupName());
         LOGGER.info("listOfGroups size: " + listOfGroups.size());
         listOfGroups.add(g);
         /*LOGGER.info("groupsToReturn size before add: " + groupsToReturn.size());
@@ -78,13 +83,9 @@ public class User {
     }
 
     public ArrayList<Groups> getListOfGroups() {
-        LOGGER.info("groupsToReturn size: " + groupsToReturn.size());
         deRef();
+        LOGGER.info("groupsToReturn size for user " + username + ": " + groupsToReturn.size());
         return groupsToReturn;
-    }
-
-    public void setListOfGroups(ArrayList<Ref<Groups>> listOfGroups) {
-        this.listOfGroups = listOfGroups;
     }
 
     public String getId() { return id; }

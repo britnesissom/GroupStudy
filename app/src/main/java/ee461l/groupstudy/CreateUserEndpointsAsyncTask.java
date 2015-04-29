@@ -49,7 +49,7 @@ class CreateUserEndpointsAsyncTask extends AsyncTask<String, Void, Void> {
         try {
             usersEndpointApi.createUser(userInfo[0], userInfo[1]).execute();
         } catch (IOException e) {
-            Log.i("CreateUserAsync", "" + e.getMessage());
+            Log.d("CreateUserAsync", "" + e.getMessage());
         }
 
         return null;
@@ -57,5 +57,5 @@ class CreateUserEndpointsAsyncTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected void onPostExecute(Void result){
-   }
+    }
 }

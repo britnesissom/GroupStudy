@@ -61,7 +61,7 @@ class LoadUsersEndpointsAsyncTask extends AsyncTask<Void, Void, List<User>> {
 
             return users;
         } catch (IOException e) {
-            Log.i("LoadUsersAsync", "" + e.getMessage());
+            Log.d("LoadUsersAsync", "" + e.getMessage());
             return Collections.EMPTY_LIST;
         }
     }

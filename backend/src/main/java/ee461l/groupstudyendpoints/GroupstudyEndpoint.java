@@ -7,7 +7,6 @@
 package ee461l.groupstudyendpoints;
 
 import com.google.api.server.spi.config.Api;
-import com.google.api.server.spi.config.ApiClass;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Nullable;
@@ -16,7 +15,6 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.cmd.Query;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -42,15 +40,23 @@ public class GroupstudyEndpoint {
      */
     @ApiMethod(name = "createGroup")
     public Groups createGroup(GroupWrapperEntity newGroup) {
-        Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
-                newGroup.getGroup().getUsers());
+        LOGGER.info("createGroup reached");
+        Groups group = new Groups();
+        group.setId(newGroup.getGroup().getId());
+        group.setGroupName(newGroup.getGroup().getGroupName());
+        group.setAdminUser(newGroup.getGroup().getAdminUser());
+        group.setTeammates(newGroup.getGroup().getTeammates());
+        LOGGER.info("group instantiated");
+        /*Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
+                newGroup.getGroup().getTeammates());*/
         OfyService.ofy().save().entity(group).now();
+        LOGGER.info("group saved to store");
         updateUsersGroups(newGroup.getGroup().getAdminUser().getId(), group);
         return group;
     }
 
     /**
-     * An endpoint that adds a task to a specific group
+     * An endpoint that adds a task to a specific group's calendar
      */
     @ApiMethod(name = "createTask")
     public Groups createTask(@Named("groupName") String groupName, @Named("task") String task) {
@@ -64,10 +70,25 @@ public class GroupstudyEndpoint {
     /**
      * An endpoint that adds a file to a specific group
      */
-    @ApiMethod(name = "addFile")
+    /*@ApiMethod(name = "addFile")
     public Groups addFile(@Named("groupName") String groupName, @Named("file") String file) {
         //byte[] fileBytes = file.getBytes(Charset.forName("UTF-8"));
         //will return null if group does not exist
+        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        group.addFile(file);
+        OfyService.ofy().save().entity(group).now();
+        return group;
+    }*/
+
+    /**
+     * An endpoint that adds a file to a specific group
+     */
+    @ApiMethod(name = "addFile")
+    public Groups addFile(@Named("groupName") String groupName, FilesEntity file) {
+        //byte[] fileBytes = file.getBytes(Charset.forName("UTF-8"));
+        //will return null if group does not exist
+        //String groupName = file.getGroupName();
+        //Byte[] fileContents = file.getFile();
         Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
         group.addFile(file);
         OfyService.ofy().save().entity(group).now();
@@ -78,14 +99,26 @@ public class GroupstudyEndpoint {
     adds a new group for a specific user so their home page is updated to
     include the new group
      */
-    @ApiMethod(name = "updateUsersGroups")
-    public User updateUsersGroups(@Named("adminUsername") String username, Groups group) {
+    /*@ApiMethod(name = "updateUsersGroups")
+    public Groups updateUsersGroups(@Named("adminUsername") String username, GroupWrapperEntity group) {
         User u = OfyService.ofy().load().type(User.class).id(username).now();
+        Groups g = OfyService.ofy().load().type(Groups.class).id(group.getGroup().getGroupName()).now();
+        LOGGER.info("user's groups size: " + u.getListOfGroups().size());
+        LOGGER.info("updateUsersGroups group name: " + g.getGroupName());
+        u.addGroup(g);
+        OfyService.ofy().save().entity(u).now();
+        return g;
+    }*/
+
+    @ApiMethod(name = "updateUsersGroups")
+    public Groups updateUsersGroups(@Named("adminUsername") String username, Groups group) {
+        User u = OfyService.ofy().load().type(User.class).id(username).now();
+        //Groups g = OfyService.ofy().load().type(Groups.class).id(group.getGroup().getGroupName()).now();
         LOGGER.info("user's groups size: " + u.getListOfGroups().size());
         LOGGER.info("updateUsersGroups group name: " + group.getGroupName());
         u.addGroup(group);
         OfyService.ofy().save().entity(u).now();
-        return u;
+        return group;
     }
 
     /**
@@ -94,15 +127,15 @@ public class GroupstudyEndpoint {
     @ApiMethod(name = "retrieveSingleGroup")
     public Groups retrieveSingleGroup(@Named("groupName") String groupName) {
         //will return null if group does not exist
-        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
-        LOGGER.info(group.getAdminUser().getUsername());
-        return group;
+        //Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        //LOGGER.info(group.getAdminUser().getUsername());
+        return OfyService.ofy().load().type(Groups.class).id(groupName).now();
     }
 
     //loads the list of groups in the app
     @ApiMethod(name = "loadGroups")
     public CollectionResponse<Groups> loadGroups(@Nullable @Named("cursor") String cursorString,
-                                             @Nullable @Named("count") Integer count) {
+                                                 @Nullable @Named("count") Integer count) {
         Query<Groups> query = OfyService.ofy().load().type(Groups.class);
         if (count != null) query.limit(count);
         if (cursorString != null && cursorString != "") {
@@ -176,10 +209,12 @@ public class GroupstudyEndpoint {
 
     //loads the single user in the app
     @ApiMethod(name = "retrieveSingleUser")
-    public User retrieveSingleUser(@Named("username") String username) {
+    public User retrieveSingleUser(@Named("username") String username,
+                                   @Named("activityName") String activityName) {
+        LOGGER.info("Called from: " + activityName);
         //will return null if user is not found
-        User user = OfyService.ofy().load().type(User.class).id(username).now();
-        LOGGER.info("user's group size: " + user.getListOfGroups().size());
-        return user;
+        //User user = OfyService.ofy().load().type(User.class).id(username).now();
+        //LOGGER.info("user's group size: " + user.getListOfGroups().size());
+        return OfyService.ofy().load().type(User.class).id(username).now();
     }
 }
