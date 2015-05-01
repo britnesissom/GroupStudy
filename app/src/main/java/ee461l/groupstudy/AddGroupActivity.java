@@ -48,13 +48,13 @@ public class AddGroupActivity extends AppCompatActivity {
         user = getIntent().getStringExtra("username");
 
         //retrieves user to set as admin
-        LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
+        /*LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
             @Override
             public void onRetrieveUserCompleted(User user) {
                 adminUser = user;
             }
         }, TAG);
-        lsuat.execute(user);
+        lsuat.execute(user);*/
 
         groupName = (EditText) findViewById(R.id.group_name);
         teammates = (EditText) findViewById(R.id.teammates);
@@ -81,7 +81,7 @@ public class AddGroupActivity extends AppCompatActivity {
 
         Log.d(TAG, "CreateGroup async about to be called");
         CreateGroupEndpointsAsyncTask cgeat = new CreateGroupEndpointsAsyncTask(this, nameOfGroup,
-                adminUser, listOfUsers);
+                user, listOfUsers);
         cgeat.execute();
     }
 
@@ -131,7 +131,7 @@ public class AddGroupActivity extends AppCompatActivity {
         private Context context;
         private GroupWrapperEntity groupWrapper;
 
-        CreateGroupEndpointsAsyncTask(Context context, String groupName, User adminUser, ArrayList<User> teammates) {
+        CreateGroupEndpointsAsyncTask(Context context, String groupName, String adminUser, ArrayList<User> teammates) {
             this.context = context;
 
             groupWrapper = new GroupWrapperEntity();
@@ -171,7 +171,7 @@ public class AddGroupActivity extends AppCompatActivity {
                 //not creating group, likely due to the User class
                 Groups group = groupEndpointApi.createGroup(groupWrapper).execute();
                 //Groups g = groupEndpointApi.updateUsersGroups(adminUser.getUsername(), groupWrapper).execute();
-                Log.d(TAG, "admin name: " + group.getAdminUser().getUsername());
+                Log.d(TAG, "admin name: " + group.getAdminUser());
                 return group;
             } catch (IOException e) {
                 Log.d(TAG, "" + e.getMessage());
@@ -188,7 +188,7 @@ public class AddGroupActivity extends AppCompatActivity {
             Intent intent = new Intent(context, NavDrawerGroups.class);
             Log.d(TAG, "group name createGroup: " + result.getGroupName());
             intent.putExtra("groupName", result.getGroupName());
-            intent.putExtra("username", result.getAdminUser().getUsername());
+            intent.putExtra("username", result.getAdminUser());
             context.startActivity(intent);
         }
     }

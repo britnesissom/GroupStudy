@@ -2,16 +2,21 @@ package ee461l.groupstudyendpoints;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.OnLoad;
+import com.googlecode.objectify.annotation.Subclass;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 @Entity
+@Subclass
+@Cache
 public class Groups {
 
     private static final Logger LOGGER = Logger.getLogger(Groups.class.getName());
@@ -22,27 +27,27 @@ public class Groups {
     String id;
     private String groupName;
 
-    @Load/*(Everything.class)*/
-    private transient ArrayList<Ref<FilesEntity>> files = new ArrayList<>();
+    @Load(Everything.class)
+    private transient ArrayList<Ref<FilesEntity>> files;
     @Ignore
     private ArrayList<FilesEntity> filesToReturn = new ArrayList<>();
 
-    @Load/*(Everything.class)*/
-    private transient ArrayList<Ref<User>> teammates = new ArrayList<>();
+    @Load(Everything.class)
+    private transient ArrayList<Ref<User>> teammates;
     @Ignore
     private ArrayList<User> teammatesToReturn = new ArrayList<>();
 
     private ArrayList<String> messages = new ArrayList<>();
     private ArrayList<String> tasks = new ArrayList<>();
 
-    @Load
-    private transient Ref<User> adminUser;
+    //@Load
+    private String adminUser;
 
     public Groups() {
 
     }
 
-    public Groups(String groupName, User adminUser, ArrayList<User> teammates) {
+    public Groups(String groupName, String adminUser, ArrayList<User> teammates) {
         setId(groupName);
         this.groupName = groupName;
         setAdminUser(adminUser);
@@ -52,50 +57,61 @@ public class Groups {
         this.tasks = new ArrayList<>();
     }
 
-    @OnLoad
+    //@OnLoad
     private void deRefFiles() {
-        if (files != null && files.size() != 0) {
+        if (files != null) {
 
             filesToReturn = new ArrayList<>();
             for (int i = 0; i < files.size(); i++) {
+                LOGGER.info("File key for retrieval: " + files.get(i).getKey());
+                while (!files.get(i).isLoaded()) {
+                    LOGGER.info("file is loading");
+                }
                 if (files.get(i).isLoaded()) {
                     //LOGGER.info("group ref: " + listOfGroups.get(i).getValue());
                     filesToReturn.add(files.get(i).get());
-                    //LOGGER.info("Group name with getValue: " + listOfGroups.get(i).getValue().getGroupName());
-                    LOGGER.info("File name: " + files.get(i).get().getFileName());
-                    LOGGER.info("File name w/o getValue: " + files.get(i).get().getFileName());
+
+                    if (files.get(i).get() == null) {
+                        LOGGER.info("file is null");
+                    } else {
+                        //LOGGER.info("Group name with getValue: " + listOfGroups.get(i).getValue().getGroupName());
+                        LOGGER.info("File safe get: " + files.get(i).get().getFileName());
+                    }
+                    //LOGGER.info("File name w/o getValue: " + files.get(i).get().getFileName());
                 }
+
             }
         }
         //no files have been added
         else {
             filesToReturn = new ArrayList<>();
         }
-        //LOGGER.info("deref groupsToReturn size: " + groupsToReturn.size());
+        LOGGER.info("deref filesToReturn size: " + filesToReturn.size());
     }
 
-    @OnLoad
+    //@OnLoad
     private void deRefUsers() {
         if (teammates != null && teammates.size() != 0) {
             teammatesToReturn = new ArrayList<>();
             for (int i = 0; i < teammates.size(); i++) {
-                if (teammates.get(i).isLoaded()) {
+                //if (teammates.get(i).isLoaded()) {
                     //LOGGER.info("group ref: " + listOfGroups.get(i).getValue());
                     teammatesToReturn.add(teammates.get(i).get());
                     //LOGGER.info("Group name with getValue: " + listOfGroups.get(i).getValue().getGroupName());
                     LOGGER.info("username: " + teammates.get(i).get().getUsername());
-                }
+                //}
             }
         }
         //no teammates have been added
         else {
             teammatesToReturn = new ArrayList<>();
         }
-        //LOGGER.info("deref groupsToReturn size: " + groupsToReturn.size());
+        LOGGER.info("deref groupsToReturn size: " + teammatesToReturn.size());
     }
 
     public ArrayList<FilesEntity> getFiles() {
-        //deRefFiles();
+        deRefFiles();
+
         LOGGER.info("filesToReturn size for " + groupName + ": " + filesToReturn.size());
         return filesToReturn;
     }
@@ -113,10 +129,14 @@ public class Groups {
     }
 
     public void addFile(FilesEntity file) {
+        //Ref<FilesEntity> g = Ref.create(Key.create(FilesEntity.class, file.getId()));
         Ref<FilesEntity> g = Ref.create(file);
-        //LOGGER.info("Key: " + g.safe().getFileName());
+        LOGGER.info("File key: " + g.getKey());
+        if (files == null)
+            files = new ArrayList<>();
         LOGGER.info("list of ref<files> size: " + files.size());
         files.add(g);
+        LOGGER.info("list of ref<files> size after add: " + files.size());
         LOGGER.info("file added!");
     }
 
@@ -128,18 +148,18 @@ public class Groups {
         this.groupName = groupName;
     }
 
-    public void setAdminUser(User adminUser) {
-        Ref<User> u = Ref.create(adminUser);
-        this.adminUser = u;
+    public void setAdminUser(String adminUser) {
+        //Ref<User> u = Ref.create(adminUser);
+        this.adminUser = adminUser;
     }
 
     public String getGroupName() {
         return groupName;
     }
 
-    public void changeAdminUser(User adminUser) {
-        Ref<User> u = Ref.create(adminUser);
-        this.adminUser = u;
+    public void changeAdminUser(String adminUser) {
+        //Ref<User> u = Ref.create(adminUser);
+        this.adminUser = adminUser;
     }
 
     public ArrayList<String> getMessages() { return messages ; }
@@ -147,18 +167,20 @@ public class Groups {
     public ArrayList<String> getTasks() { return tasks;}
 
     public ArrayList<User> getTeammates() {
-        //deRefUsers();
+        deRefUsers();
+        LOGGER.info("teammatesToReturn size for " + groupName + ": " + teammatesToReturn.size());
         return teammatesToReturn;
     }
 
     public void setTeammates(ArrayList<User> teammates) {
+        teammates = new ArrayList<>();
         for (User u : teammates) {
             Ref<User> refToUser = Ref.create(u);
             this.teammates.add(refToUser);
         }
     }
 
-    public User getAdminUser() {
-        return adminUser.get();
+    public String getAdminUser() {
+        return adminUser;
     }
 }

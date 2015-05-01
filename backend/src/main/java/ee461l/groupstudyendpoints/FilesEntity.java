@@ -1,7 +1,9 @@
 package ee461l.groupstudyendpoints;
 
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Subclass;
 
 import java.util.ArrayList;
 import java.lang.Byte;
@@ -10,6 +12,8 @@ import java.lang.Byte;
  * Created by britne on 4/28/15.
  */
 @Entity
+@Subclass
+@Cache
 public class FilesEntity {
 
     @Id

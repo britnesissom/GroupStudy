@@ -13,6 +13,7 @@ import com.google.api.server.spi.config.Nullable;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
@@ -49,9 +50,9 @@ public class GroupstudyEndpoint {
         LOGGER.info("group instantiated");
         /*Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
                 newGroup.getGroup().getTeammates());*/
-        OfyService.ofy().save().entity(group).now();
         LOGGER.info("group saved to store");
-        updateUsersGroups(newGroup.getGroup().getAdminUser().getId(), group);
+        updateUsersGroups(newGroup.getGroup().getAdminUser(), group);
+        OfyService.ofy().save().entity(group).now();
         return group;
     }
 
@@ -90,6 +91,10 @@ public class GroupstudyEndpoint {
         //String groupName = file.getGroupName();
         //Byte[] fileContents = file.getFile();
         Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        Ref<Groups> r = Ref.create(group);
+        while (!r.isLoaded()) {
+            LOGGER.info("waiting for group to load to add file");
+        }
         group.addFile(file);
         OfyService.ofy().save().entity(group).now();
         return group;
@@ -112,12 +117,19 @@ public class GroupstudyEndpoint {
 
     @ApiMethod(name = "updateUsersGroups")
     public Groups updateUsersGroups(@Named("adminUsername") String username, Groups group) {
+        List<User> users = new ArrayList<User>();
         User u = OfyService.ofy().load().type(User.class).id(username).now();
-        //Groups g = OfyService.ofy().load().type(Groups.class).id(group.getGroup().getGroupName()).now();
-        LOGGER.info("user's groups size: " + u.getListOfGroups().size());
-        LOGGER.info("updateUsersGroups group name: " + group.getGroupName());
         u.addGroup(group);
-        OfyService.ofy().save().entity(u).now();
+        users.add(u);
+        for (int i = 0; i < group.getTeammates().size(); i++) {
+            u = OfyService.ofy().load().type(User.class).id(group.getTeammates().get(i).getUsername()).now();
+            //Groups g = OfyService.ofy().load().type(Groups.class).id(group.getGroup().getGroupName()).now();
+            LOGGER.info(group.getTeammates().get(i).getUsername() + " groups size: " + u.getListOfGroups().size());
+            LOGGER.info("updateUsersGroups group name: " + group.getGroupName());
+            u.addGroup(group);
+            users.add(u);
+        }
+        OfyService.ofy().save().entities(users).now();
         return group;
     }
 
@@ -127,9 +139,9 @@ public class GroupstudyEndpoint {
     @ApiMethod(name = "retrieveSingleGroup")
     public Groups retrieveSingleGroup(@Named("groupName") String groupName) {
         //will return null if group does not exist
-        //Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
         //LOGGER.info(group.getAdminUser().getUsername());
-        return OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        return group;
     }
 
     //loads the list of groups in the app
@@ -181,7 +193,7 @@ public class GroupstudyEndpoint {
                                               @Nullable @Named("count") Integer count) {
         Query<User> query = OfyService.ofy().load().type(User.class);
         if (count != null) query.limit(count);
-        if (cursorString != null && cursorString != "") {
+        if (cursorString != null && !cursorString.equals("")) {
             query = query.startAt(Cursor.fromWebSafeString(cursorString));
         }
 
@@ -213,8 +225,12 @@ public class GroupstudyEndpoint {
                                    @Named("activityName") String activityName) {
         LOGGER.info("Called from: " + activityName);
         //will return null if user is not found
-        //User user = OfyService.ofy().load().type(User.class).id(username).now();
-        //LOGGER.info("user's group size: " + user.getListOfGroups().size());
-        return OfyService.ofy().load().type(User.class).id(username).now();
+        User user = OfyService.ofy().load().type(User.class).id(username).now();
+        Ref<User> r = Ref.create(user);
+        while (!r.isLoaded()) {
+            LOGGER.info("waiting for user to load");
+        }
+        LOGGER.info("username: " + user.getUsername());
+        return user;
     }
 }

@@ -30,7 +30,7 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Groups> {
     private Context context;
     private GroupWrapperEntity groupWrapper;
 
-    CreateGroupEndpointsAsyncTask(Context context, String groupName, User adminUser, ArrayList<User> teammates) {
+    CreateGroupEndpointsAsyncTask(Context context, String groupName, String adminUser, ArrayList<User> teammates) {
         this.context = context;
 
         groupWrapper = new GroupWrapperEntity();
@@ -65,7 +65,7 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Groups> {
         try {
             //not creating group, likely due to the User class
             Groups group = groupEndpointApi.createGroup(groupWrapper).execute();
-            Log.d(TAG, "admin name: " + group.getAdminUser().getUsername());
+            //Log.d(TAG, "admin name: " + group.getAdminUser().getUsername());
             return group;
         } catch (IOException e) {
             Log.d(TAG, "" + e.getMessage());
@@ -81,7 +81,7 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Groups> {
         //the app knows who the admin should be
         Intent intent = new Intent(context, NavDrawerGroups.class);
         intent.putExtra("group name", result.getGroupName());
-        intent.putExtra("username", result.getAdminUser().getUsername());
+        intent.putExtra("username", result.getAdminUser());
         context.startActivity(intent);
     }
 }

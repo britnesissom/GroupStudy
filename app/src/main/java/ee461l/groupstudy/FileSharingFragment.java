@@ -54,7 +54,7 @@ public class FileSharingFragment extends Fragment {
     private TextView users;
     private ListView files;
     private List<FilesEntity> filesFromServer;
-    private List<File> filesToView;
+    //private List<File> filesToView;
     private String groupName;
     private Groups group;
     private FileListViewAdapter adapter;
@@ -204,7 +204,7 @@ public class FileSharingFragment extends Fragment {
     }
 
     //convert file to byte array then save it as entity in group
-    private class SendFileToGroupEndpoint extends AsyncTask<Uri, Void, Void> {
+    private class SendFileToGroupEndpoint extends AsyncTask<Uri, Void, Groups> {
         private GroupstudyEndpoint groupEndpointApi = null;
         private Context context;
 
@@ -221,7 +221,7 @@ public class FileSharingFragment extends Fragment {
         //convert file to byte array to save
         //save file to arraylist for files in specific group
         @Override
-        protected Void doInBackground(Uri... uri) {
+        protected Groups doInBackground(Uri... uri) {
             if(groupEndpointApi == null) {  // Only do this once
                 GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                         new AndroidJsonFactory(), null)
@@ -265,7 +265,7 @@ public class FileSharingFragment extends Fragment {
                 fe.setFileName(file.getName());
                 fe.setFileContents(fileBytes);
 
-                groupEndpointApi.addFile(groupName, fe).execute();
+                Groups groupReturned = groupEndpointApi.addFile(groupName, fe).execute();
 
                 //String fileBytes = new String(bFile);
 
@@ -277,6 +277,7 @@ public class FileSharingFragment extends Fragment {
                 //FileWrapperEntity fwe = new FileWrapperEntity();
                 //fwe.setFileInfo(groupName, fileBytes);
                 Log.d(TAG, "file added to group");
+                return groupReturned;
             }
             catch(IOException e) {
                 Log.e(TAG, e.getMessage());
@@ -286,11 +287,13 @@ public class FileSharingFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(Groups result) {
             Toast.makeText(getActivity().getApplicationContext(), "File uploaded!",
                     Toast.LENGTH_LONG).show();
 
             super.onPostExecute(result);
+            filesFromServer.addAll(result.getFiles());
+            adapter.notifyDataSetChanged();
         }
     }
 }

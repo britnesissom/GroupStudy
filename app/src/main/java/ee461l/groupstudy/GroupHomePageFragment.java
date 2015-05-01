@@ -98,7 +98,7 @@ public class GroupHomePageFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_group_home_page, container, false);
         getActivity().setTitle(group.getGroupName() + " Home");
         Log.d(TAG, "Group home fragment open");
-        Log.d(TAG, "admin username: " + group.getAdminUser().getUsername());
+        //Log.d(TAG, "admin username: " + group.getAdminUser().getUsername());
 
         return rootView;
     }
