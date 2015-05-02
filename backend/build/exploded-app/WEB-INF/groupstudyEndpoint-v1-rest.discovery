@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/oB0nFlWx8b5k0hclNaKLGP7Aek4\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/O1afMgYf3SfJekzftqhf5zzZQRQ\"",
  "discoveryVersion": "v1",
  "id": "groupstudyEndpoint:v1",
  "name": "groupstudyEndpoint",
@@ -225,6 +225,33 @@
     "$ref": "GroupWrapperEntity",
     "parameterName": "resource"
    },
+   "response": {
+    "$ref": "Groups"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "createMessage": {
+   "id": "groupstudyEndpoint.createMessage",
+   "path": "createMessage/{groupName}/{message}",
+   "httpMethod": "POST",
+   "parameters": {
+    "groupName": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    },
+    "message": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "groupName",
+    "message"
+   ],
    "response": {
     "$ref": "Groups"
    },

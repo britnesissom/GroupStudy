@@ -72,6 +72,21 @@ public class GroupstudyEndpoint {
     }
 
     /**
+     * Creates message and stores it in objectify
+     */
+    @ApiMethod(name = "createMessage")
+    public Groups createMessage(@Named("groupName") String groupName, @Named("message") String message) {
+        //will return null if group does not exist
+        LOGGER.info("createTask reached");
+        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        group.addTask(message);
+        ArrayList<String> messages = group.getMessages();
+        group.setMessages(messages);
+        OfyService.ofy().save().entity(group).now();
+        return group;
+    }
+
+    /**
      * An endpoint that adds a file to a specific group
      */
     /*@ApiMethod(name = "addFile")
@@ -93,6 +108,7 @@ public class GroupstudyEndpoint {
         //will return null if group does not exist
         //String groupName = file.getGroupName();
         //Byte[] fileContents = file.getFile();
+        LOGGER.info("file contents: " + file.getFileContents());
         Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
         group = group.addFile(file);
         OfyService.ofy().save().entity(group).now();
