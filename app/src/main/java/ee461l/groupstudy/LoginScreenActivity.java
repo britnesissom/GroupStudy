@@ -1,6 +1,8 @@
 package ee461l.groupstudy;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,9 +13,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
+import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 
@@ -94,5 +103,60 @@ public class LoginScreenActivity extends AppCompatActivity {
     public void createAccount(View v) {
         Intent intent = new Intent(this,CreateNewAccountActivity.class);
         startActivity(intent);
+    }
+
+    private class LoadSingleUserAsyncTask extends AsyncTask<String, Void, User> {
+        private static final String TAG = "LoadSingleUserAsync";
+        private GroupstudyEndpoint usersEndpointApi = null;
+        private Context context;
+        private String activityName;
+        private OnRetrieveSingleUserTaskCompleted listener;
+
+        LoadSingleUserAsyncTask(Context context, OnRetrieveSingleUserTaskCompleted listener,
+                                String activityName) {
+            this.context = context;
+            this.listener = listener;
+            this.activityName = activityName;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Toast.makeText(context, "Logging in...", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected User doInBackground(String... username) {
+            if(usersEndpointApi == null) {  // Only do this once
+                GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
+                        new AndroidJsonFactory(), null)
+                        // options for running against local devappserver
+                        // - 10.0.2.2 is localhost's IP address in Android emulator
+                        // - turn off compression when running against local devappserver
+                        .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
+                        .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                            @Override
+                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                                abstractGoogleClientRequest.setDisableGZipContent(true);
+                            }
+                        });
+                // end options for devappserver
+
+                usersEndpointApi = builder.build();
+            }
+
+            try {
+                User user = usersEndpointApi.retrieveSingleUser(username[0], activityName).execute();
+                Log.d(TAG, "user retrieved");
+                return user;
+            } catch (IOException e) {
+                Log.d(TAG, "" + e.getMessage());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(User result) {
+            listener.onRetrieveUserCompleted(result);
+        }
     }
 }

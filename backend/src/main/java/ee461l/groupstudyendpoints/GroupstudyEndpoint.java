@@ -62,8 +62,11 @@ public class GroupstudyEndpoint {
     @ApiMethod(name = "createTask")
     public Groups createTask(@Named("groupName") String groupName, @Named("task") String task) {
         //will return null if group does not exist
+        LOGGER.info("createTask reached");
         Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
         group.addTask(task);
+        ArrayList<String> tasks = group.getTasks();
+        group.setTasks(tasks);
         OfyService.ofy().save().entity(group).now();
         return group;
     }
@@ -91,12 +94,9 @@ public class GroupstudyEndpoint {
         //String groupName = file.getGroupName();
         //Byte[] fileContents = file.getFile();
         Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
-        Ref<Groups> r = Ref.create(group);
-        while (!r.isLoaded()) {
-            LOGGER.info("waiting for group to load to add file");
-        }
-        group.addFile(file);
+        group = group.addFile(file);
         OfyService.ofy().save().entity(group).now();
+        LOGGER.info("returned to endpoint addFile method");
         return group;
     }
 
@@ -119,18 +119,19 @@ public class GroupstudyEndpoint {
     public Groups updateUsersGroups(@Named("adminUsername") String username, Groups group) {
         List<User> users = new ArrayList<User>();
         User u = OfyService.ofy().load().type(User.class).id(username).now();
-        u.addGroup(group);
+        u = u.addGroup(group);
         users.add(u);
         for (int i = 0; i < group.getTeammates().size(); i++) {
             u = OfyService.ofy().load().type(User.class).id(group.getTeammates().get(i).getUsername()).now();
             //Groups g = OfyService.ofy().load().type(Groups.class).id(group.getGroup().getGroupName()).now();
             LOGGER.info(group.getTeammates().get(i).getUsername() + " groups size: " + u.getListOfGroups().size());
             LOGGER.info("updateUsersGroups group name: " + group.getGroupName());
-            u.addGroup(group);
+            u = u.addGroup(group);
             users.add(u);
         }
         OfyService.ofy().save().entities(users).now();
-        return group;
+        Groups g = group;
+        return g;
     }
 
     /**
@@ -226,10 +227,6 @@ public class GroupstudyEndpoint {
         LOGGER.info("Called from: " + activityName);
         //will return null if user is not found
         User user = OfyService.ofy().load().type(User.class).id(username).now();
-        Ref<User> r = Ref.create(user);
-        while (!r.isLoaded()) {
-            LOGGER.info("waiting for user to load");
-        }
         LOGGER.info("username: " + user.getUsername());
         return user;
     }

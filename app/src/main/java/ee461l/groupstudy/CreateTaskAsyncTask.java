@@ -3,6 +3,7 @@ package ee461l.groupstudy;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.provider.Contacts;
+import android.util.Log;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -33,14 +34,14 @@ public class CreateTaskAsyncTask extends AsyncTask<String, Void, Void> { //first
     }
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected Void doInBackground(String... event) {
         if(groupEndpointApi == null) {  // Only do this once
             GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
                     // options for running against local devappserver
                     // - 10.0.2.2 is localhost's IP address in Android emulator
                     // - turn off compression when running against local devappserver
-                    .setRootUrl("https://groupstudy-ee-461l.appspot.com/_ah/api")
+                    .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
                     .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                         @Override
                         public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
@@ -53,8 +54,8 @@ public class CreateTaskAsyncTask extends AsyncTask<String, Void, Void> { //first
         }
 
         try {
-            groupEndpointApi.createTask(groupName, params[0]);
-
+            groupEndpointApi.createTask(groupName, event[0]).execute();
+            Log.d(TAG, "task added");
         } catch (IOException e) {
             e.printStackTrace();
         }

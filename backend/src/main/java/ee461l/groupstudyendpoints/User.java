@@ -75,7 +75,7 @@ public class User {
         //LOGGER.info("deref groupsToReturn size: " + groupsToReturn.size());
     }*/
 
-    public void addGroup(Groups group) {
+    public User addGroup(Groups group) {
         LOGGER.info("User class before ref created");
         Ref<Groups> g = Ref.create(Key.create(Groups.class, group.getId()));
         //Ref<Groups> g = Ref.create(group);
@@ -88,6 +88,7 @@ public class User {
         groupsToReturn.add(group);
         LOGGER.info("groupsToReturn size: " + groupsToReturn.size());*/
         LOGGER.info("group added!");
+        return this;
     }
 
     public ArrayList<Groups> getListOfGroups() {

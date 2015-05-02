@@ -54,7 +54,7 @@ class LoadSingleGroupAsyncTask extends AsyncTask<String, Void, Groups> {
 
         try {
             Groups group = groupEndpointApi.retrieveSingleGroup(groupName[0]).execute();
-            Log.d(TAG, "group retrieved");
+            Log.d(TAG, "group retrieved: " + group.getGroupName());
             return group;
         } catch (IOException e) {
             Log.d(TAG, "Error: " + e.getMessage());
@@ -64,6 +64,7 @@ class LoadSingleGroupAsyncTask extends AsyncTask<String, Void, Groups> {
 
     @Override
     protected void onPostExecute(Groups result) {
+        Log.d(TAG, "group retrieved onpostexecute: " + result.getGroupName());
         listener.onRetrieveSingleGroupCompleted(result);
     }
 }

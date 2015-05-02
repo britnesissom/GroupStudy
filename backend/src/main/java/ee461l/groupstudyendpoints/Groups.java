@@ -8,8 +8,10 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.OnLoad;
+import com.googlecode.objectify.annotation.Serialize;
 import com.googlecode.objectify.annotation.Subclass;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -17,8 +19,9 @@ import java.util.logging.Logger;
 @Entity
 @Subclass
 @Cache
-public class Groups {
+public class Groups implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = Logger.getLogger(Groups.class.getName());
 
     public static class Everything {}
@@ -37,7 +40,10 @@ public class Groups {
     @Ignore
     private ArrayList<User> teammatesToReturn = new ArrayList<>();
 
+    @Load
     private ArrayList<String> messages = new ArrayList<>();
+
+    @Load
     private ArrayList<String> tasks = new ArrayList<>();
 
     //@Load
@@ -121,14 +127,18 @@ public class Groups {
     }
 
     public void setTasks(ArrayList<String> tasks) {
-        this.tasks = tasks;
+        this.tasks = new ArrayList<>();
+        this.tasks.addAll(tasks);
     }
 
     public void addTask(String task) {
+        if (this.tasks == null)
+            this.tasks = new ArrayList<>();
         tasks.add(task);
+        LOGGER.info("task added!");
     }
 
-    public void addFile(FilesEntity file) {
+    public Groups addFile(FilesEntity file) {
         //Ref<FilesEntity> g = Ref.create(Key.create(FilesEntity.class, file.getId()));
         Ref<FilesEntity> g = Ref.create(file);
         LOGGER.info("File key: " + g.getKey());
@@ -138,6 +148,7 @@ public class Groups {
         files.add(g);
         LOGGER.info("list of ref<files> size after add: " + files.size());
         LOGGER.info("file added!");
+        return this;
     }
 
     public String getId() { return id; }

@@ -292,7 +292,12 @@ public class FileSharingFragment extends Fragment {
                     Toast.LENGTH_LONG).show();
 
             super.onPostExecute(result);
-            filesFromServer.addAll(result.getFiles());
+
+            //group did not load correctly so it can't be returned
+            if (result != null)
+                filesFromServer.addAll(result.getFiles());
+            else
+                filesFromServer.addAll(new ArrayList<FilesEntity>());
             adapter.notifyDataSetChanged();
         }
     }
