@@ -43,8 +43,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     FragmentManager manager;
     private boolean dateCancel = false;
     private Groups group;
-
     private String groupName;
+    private String lastDate = null;
+    private String lastTime = null;
+    private String lastDescription = null;
     //private OnFragmentInteractionListener mListener;
 
     /**
@@ -150,6 +152,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         //newFragment.show(this.manager, "timePicker");
         TimePickerDialog timeDialog = new TimePickerDialog(getActivity(),
                 new mTimeSetListener(), hour, minute, false);
+
         //Dialog description = new Dialog(getActivity());
         //description.show();
 
@@ -202,14 +205,17 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         if (dateCancel) {
-                            // already removed date and time
+                            // time added, date canceled
                         } else if (dateList.size() > timeList.size()) {
                             //date not canceled but time was
                             dateList.remove(dateList.size() - 1);
                         } else if (dateList.size() == timeList.size()) {
                             //date not canceled, time not canceled
-                            dateList.remove(dateList.size() - 1);
-                            timeList.remove(timeList.size() - 1);
+                            //or both canceled
+                            if(dateList.size() != 0){
+                                dateList.remove(dateList.size() - 1);
+                                timeList.remove(timeList.size() - 1);
+                            }
                         }
                         dialog.cancel();
                     }
@@ -262,14 +268,14 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             boolean AM = false;
 
             if(dateList.size() == timeList.size()){
-                // a date wasn't added, it was canceled
+                // a date wasn't added, it was canceled, but a time was added
                 dateCancel = true;
             } else {
                 if (mHour < 12) {
                     AM = true;
                 }
-                if (mHour == 12) {
-                    //don't change it
+                else if (mHour == 12) {
+                    //don't change it, 12 PM
                 } else {
                     mHour -= 12;
                 }
@@ -286,6 +292,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
 
     }
+
 
 
 }
