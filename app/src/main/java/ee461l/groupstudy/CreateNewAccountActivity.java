@@ -123,15 +123,5 @@ public class CreateNewAccountActivity extends AppCompatActivity {
         createPassword.setText("");
         confirmPassword.setText("");
     }
-/*
-
-    private boolean checkIfUserExists(String user) {
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getUsername().equals(user))
-                return true;
-        }
-        return false;
-    }
-*/
 
 }

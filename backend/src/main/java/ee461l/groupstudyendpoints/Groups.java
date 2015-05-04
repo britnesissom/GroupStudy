@@ -119,7 +119,7 @@ public class Groups implements Serializable {
     public void addMessage(String message) {
         if (this.messages == null)
             this.messages = new ArrayList<>();
-        tasks.add(message);
+        messages.add(message);
         LOGGER.info("message added!");
     }
 

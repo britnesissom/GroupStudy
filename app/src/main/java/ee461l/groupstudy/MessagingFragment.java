@@ -146,6 +146,8 @@ public class MessagingFragment extends Fragment implements View.OnClickListener,
 
         messagesForAdapter.add(text);
         adapter.notifyDataSetChanged();
+
+        clearText();
         //displayMessage.setText(username + ": " + messageEditor.getText().toString());
     }
 
@@ -158,7 +160,12 @@ public class MessagingFragment extends Fragment implements View.OnClickListener,
         messagesForAdapter.add(text);
         adapter.notifyDataSetChanged();
 
+        clearText();
         //displayMessage.setText(messageEditor.getText().toString());
         return false;
+    }
+
+    private void clearText() {
+        messageEditor.setText("");
     }
 }

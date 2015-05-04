@@ -62,13 +62,15 @@ public class MessagingListViewAdapter extends BaseAdapter {
         if(user.equals(username))
         {
             holder.message.setBackgroundResource(R.drawable.yourself_message_border);
-            lp.gravity = Gravity.RIGHT;
+            lp.leftMargin = (int) context.getResources().getDimension(R.dimen.message_left_margin);
+            lp.rightMargin = (int) context.getResources().getDimension(R.dimen.message_side_margin);
         }
         //If not mine then it is from teammate and align to left
         else
         {
             holder.message.setBackgroundResource(R.drawable.teammates_message_border);
-            lp.gravity = Gravity.LEFT;
+            lp.rightMargin = (int) context.getResources().getDimension(R.dimen.message_right_margin);
+            lp.leftMargin = (int) context.getResources().getDimension(R.dimen.message_side_margin);
         }
 
         holder.message.setLayoutParams(lp);

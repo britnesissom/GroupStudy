@@ -126,12 +126,11 @@ public class GroupHomePageFragment extends Fragment {
         if (messages != null) {
 
             if (messages.size() > 2) {
-                //the newest messages are at the end of the array list
-                for (int i = messages.size()-1; i > messages.size()-3; i--) {
+                for (int i = 0; i < 2; i++) {
                     newMessages.append(messages.get(i) + "\n");
                 }
             } else {
-                for (int i = messages.size()-1; i > 0; i--) {
+                for (int i = 0; i < messages.size(); i++) {
                     newMessages.append(messages.get(i) + "\n");
                 }
             }
