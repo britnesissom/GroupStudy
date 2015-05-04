@@ -24,15 +24,18 @@ public class GroupsListViewAdapter extends BaseAdapter {
     private Context context;
     private int layoutResourceId;
     private String groupName;
+    private String username;
 
     static class ViewHolder {
         Button groupButton;
     }
 
-    public GroupsListViewAdapter(Context context, int layoutResourceId, List<Groups> groups) {
+    public GroupsListViewAdapter(Context context, int layoutResourceId, List<Groups> groups,
+                                 String username) {
         this.context = context;
         this.groups = groups;
         this.layoutResourceId = layoutResourceId;
+        this.username = username;
     }
 
     @Override
@@ -77,6 +80,7 @@ public class GroupsListViewAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     Intent intent = new Intent(context, NavDrawerGroups.class);
                     intent.putExtra("groupName", groupName);
+                    intent.putExtra("username", username);
                     context.startActivity(intent);
                 }
             });

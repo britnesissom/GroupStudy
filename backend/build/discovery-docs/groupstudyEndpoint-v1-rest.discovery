@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/O1afMgYf3SfJekzftqhf5zzZQRQ\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/ThieryorUpibGa4HcMHKpP0fTCA\"",
  "discoveryVersion": "v1",
  "id": "groupstudyEndpoint:v1",
  "name": "groupstudyEndpoint",
@@ -161,7 +161,7 @@
     "teammates": {
      "type": "array",
      "items": {
-      "$ref": "User"
+      "type": "string"
      }
     }
    }

@@ -51,6 +51,7 @@ public class GroupstudyEndpoint {
         /*Groups group = new Groups(newGroup.getGroup().getGroupName(), newGroup.getGroup().getAdminUser(),
                 newGroup.getGroup().getTeammates());*/
         LOGGER.info("group saved to store");
+        LOGGER.info("teammates size for new group: " + group.getTeammates().size());
         updateUsersGroups(newGroup.getGroup().getAdminUser(), group);
         OfyService.ofy().save().entity(group).now();
         return group;
@@ -79,7 +80,7 @@ public class GroupstudyEndpoint {
         //will return null if group does not exist
         LOGGER.info("createTask reached");
         Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
-        group.addTask(message);
+        group.addMessage(message);
         ArrayList<String> messages = group.getMessages();
         group.setMessages(messages);
         OfyService.ofy().save().entity(group).now();
@@ -133,18 +134,22 @@ public class GroupstudyEndpoint {
 
     @ApiMethod(name = "updateUsersGroups")
     public Groups updateUsersGroups(@Named("adminUsername") String username, Groups group) {
+        LOGGER.info("teammates size for new group: " + group.getTeammates().size());
         List<User> users = new ArrayList<User>();
         User u = OfyService.ofy().load().type(User.class).id(username).now();
         u = u.addGroup(group);
         users.add(u);
+
         for (int i = 0; i < group.getTeammates().size(); i++) {
-            u = OfyService.ofy().load().type(User.class).id(group.getTeammates().get(i).getUsername()).now();
+            u = OfyService.ofy().load().type(User.class).id(group.getTeammates().get(i)).now();
+            LOGGER.info("teammate name: " + u.getUsername());
             //Groups g = OfyService.ofy().load().type(Groups.class).id(group.getGroup().getGroupName()).now();
-            LOGGER.info(group.getTeammates().get(i).getUsername() + " groups size: " + u.getListOfGroups().size());
+            LOGGER.info(group.getTeammates().get(i) + " groups size: " + u.getListOfGroups().size());
             LOGGER.info("updateUsersGroups group name: " + group.getGroupName());
             u = u.addGroup(group);
             users.add(u);
         }
+
         OfyService.ofy().save().entities(users).now();
         Groups g = group;
         return g;

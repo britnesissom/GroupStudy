@@ -1,21 +1,32 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="ee461l.groupstudy.MessagingFragment">
 
-    <TextView
+    <!--<TextView
         android:id="@+id/display_message"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"/>-->
+    <ListView
+        android:id="@+id/message_list_view"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/edit_message"
+        android:layout_marginBottom="20dp">
+
+    </ListView>
     <EditText android:id="@+id/edit_message"
-        android:layout_width="280dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/hint"
-        android:layout_gravity="start|bottom" />
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/sendButton"
+        android:layout_alignParentLeft="true"/>
     <Button
         android:id="@+id/sendButton"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+        android:layout_width="70dp"
         android:text="@string/button"
-        android:layout_gravity="end|bottom"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"/>
 
-</FrameLayout>
+</RelativeLayout>

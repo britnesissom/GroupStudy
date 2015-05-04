@@ -33,18 +33,16 @@ public class Groups implements Serializable {
     @Load(Everything.class)
     private transient ArrayList<Ref<FilesEntity>> files;
     @Ignore
-    private ArrayList<FilesEntity> filesToReturn = new ArrayList<>();
-
-    @Load(Everything.class)
-    private transient ArrayList<Ref<User>> teammates;
-    @Ignore
-    private ArrayList<User> teammatesToReturn = new ArrayList<>();
+    private ArrayList<FilesEntity> filesToReturn;
 
     @Load
-    private ArrayList<String> messages = new ArrayList<>();
+    private ArrayList<String> teammates;
 
     @Load
-    private ArrayList<String> tasks = new ArrayList<>();
+    private ArrayList<String> messages;
+
+    @Load
+    private ArrayList<String> tasks;
 
     //@Load
     private String adminUser;
@@ -53,7 +51,7 @@ public class Groups implements Serializable {
 
     }
 
-    public Groups(String groupName, String adminUser, ArrayList<User> teammates) {
+    public Groups(String groupName, String adminUser, ArrayList<String> teammates) {
         setId(groupName);
         this.groupName = groupName;
         setAdminUser(adminUser);
@@ -95,26 +93,6 @@ public class Groups implements Serializable {
         LOGGER.info("deref filesToReturn size: " + filesToReturn.size());
     }
 
-    //@OnLoad
-    private void deRefUsers() {
-        if (teammates != null && teammates.size() != 0) {
-            teammatesToReturn = new ArrayList<>();
-            for (int i = 0; i < teammates.size(); i++) {
-                //if (teammates.get(i).isLoaded()) {
-                    //LOGGER.info("group ref: " + listOfGroups.get(i).getValue());
-                    teammatesToReturn.add(teammates.get(i).get());
-                    //LOGGER.info("Group name with getValue: " + listOfGroups.get(i).getValue().getGroupName());
-                    LOGGER.info("username: " + teammates.get(i).get().getUsername());
-                //}
-            }
-        }
-        //no teammates have been added
-        else {
-            teammatesToReturn = new ArrayList<>();
-        }
-        LOGGER.info("deref groupsToReturn size: " + teammatesToReturn.size());
-    }
-
     public ArrayList<FilesEntity> getFiles() {
         deRefFiles();
 
@@ -136,6 +114,13 @@ public class Groups implements Serializable {
             this.tasks = new ArrayList<>();
         tasks.add(task);
         LOGGER.info("task added!");
+    }
+
+    public void addMessage(String message) {
+        if (this.messages == null)
+            this.messages = new ArrayList<>();
+        tasks.add(message);
+        LOGGER.info("message added!");
     }
 
     public Groups addFile(FilesEntity file) {
@@ -173,22 +158,20 @@ public class Groups implements Serializable {
         this.adminUser = adminUser;
     }
 
-    public ArrayList<String> getMessages() { return messages ; }
+    public ArrayList<String> getMessages() { return messages; }
 
     public ArrayList<String> getTasks() { return tasks;}
 
-    public ArrayList<User> getTeammates() {
-        deRefUsers();
-        LOGGER.info("teammatesToReturn size for " + groupName + ": " + teammatesToReturn.size());
-        return teammatesToReturn;
+    public ArrayList<String> getTeammates() {
+        return teammates;
     }
 
-    public void setTeammates(ArrayList<User> teammates) {
+    public void setTeammates(ArrayList<String> team) {
         teammates = new ArrayList<>();
-        for (User u : teammates) {
-            Ref<User> refToUser = Ref.create(u);
-            this.teammates.add(refToUser);
+        for (String member : team) {
+            teammates.add(member);
         }
+
     }
 
     public String getAdminUser() {

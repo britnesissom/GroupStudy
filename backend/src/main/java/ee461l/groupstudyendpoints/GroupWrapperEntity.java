@@ -21,7 +21,7 @@ public class GroupWrapperEntity {
         return group;
     }
 
-    public void setGroup(String groupName, String adminUser, ArrayList<User> teammates) {
+    public void setGroup(String groupName, String adminUser, ArrayList<String> teammates) {
         group = new Groups(groupName, adminUser, teammates);
     }
 

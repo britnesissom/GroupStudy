@@ -41,13 +41,17 @@
     <!--App Home Page-->
     <string name="groups">Groups</string>
 
+    <!--Group Home Page-->
+    <string name="upcoming_tasks">Upcoming Tasks</string>
+    <string name="new_messages">Recent Messages</string>
+
     <!-- Content Description -->
     <string name="desc_list_item_icon">Item Icon</string>
     <string name="title_activity_nav_drawer">NavDrawerActivity</string>
     <string name="title_activity_calendar">CalendarActivity</string>
 
     <string name="upload_file">Upload File</string>
-    <string name="use_gmail">Please use your gmail account as your username</string>
+    <string name="use_eid">Please use your UT EID as your username</string>
     <string name="title_activity_add_group">AddGroupActivity</string>
     <string name="create_group">Create Group</string>
 
@@ -55,9 +59,7 @@
     <string name="addEvent">Add Event</string>
 
     <!-- Message Fragment -->
-    <string name="edit_message"></string>
-    <string name="display_message"></string>
-    <string name="hint">type a message...</string>
+    <string name="hint">Type a message</string>
     <string name="button">SEND</string>
 
 </resources>

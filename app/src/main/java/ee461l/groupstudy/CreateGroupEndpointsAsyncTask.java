@@ -30,7 +30,7 @@ class CreateGroupEndpointsAsyncTask extends AsyncTask<Void, Void, Groups> {
     private Context context;
     private GroupWrapperEntity groupWrapper;
 
-    CreateGroupEndpointsAsyncTask(Context context, String groupName, String adminUser, ArrayList<User> teammates) {
+    CreateGroupEndpointsAsyncTask(Context context, String groupName, String adminUser, ArrayList<String> teammates) {
         this.context = context;
 
         groupWrapper = new GroupWrapperEntity();

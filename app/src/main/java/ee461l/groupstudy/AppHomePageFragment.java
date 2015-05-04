@@ -1,7 +1,6 @@
 package ee461l.groupstudy;
 
 import android.app.Fragment;
-import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -24,9 +22,7 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
@@ -118,7 +114,8 @@ public class AppHomePageFragment extends Fragment {
         getActivity().setTitle("Home");
 
         //initialize listview and adapter to list groups on home page
-        adapter = new GroupsListViewAdapter(getActivity(), R.layout.home_page_groups_list_item, groups);
+        adapter = new GroupsListViewAdapter(getActivity(), R.layout.home_page_groups_list_item,
+                groups, username);
         groupsListView = (ListView) rootView.findViewById(R.id.groups_list);
         Log.d(TAG, "Setting adapter");
         groupsListView.setAdapter(adapter);
@@ -151,7 +148,7 @@ public class AppHomePageFragment extends Fragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.create_group:
-                Intent intent = new Intent(getActivity(), AddGroupActivity.class);
+                Intent intent = new Intent(getActivity(), CreateGroupActivity.class);
                 intent.putExtra("username", username);
                 startActivity(intent);
                 return true;
