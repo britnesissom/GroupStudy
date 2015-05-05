@@ -21,6 +21,8 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -125,9 +127,20 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         List<String> tasks = group.getTasks();
 
         // tasks have been created so they can be loaded
-        //otherwise no tasks will show initially
+        // otherwise no tasks will show initially
         if (tasks != null) {
             Collections.sort(tasks);
+            Collections.sort(tasks, new Comparator<String>(){
+                public int compare(String a, String b){
+                    String[] as = a.split("/");
+                    String[] bs = b.split("/");
+                    int result = Integer.valueOf(as[0]).compareTo(Integer.valueOf(bs[0]));
+                    if(result==0)
+                        result = Integer.valueOf(as[1]).compareTo(Integer.valueOf(bs[1]));
+                    return result;
+                }
+              });
+
             for (int i = 0; i < tasks.size(); i++) {
                 events.append(tasks.get(i) + "\n");
             }
@@ -251,7 +264,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         public void onCancel(DialogInterface dialog) {
             dateCancel = true;
             timeDialog.dismiss();
-            //descriptionDialog.cancel();
             System.out.println("date canceled");
         }
     }
@@ -285,9 +297,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
             if ((mHour < 12)) {
                 AM = true;
+                if(mHour == 0){
+                    mHour = 12;
+                }
             }
-            else if ((mHour == 12) || (mHour == 0)) {
-                mHour = 12;
+            else if (mHour == 12) {
+                //do nothing, 12PM
             } else {
                 mHour -= 12;
             }
@@ -307,7 +322,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             timeList.add(eventTime.getText().toString());
             timeAdded = true;
         }
-
 
     }
 
