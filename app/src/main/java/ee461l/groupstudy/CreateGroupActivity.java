@@ -88,23 +88,6 @@ public class CreateGroupActivity extends AppCompatActivity {
         cgeat.execute();
     }
 
-    //group needs arraylist of users not just their usernames
-    //find each user and add to arraylist
-
-    //FIX THIS CODE LATER BECAUSE IT IS VERY SLOW - O(n^2)
-    private ArrayList<User> getUsersFromArray(String[] usernames) {
-        ArrayList<User> listOfUsers = new ArrayList<>();
-        for (int i = 0; i < usernames.length; i++) {
-            for (int j = i; j < users.size(); j++) {
-                if (usernames[i].equals(users.get(j).getUsername())) {
-                    listOfUsers.add(users.get(j));
-                }
-            }
-        }
-        return listOfUsers;
-    }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -186,15 +169,19 @@ public class CreateGroupActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Groups result) {
 
-            Toast.makeText(context, "Group created!", Toast.LENGTH_SHORT).show();
+            if (result != null) {
+                Toast.makeText(context, "Group created!", Toast.LENGTH_SHORT).show();
 
-            //pass name of group and username to next activity so if user creates another group
-            //the app knows who the admin should be
-            Intent intent = new Intent(context, NavDrawerGroups.class);
-            Log.d(TAG, "group name createGroup: " + result.getGroupName());
-            intent.putExtra("groupName", result.getGroupName());
-            intent.putExtra("username", user);
-            context.startActivity(intent);
+                //pass name of group and username to next activity so if user creates another group
+                //the app knows who the admin should be
+                Intent intent = new Intent(context, NavDrawerGroups.class);
+                Log.d(TAG, "group name createGroup: " + result.getGroupName());
+                intent.putExtra("groupName", result.getGroupName());
+                intent.putExtra("username", user);
+                context.startActivity(intent);
+            } else {
+                Toast.makeText(context, "Incorrect username(s) given", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
