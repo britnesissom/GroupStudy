@@ -14,6 +14,7 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.FilesEntity;
 
 /**
  * Created by britne on 4/27/15.
+ * Opens file with device's document viewer
  */
 public class OpenFileAsyncTask extends AsyncTask<Void, String, Void> {
 

@@ -24,9 +24,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     @Override
     @Before
     protected void setUp() throws Exception {
-        new CreateUserEndpointsAsyncTask(getContext()).execute("John","123");
+        /*new CreateUserEndpointsAsyncTask(getContext()).execute("John","123");
         new CreateUserEndpointsAsyncTask(getContext()).execute("Sue","1234");
-        new CreateUserEndpointsAsyncTask(getContext()).execute("Frank","12345");
+        new CreateUserEndpointsAsyncTask(getContext()).execute("Frank","12345");*/
     }
 
     @org.junit.Test
@@ -36,7 +36,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         //assertEquals("John", users.contains("John"));
         //assertEquals("Sue", users.getUser("Sue").getUsername());
         //assertEquals("Frank", users.getUser("Frank").getUsername());
-        LoadSingleUserAsyncTask l = new LoadSingleUserAsyncTask(getContext(), new OnRetrieveSingleUserTaskCompleted() {
+        /*LoadSingleUserAsyncTask l = new LoadSingleUserAsyncTask(getContext(), new OnRetrieveSingleUserTaskCompleted() {
             @Override
             public void onRetrieveUserCompleted(User user) {
                 testUser = user;
@@ -44,7 +44,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         });
         l.execute("John");
 
-        new CreateGroupEndpointsAsyncTask(getContext(), "test", testUser, new ArrayList<User>()).execute();
+        new CreateGroupEndpointsAsyncTask(getContext(), "test", testUser, new ArrayList<User>()).execute();*/
 
     }
 

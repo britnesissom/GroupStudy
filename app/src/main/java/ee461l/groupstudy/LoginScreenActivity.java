@@ -68,6 +68,7 @@ public class LoginScreenActivity extends AppCompatActivity {
 
     //make sure the user actually exists before going to new homepage activity
     public void verifyUser(View v) {
+        Toast.makeText(this, "Logging in...", Toast.LENGTH_SHORT).show();
         LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
             @Override
             public void onRetrieveUserCompleted(User userLogin) {
@@ -75,27 +76,7 @@ public class LoginScreenActivity extends AppCompatActivity {
                 login();
             }
         }, TAG);
-
-        try {
-            user = lsuat.execute(username.getText().toString()).get();
-
-        }
-        catch(InterruptedException e) {
-
-        } catch ( ExecutionException e) {
-
-        }
-        String passwordText = password.getText().toString();
-
-        //username, password combo is correct so log in the user
-        if (user.getPassword().equals(passwordText)) {
-            Intent intent = new Intent(this, NavDrawerHomePage.class);
-            intent.putExtra("username", user.getUsername());
-            startActivity(intent);
-        } else {
-            Toast.makeText(getApplicationContext(), "Invalid username or password",
-                    Toast.LENGTH_LONG).show();
-        }
+        lsuat.execute(username.getText().toString());
     }
 
     private void login() {
@@ -116,60 +97,5 @@ public class LoginScreenActivity extends AppCompatActivity {
     public void createAccount(View v) {
         Intent intent = new Intent(this,CreateNewAccountActivity.class);
         startActivity(intent);
-    }
-
-    private class LoadSingleUserAsyncTask extends AsyncTask<String, Void, User> {
-        private static final String TAG = "LoadSingleUserAsync";
-        private GroupstudyEndpoint usersEndpointApi = null;
-        private Context context;
-        private String activityName;
-        private OnRetrieveSingleUserTaskCompleted listener;
-
-        LoadSingleUserAsyncTask(Context context, OnRetrieveSingleUserTaskCompleted listener,
-                                String activityName) {
-            this.context = context;
-            this.listener = listener;
-            this.activityName = activityName;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            Toast.makeText(context, "Logging in...", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        protected User doInBackground(String... username) {
-            if(usersEndpointApi == null) {  // Only do this once
-                GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
-                        new AndroidJsonFactory(), null)
-                        // options for running against local devappserver
-                        // - 10.0.2.2 is localhost's IP address in Android emulator
-                        // - turn off compression when running against local devappserver
-                        .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
-                        .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-                            @Override
-                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                                abstractGoogleClientRequest.setDisableGZipContent(true);
-                            }
-                        });
-                // end options for devappserver
-
-                usersEndpointApi = builder.build();
-            }
-
-            try {
-                User user = usersEndpointApi.retrieveSingleUser(username[0], activityName).execute();
-                Log.d(TAG, "user retrieved");
-                return user;
-            } catch (IOException e) {
-                Log.d(TAG, "" + e.getMessage());
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(User result) {
-            listener.onRetrieveUserCompleted(result);
-        }
     }
 }

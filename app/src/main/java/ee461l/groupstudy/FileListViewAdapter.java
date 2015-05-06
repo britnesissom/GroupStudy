@@ -86,12 +86,4 @@ public class FileListViewAdapter extends BaseAdapter {
     public long getItemId(int position) {
         return position;
     }
-
-    //create new class (RetrieveFilesFromServer) to save list of files
-    //from server under specific group
-    //can get group name depending on which group you click on in homepage
-    //because it will have an id associated with it
-
-    //FileListViewAdapter is for when we already have the list of files
-    //downloaded from the server
 }

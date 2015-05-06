@@ -58,8 +58,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     // if we want the default location to be PCL:            ADDED BY DANIEL
     private String locationString = "PCL - Perry-Castañeda Library";
-    // else
-    // private String locationString;      // Added by Daniel.
 
     /**
      * Use this factory method to create a new instance of
@@ -87,17 +85,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
 
         LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(), this);
-
-        //defeats purpose of async task
-        /*try {
-            group = lsgat.execute(groupName).get();
-        }
-        catch(InterruptedException e) {
-            Log.e(TAG, "InterruptedException: " + e.getMessage());
-        }
-        catch(ExecutionException e) {
-            Log.e(TAG, "ExecutionException: " + e.getMessage());
-        }*/
         lsgat.execute(groupName);
     }
 
@@ -154,32 +141,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         eventTime = (TextView) rootView.findViewById(R.id.eventTime);
         eventTime.setVisibility(View.GONE);
 
-
-        /*getActivity().setTitle("Calendar");
-
-        tasks = group.getTasks();
-
-        // tasks have been created so they can be loaded
-        // otherwise no tasks will show initially
-        if (tasks != null) {
-            Collections.sort(tasks);
-            Collections.sort(tasks, new Comparator<String>(){
-                public int compare(String a, String b){
-                    String[] as = a.split("/");
-                    String[] bs = b.split("/");
-                    int result = Integer.valueOf(as[0]).compareTo(Integer.valueOf(bs[0]));
-                    if(result==0)
-                        result = Integer.valueOf(as[1]).compareTo(Integer.valueOf(bs[1]));
-                    return result;
-                }
-              });
-
-            for (int i = 0; i < tasks.size(); i++) {
-                events.append(tasks.get(i) + "\n");
-            }
-
-        }
-*/
         return rootView;
     }
 
@@ -207,8 +168,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         AlertDialog.Builder locationBuilder = new AlertDialog.Builder(getActivity());       // ADDED BY DANIEL
         locationBuilder.setTitle("Pick a location:");
-//        eventLocationSpinner = rootView.findViewById((R.id.eventLocationSpinner));
-//        String location = String.valueOf(eventLocationSpinner.getSelectedItem());
+
         String[] types = {"ECJ - Ernest Cockrell Jr. Hall","ETC - Engineering Teaching Center II",
                 "FAC - Peter T. Flawn Academic Center",
                 "PCL - Perry-Castañeda Library","UNB - Union Building"};
@@ -253,26 +213,25 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
 
+                        // get user input and set it to result
+                        descriptionList.add(userInput.getText().toString());
+                        int index = descriptionList.indexOf(userInput.getText().toString());
+                        int size = descriptionList.size();
 
-                            // get user input and set it to result
-                            descriptionList.add(userInput.getText().toString());
-                            int index = descriptionList.indexOf(userInput.getText().toString());
-                            int size = descriptionList.size();
+                        events.append("\n" + dateList.get(index));
+                        events.append(" " + timeList.get(index) + ": ");
+                        events.append(locationString + "\n" + descriptionList.get(index));
 
-                            events.append("\n" + dateList.get(index));
-                            events.append(" " + timeList.get(index) + ": ");
-                            events.append(locationString + "\n" + descriptionList.get(index));
+                        String localEvent = dateList.get(index) + " " + timeList.get(index) + ": "
+                                + locationString + "\n" + descriptionList.get(index) + "\n";
 
-                            String localEvent = dateList.get(index) + " " + timeList.get(index) + ": "
-                                    + locationString + "\n" + descriptionList.get(index) + "\n";
+                        CreateTaskAsyncTask ctat = new CreateTaskAsyncTask(getActivity(), groupName);
+                        ctat.execute(localEvent);
 
-                            CreateTaskAsyncTask ctat = new CreateTaskAsyncTask(getActivity(), groupName);
-                            ctat.execute(localEvent);
+                        Toast.makeText(getActivity(), "Event added!", Toast.LENGTH_SHORT).show();
+                    }
 
-                            Toast.makeText(getActivity(), "Event added!", Toast.LENGTH_SHORT).show();
-                        }
-
-                    })
+                })
             .setNegativeButton("Cancel",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
@@ -302,6 +261,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
 
+    //select the date of the event
     class mDateSetListener implements DatePickerDialog.OnDateSetListener {
 
         @Override
@@ -323,6 +283,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
+    //if the user cancels the date dialog, this is called
     class mDateCancelListener implements DatePickerDialog.OnCancelListener{
         @Override
         public void onCancel(DialogInterface dialog) {
@@ -332,6 +293,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
+    //if the user cancels the time dialog, this is called
+    //will cancel time dialog and all dialogs after
+    //removes newest date from list since it was already added by a previous dialog
     class mTimeDismissListener implements DialogInterface.OnDismissListener {
         @Override
         public void onDismiss(DialogInterface dialog) {
@@ -350,6 +314,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
+    //dialog for user to set time of event
     class mTimeSetListener implements TimePickerDialog.OnTimeSetListener{
 
         @Override

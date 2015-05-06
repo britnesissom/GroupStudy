@@ -19,6 +19,7 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 /**
  * Created by britne on 4/11/15.
+ * Loads a single user and returns null if the user does not exist
  */
 class LoadSingleUserAsyncTask extends AsyncTask<String, Void, User> {
     private static final String TAG = "LoadSingleUserAsync";
@@ -39,9 +40,6 @@ class LoadSingleUserAsyncTask extends AsyncTask<String, Void, User> {
         if(usersEndpointApi == null) {  // Only do this once
             GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
-                    // options for running against local devappserver
-                    // - 10.0.2.2 is localhost's IP address in Android emulator
-                    // - turn off compression when running against local devappserver
                     .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
                     .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                         @Override
@@ -49,7 +47,6 @@ class LoadSingleUserAsyncTask extends AsyncTask<String, Void, User> {
                             abstractGoogleClientRequest.setDisableGZipContent(true);
                         }
                     });
-            // end options for devappserver
 
             usersEndpointApi = builder.build();
         }

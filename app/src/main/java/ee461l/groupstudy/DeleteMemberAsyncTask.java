@@ -19,7 +19,8 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 /**
- * Created by RyanMcClure on 4/27/15.
+ * Created by Brit'ne on 4/27/15.
+ * Deletes member from a group
  */
 public class DeleteMemberAsyncTask extends AsyncTask<String, Void, Void> { //first String is task
 
@@ -38,9 +39,6 @@ public class DeleteMemberAsyncTask extends AsyncTask<String, Void, Void> { //fir
         if(groupEndpointApi == null) {  // Only do this once
             GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
-                    // options for running against local devappserver
-                    // - 10.0.2.2 is localhost's IP address in Android emulator
-                    // - turn off compression when running against local devappserver
                     .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
                     .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                         @Override
@@ -48,7 +46,6 @@ public class DeleteMemberAsyncTask extends AsyncTask<String, Void, Void> { //fir
                             abstractGoogleClientRequest.setDisableGZipContent(true);
                         }
                     });
-            // end options for devappserver
 
             groupEndpointApi = builder.build();
         }

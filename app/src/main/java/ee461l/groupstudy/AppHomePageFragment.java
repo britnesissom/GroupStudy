@@ -177,9 +177,6 @@ public class AppHomePageFragment extends Fragment implements AdapterView.OnItemC
             if(usersEndpointApi == null) {  // Only do this once
                 GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                         new AndroidJsonFactory(), null)
-                        // options for running against local devappserver
-                        // - 10.0.2.2 is localhost's IP address in Android emulator
-                        // - turn off compression when running against local devappserver
                         .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
                         .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                             @Override
@@ -187,7 +184,6 @@ public class AppHomePageFragment extends Fragment implements AdapterView.OnItemC
                                 abstractGoogleClientRequest.setDisableGZipContent(true);
                             }
                         });
-                // end options for devappserver
 
                 usersEndpointApi = builder.build();
             }

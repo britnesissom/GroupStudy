@@ -184,20 +184,12 @@ public class FileSharingFragment extends Fragment {
             if (resultData != null) {
                 androidUri = resultData.getData();
 
-                //InputStream fileInputStream = getActivity().getContentResolver().openInputStream(androidUri);
-                //String uriString = fileInputStream.toString();
                 Log.d(TAG, "Android Uri: " + androidUri.toString());
-                //Log.d(TAG, "String uri: " + uriString);
 
                 //begin sending file to server
                 SendFileToGroupEndpoint sendFile = new SendFileToGroupEndpoint(getActivity());
                 sendFile.execute(androidUri);
 
-
-                /*catch(FileNotFoundException e) {
-                    Log.d(TAG, "file not found");
-                    e.printStackTrace();
-                }*/
             }
             // END_INCLUDE (parse_open_document_response)
         }
@@ -225,9 +217,6 @@ public class FileSharingFragment extends Fragment {
             if(groupEndpointApi == null) {  // Only do this once
                 GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                         new AndroidJsonFactory(), null)
-                        // options for running against local devappserver
-                        // - 10.0.2.2 is localhost's IP address in Android emulator
-                        // - turn off compression when running against local devappserver
                         .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
                         .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                             @Override
@@ -235,7 +224,6 @@ public class FileSharingFragment extends Fragment {
                                 abstractGoogleClientRequest.setDisableGZipContent(true);
                             }
                         });
-                // end options for devappserver
 
                 groupEndpointApi = builder.build();
             }
@@ -267,15 +255,6 @@ public class FileSharingFragment extends Fragment {
 
                 Groups groupReturned = groupEndpointApi.addFile(groupName, fe).execute();
 
-                //String fileBytes = new String(bFile);
-
-                //Byte[] fileBytes = new Byte[bFile.length];
-                /*i = 0;
-                for (byte b : bFile)
-                    fileBytes[i++] = b; //Autoboxing*/
-
-                //FileWrapperEntity fwe = new FileWrapperEntity();
-                //fwe.setFileInfo(groupName, fileBytes);
                 Log.d(TAG, "file added to group");
                 return groupReturned;
             }

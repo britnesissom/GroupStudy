@@ -124,16 +124,6 @@ public class MessagingFragment extends Fragment implements View.OnClickListener,
         //this is if the enter button is pressed to send the message
         messageEditor.setOnEditorActionListener(this);
 
-
-
-        // messages have been created so they can be loaded
-        //otherwise no messages will show initially
-/*        if (messages != null) {
-            for (int i = 0; i < messages.size(); i++) {
-                displayMessage.append(messages.get(i) + "\n");
-            }
-        }*/
-
         return rootView;
     }
 
@@ -148,7 +138,6 @@ public class MessagingFragment extends Fragment implements View.OnClickListener,
         adapter.notifyDataSetChanged();
 
         clearText();
-        //displayMessage.setText(username + ": " + messageEditor.getText().toString());
     }
 
     @Override
@@ -161,7 +150,6 @@ public class MessagingFragment extends Fragment implements View.OnClickListener,
         adapter.notifyDataSetChanged();
 
         clearText();
-        //displayMessage.setText(messageEditor.getText().toString());
         return false;
     }
 

@@ -145,7 +145,6 @@ public class GroupHomePageFragment extends Fragment implements OnRetrieveSingleG
 
         }
 
-
         //view two most recent (if there are that many) messages on group home screen
         //might show your own messages woops
         if (messages != null) {

@@ -49,15 +49,6 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         user = getIntent().getStringExtra("username");
 
-        //retrieves user to set as admin
-        /*LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
-            @Override
-            public void onRetrieveUserCompleted(User user) {
-                adminUser = user;
-            }
-        }, TAG);
-        lsuat.execute(user);*/
-
         groupName = (EditText) findViewById(R.id.group_name);
         teammates = (EditText) findViewById(R.id.teammates);
 
@@ -126,9 +117,6 @@ public class CreateGroupActivity extends AppCompatActivity {
             group.setGroupName(groupName);
             group.setAdminUser(adminUser);
             group.setTeammates(teammates);
-            /*group.setFiles(new ArrayList<FilesEntity>());
-            group.setMessages(new ArrayList<String>());
-            group.setTasks(new ArrayList<String>());*/
             groupWrapper.setGroup(group);
         }
 
@@ -137,9 +125,6 @@ public class CreateGroupActivity extends AppCompatActivity {
             if(groupEndpointApi == null) {  // Only do this once
                 GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
                         new AndroidJsonFactory(), null)
-                        // options for running against local devappserver
-                        // - 10.0.2.2 is localhost's IP address in Android emulator
-                        // - turn off compression when running against local devappserver
                         .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
                         .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                             @Override
@@ -147,16 +132,14 @@ public class CreateGroupActivity extends AppCompatActivity {
                                 abstractGoogleClientRequest.setDisableGZipContent(true);
                             }
                         });
-                // end options for devappserver
 
                 groupEndpointApi = builder.build();
             }
 
             //createUser(name, password)
             try {
-                //not creating group, likely due to the User class
                 Groups group = groupEndpointApi.createGroup(groupWrapper).execute();
-                //Groups g = groupEndpointApi.updateUsersGroups(adminUser.getUsername(), groupWrapper).execute();
+
                 Log.d(TAG, "admin name: " + group.getAdminUser());
                 return group;
             } catch (IOException e) {
