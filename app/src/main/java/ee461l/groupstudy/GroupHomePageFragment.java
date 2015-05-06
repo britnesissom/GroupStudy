@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -108,7 +109,17 @@ public class GroupHomePageFragment extends Fragment {
 
         //view first three (if there are that many) upcoming events on group home screen
         if (tasks != null) {
-            Collections.sort(tasks);    //sorts tasks by date - most recent first
+            Collections.sort(tasks);
+            Collections.sort(tasks, new Comparator<String>(){
+                public int compare(String a, String b){
+                    String[] as = a.split("/");
+                    String[] bs = b.split("/");
+                    int result = Integer.valueOf(as[0]).compareTo(Integer.valueOf(bs[0]));
+                    if(result==0)
+                        result = Integer.valueOf(as[1]).compareTo(Integer.valueOf(bs[1]));
+                    return result;
+                }
+            });
 
             if (tasks.size() > 3) {
                 for (int i = 0; i < 3; i++) {
@@ -119,7 +130,9 @@ public class GroupHomePageFragment extends Fragment {
                     upcomingTasks.append(tasks.get(i) + "\n");
                 }
             }
+
         }
+
 
         //view two most recent (if there are that many) messages on group home screen
         //might show your own messages woops
