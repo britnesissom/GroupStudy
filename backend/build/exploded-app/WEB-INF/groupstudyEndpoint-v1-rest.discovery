@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/ThieryorUpibGa4HcMHKpP0fTCA\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/X4iuWdlpGMCNp5ANpZAXHZEnyD8\"",
  "discoveryVersion": "v1",
  "id": "groupstudyEndpoint:v1",
  "name": "groupstudyEndpoint",
@@ -217,6 +217,33 @@
     "https://www.googleapis.com/auth/userinfo.email"
    ]
   },
+  "addMember": {
+   "id": "groupstudyEndpoint.addMember",
+   "path": "addMember/{groupName}/{member}",
+   "httpMethod": "POST",
+   "parameters": {
+    "groupName": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    },
+    "member": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "groupName",
+    "member"
+   ],
+   "response": {
+    "$ref": "Groups"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
   "createGroup": {
    "id": "groupstudyEndpoint.createGroup",
    "path": "createGroup",
@@ -352,6 +379,55 @@
    },
    "response": {
     "$ref": "CollectionResponse_User"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "removeGroupFromUser": {
+   "id": "groupstudyEndpoint.removeGroupFromUser",
+   "path": "groupfromuser/{member}",
+   "httpMethod": "DELETE",
+   "parameters": {
+    "member": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "member"
+   ],
+   "request": {
+    "$ref": "Groups",
+    "parameterName": "resource"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  },
+  "removeMember": {
+   "id": "groupstudyEndpoint.removeMember",
+   "path": "member/{groupName}/{member}",
+   "httpMethod": "DELETE",
+   "parameters": {
+    "groupName": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    },
+    "member": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "groupName",
+    "member"
+   ],
+   "response": {
+    "$ref": "Groups"
    },
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"

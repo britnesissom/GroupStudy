@@ -177,4 +177,12 @@ public class Groups implements Serializable {
     public String getAdminUser() {
         return adminUser;
     }
-}
+
+    public void removeMember(String member) {
+        teammates.remove(member);
+    }
+
+    public void addMember(String member) {
+        teammates.add(member);
+    }
+ }

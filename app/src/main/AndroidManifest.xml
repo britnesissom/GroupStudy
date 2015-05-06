@@ -35,7 +35,14 @@
             android:name=".CreateGroupActivity"
             android:label="@string/app_name" >
         </activity>
-
+        <activity
+            android:name=".AddMemberToGroupActivity"
+            android:label="@string/title_activity_add_member_to_group" >
+        </activity>
+        <activity
+            android:name=".DeleteMemberFromGroupActivity"
+            android:label="@string/title_activity_delete_member_from_group" >
+        </activity>
     </application>
 
 </manifest>

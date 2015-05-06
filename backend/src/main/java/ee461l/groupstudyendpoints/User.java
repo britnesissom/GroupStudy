@@ -91,6 +91,21 @@ public class User {
         return this;
     }
 
+    public void removeGroup(String groupName) {
+        for (int i = 0; i < listOfGroups.size(); i++) {
+            if (listOfGroups.get(i).isLoaded()) {
+                LOGGER.info("listOfGroups size: " + listOfGroups.size());
+
+                //if the listOfGroups name and group name are equal, it's the group to remove
+                if (listOfGroups.get(i).get().getGroupName().equals(groupName)) {
+                    listOfGroups.remove(listOfGroups.get(i));
+                    LOGGER.info("listOfGroups size after remove: " + listOfGroups.size());
+                    break;  //you can leave the loop now because the group is removed
+                }
+            }
+        }
+    }
+
     public ArrayList<Groups> getListOfGroups() {
         if (listOfGroups != null) {
             groupsToReturn = new ArrayList<>();

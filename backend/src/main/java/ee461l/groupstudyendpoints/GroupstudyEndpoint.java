@@ -73,6 +73,54 @@ public class GroupstudyEndpoint {
     }
 
     /**
+     * An endpoint that adds a task to a specific group's calendar
+     */
+    @ApiMethod(name = "addMember")
+    public Groups addMember(@Named("groupName") String groupName, @Named("member") String member) {
+        //will return null if group does not exist
+        LOGGER.info("removeMember reached");
+        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        group.addMember(member);
+        ArrayList<String> teammates = group.getTeammates();
+        group.setTeammates(teammates);
+        OfyService.ofy().save().entity(group).now();
+
+        //add group to user's list of groups
+        User u = OfyService.ofy().load().type(User.class).id(member).now();
+        u = u.addGroup(group);
+        OfyService.ofy().save().entity(u).now();
+        return group;
+    }
+
+    /**
+     * An endpoint that adds a task to a specific group's calendar
+     */
+    @ApiMethod(name = "removeMember")
+    public Groups removeMember(@Named("groupName") String groupName, @Named("member") String member) {
+        //will return null if group does not exist
+        LOGGER.info("removeMember reached");
+        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
+        group.removeMember(member);
+        ArrayList<String> teammates = group.getTeammates();
+        group.setTeammates(teammates);
+
+        removeGroupFromUser(member, group.getGroupName());
+        OfyService.ofy().save().entity(group).now();
+        return group;
+    }
+
+    /**
+     * removes the group from the user's list of groups
+     */
+    @ApiMethod(name = "removeGroupFromUser")
+    public void removeGroupFromUser(@Named("member") String member, @Named("groupName") String groupName) {
+        User u = OfyService.ofy().load().type(User.class).id(member).now();
+        u.removeGroup(groupName);
+        OfyService.ofy().save().entity(u).now();
+        LOGGER.info("group removed from member");
+    }
+
+    /**
      * Creates message and stores it in objectify
      */
     @ApiMethod(name = "createMessage")
@@ -90,19 +138,6 @@ public class GroupstudyEndpoint {
     /**
      * An endpoint that adds a file to a specific group
      */
-    /*@ApiMethod(name = "addFile")
-    public Groups addFile(@Named("groupName") String groupName, @Named("file") String file) {
-        //byte[] fileBytes = file.getBytes(Charset.forName("UTF-8"));
-        //will return null if group does not exist
-        Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
-        group.addFile(file);
-        OfyService.ofy().save().entity(group).now();
-        return group;
-    }*/
-
-    /**
-     * An endpoint that adds a file to a specific group
-     */
     @ApiMethod(name = "addFile")
     public Groups addFile(@Named("groupName") String groupName, FilesEntity file) {
         //byte[] fileBytes = file.getBytes(Charset.forName("UTF-8"));
@@ -116,21 +151,6 @@ public class GroupstudyEndpoint {
         LOGGER.info("returned to endpoint addFile method");
         return group;
     }
-
-    /*
-    adds a new group for a specific user so their home page is updated to
-    include the new group
-     */
-    /*@ApiMethod(name = "updateUsersGroups")
-    public Groups updateUsersGroups(@Named("adminUsername") String username, GroupWrapperEntity group) {
-        User u = OfyService.ofy().load().type(User.class).id(username).now();
-        Groups g = OfyService.ofy().load().type(Groups.class).id(group.getGroup().getGroupName()).now();
-        LOGGER.info("user's groups size: " + u.getListOfGroups().size());
-        LOGGER.info("updateUsersGroups group name: " + g.getGroupName());
-        u.addGroup(g);
-        OfyService.ofy().save().entity(u).now();
-        return g;
-    }*/
 
     @ApiMethod(name = "updateUsersGroups")
     public Groups updateUsersGroups(@Named("adminUsername") String username, Groups group) {

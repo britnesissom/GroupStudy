@@ -54,6 +54,8 @@
     <string name="use_eid">Please use your UT EID as your username</string>
     <string name="title_activity_add_group">AddGroupActivity</string>
     <string name="create_group">Create Group</string>
+    <string name="add_member">Add Teammate</string>
+    <string name="delete_member">Delete Teammate</string>
 
     <!-- Calendar -->
     <string name="addEvent">Add Event</string>
@@ -61,5 +63,9 @@
     <!-- Message Fragment -->
     <string name="hint">Type a message</string>
     <string name="button">SEND</string>
+    <string name="title_activity_add_member_to_group">AddMemberToGroupActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_delete_member_from_group">DeleteMemberFromGroupActivity</string>
 
 </resources>

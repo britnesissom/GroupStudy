@@ -68,28 +68,21 @@ public class LoginScreenActivity extends AppCompatActivity {
 
     //make sure the user actually exists before going to new homepage activity
     public void verifyUser(View v) {
-        String passwordText = password.getText().toString();
-
         LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
             @Override
             public void onRetrieveUserCompleted(User userLogin) {
                 user = userLogin;
+                login();
             }
         }, TAG);
+        lsuat.execute(username.getText().toString());
+    }
 
-        //defeats purpose of async task
-        try {
-            user = lsuat.execute(username.getText().toString()).get();
-        }
-        catch(InterruptedException e) {
-            Log.e(TAG, "InterruptedException: " + e.getMessage());
-        }
-        catch(ExecutionException e) {
-            Log.e(TAG, "ExecutionException: " + e.getMessage());
-        }
+    private void login() {
+        String passwordText = password.getText().toString();
 
         //username, password combo is correct so log in the user
-        if (user != null && user.getPassword().equals(passwordText)) {
+        if (user.getPassword().equals(passwordText)) {
             Intent intent = new Intent(this, NavDrawerHomePage.class);
             intent.putExtra("username", user.getUsername());
             startActivity(intent);
