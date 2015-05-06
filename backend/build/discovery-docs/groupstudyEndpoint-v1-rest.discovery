@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/X4iuWdlpGMCNp5ANpZAXHZEnyD8\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/--WnFfPE1ra99SseSbsdAAEjKA8\"",
  "discoveryVersion": "v1",
  "id": "groupstudyEndpoint:v1",
  "name": "groupstudyEndpoint",
@@ -386,9 +386,14 @@
   },
   "removeGroupFromUser": {
    "id": "groupstudyEndpoint.removeGroupFromUser",
-   "path": "groupfromuser/{member}",
+   "path": "groupfromuser/{member}/{groupName}",
    "httpMethod": "DELETE",
    "parameters": {
+    "groupName": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    },
     "member": {
      "type": "string",
      "required": true,
@@ -396,12 +401,9 @@
     }
    },
    "parameterOrder": [
-    "member"
+    "member",
+    "groupName"
    ],
-   "request": {
-    "$ref": "Groups",
-    "parameterName": "resource"
-   },
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"
    ]

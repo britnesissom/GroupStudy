@@ -77,47 +77,10 @@ public class CreateNewAccountActivity extends AppCompatActivity {
             public void onRetrieveUserCompleted(User userLogin) {
                 user = userLogin;
                 create();
+
             }
         }, TAG);
         lsuat.execute(username.getText().toString());
-        //fix this because it defeats purpose of async task
-        /*try {
-            user = lsuat.execute(username.getText().toString()).get();
-        }
-        catch(InterruptedException e) {
-            Log.e(TAG, "InterruptedException: " + e.getMessage());
-        }
-        catch(ExecutionException e) {
-            Log.e(TAG, "ExecutionException: " + e.getMessage());
-        }*/
-
-/*        //if user doesn't exist, add new user to list of users
-        //else, tell them to choose a new name
-        if (user == null) {
-            Log.d(TAG, "user does not exist");
-            //be sure to change to NavDrawerHomePage!
-            //makes sure the inputted passwords are the same
-            //makes sure user doesn't already exist
-            if (createPassword.getText().toString().equals(confirmPassword.getText().toString())) {
-
-                //add user to server
-                CreateUserEndpointsAsyncTask cueat = new CreateUserEndpointsAsyncTask(this);
-                cueat.execute(usernameText, createPassword.getText().toString());
-
-                Intent intent = new Intent(this, NavDrawerHomePage.class);
-                intent.putExtra("username", usernameText);
-                startActivity(intent);
-            } else {
-                Toast.makeText(getApplicationContext(), "Passwords do not match",
-                        Toast.LENGTH_LONG).show();
-                clearTextFields();
-            }
-
-        } else {
-            Toast.makeText(getApplicationContext(), "Username already taken",
-                    Toast.LENGTH_LONG).show();
-            clearTextFields();
-        }*/
     }
 
     private void create() {

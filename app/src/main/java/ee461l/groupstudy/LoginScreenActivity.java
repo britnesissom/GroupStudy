@@ -75,7 +75,27 @@ public class LoginScreenActivity extends AppCompatActivity {
                 login();
             }
         }, TAG);
-        lsuat.execute(username.getText().toString());
+
+        try {
+            user = lsuat.execute(username.getText().toString()).get();
+
+        }
+        catch(InterruptedException e) {
+
+        } catch ( ExecutionException e) {
+
+        }
+        String passwordText = password.getText().toString();
+
+        //username, password combo is correct so log in the user
+        if (user.getPassword().equals(passwordText)) {
+            Intent intent = new Intent(this, NavDrawerHomePage.class);
+            intent.putExtra("username", user.getUsername());
+            startActivity(intent);
+        } else {
+            Toast.makeText(getApplicationContext(), "Invalid username or password",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void login() {

@@ -268,7 +268,6 @@ public class GroupstudyEndpoint {
         LOGGER.info("Called from: " + activityName);
         //will return null if user is not found
         User user = OfyService.ofy().load().type(User.class).id(username).now();
-        LOGGER.info("username: " + user.getUsername());
         return user;
     }
 }

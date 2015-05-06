@@ -1,6 +1,6 @@
 {
  "kind": "discovery#rpcDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/X4iuWdlpGMCNp5ANpZAXHZEnyD8\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/--WnFfPE1ra99SseSbsdAAEjKA8\"",
  "discoveryVersion": "v1",
  "id": "groupstudyEndpoint:v1",
  "name": "groupstudyEndpoint",
@@ -360,17 +360,18 @@
   "groupstudyEndpoint.removeGroupFromUser": {
    "id": "groupstudyEndpoint.removeGroupFromUser",
    "parameters": {
-    "member": {
+    "groupName": {
      "type": "string",
      "required": true
     },
-    "resource": {
-     "$ref": "Groups"
+    "member": {
+     "type": "string",
+     "required": true
     }
    },
    "parameterOrder": [
-    "resource",
-    "member"
+    "member",
+    "groupName"
    ],
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"
