@@ -228,7 +228,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                             // get user input and set it to result
                             descriptionList.add(userInput.getText().toString());
                             int index = descriptionList.indexOf(userInput.getText().toString());
-                            if (index == 0) {
+                            int size = descriptionList.size();
+                            if (size == 1) {
                                 events.append("YOU ADDED EVENT:");
                             }
                             events.append("\n" + dateList.get(index));
