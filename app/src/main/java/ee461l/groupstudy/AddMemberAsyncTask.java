@@ -23,7 +23,7 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
  */
 public class AddMemberAsyncTask extends AsyncTask<String, Void, Void> { //first String is task
 
-    private static final String TAG = "DeleteMemberAsync";
+    private static final String TAG = "AddMemberAsync";
     private static GroupstudyEndpoint groupEndpointApi = null;
     private Context context;
     private String groupName = null;

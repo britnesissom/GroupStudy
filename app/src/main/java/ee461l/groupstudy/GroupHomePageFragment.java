@@ -178,45 +178,6 @@ public class GroupHomePageFragment extends Fragment implements OnRetrieveSingleG
 
         Log.d(TAG, "fragment view created");
 
-        /*if (group != null) {
-            getActivity().setTitle(group.getGroupName() + " Home");
-            Log.d(TAG, "Group home fragment view created");
-            //Log.d(TAG, "admin username: " + group.getAdminUser().getUsername());
-
-            List<String> tasks = group.getTasks();
-            List<String> messages = group.getMessages();
-
-            //view first three (if there are that many) upcoming events on group home screen
-            if (tasks != null) {
-                Collections.sort(tasks);    //sorts tasks by date - most recent first
-
-                if (tasks.size() > 3) {
-                    for (int i = 0; i < 3; i++) {
-                        upcomingTasks.append(tasks.get(i) + "\n");
-                    }
-                } else {
-                    for (int i = 0; i < tasks.size(); i++) {
-                        upcomingTasks.append(tasks.get(i) + "\n");
-                    }
-                }
-            }
-
-            //view two most recent (if there are that many) messages on group home screen
-            //might show your own messages woops
-            if (messages != null) {
-
-                if (messages.size() > 2) {
-                    for (int i = 0; i < 2; i++) {
-                        newMessages.append(messages.get(i) + "\n");
-                    }
-                } else {
-                    for (int i = 0; i < messages.size(); i++) {
-                        newMessages.append(messages.get(i) + "\n");
-                    }
-                }
-            }
-        }*/
-
         return rootView;
     }
 

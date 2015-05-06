@@ -78,7 +78,7 @@ public class GroupstudyEndpoint {
     @ApiMethod(name = "addMember")
     public Groups addMember(@Named("groupName") String groupName, @Named("member") String member) {
         //will return null if group does not exist
-        LOGGER.info("removeMember reached");
+        LOGGER.info("addMember reached");
         Groups group = OfyService.ofy().load().type(Groups.class).id(groupName).now();
         group.addMember(member);
         ArrayList<String> teammates = group.getTeammates();

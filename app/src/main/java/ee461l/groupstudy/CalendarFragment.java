@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 
 import java.util.ArrayList;
@@ -235,18 +236,18 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             }
         });
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+        AlertDialog.Builder descriptionDialogBuilder = new AlertDialog.Builder(
                 getActivity());
 
         // set prompts.xml to alertdialog builder
-        alertDialogBuilder.setView(promptsView);
+        descriptionDialogBuilder.setView(promptsView);
 
 
         final EditText userInput = (EditText) promptsView
                 .findViewById(R.id.editTextDialogUserInput);
 
         // set dialog message
-        alertDialogBuilder
+        descriptionDialogBuilder
             .setCancelable(true)
             .setPositiveButton("OK",
                     new DialogInterface.OnClickListener() {
@@ -257,18 +258,18 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                             descriptionList.add(userInput.getText().toString());
                             int index = descriptionList.indexOf(userInput.getText().toString());
                             int size = descriptionList.size();
-                            if (size == 1) {
-                                events.append("YOU ADDED EVENT:");
-                            }
+
                             events.append("\n" + dateList.get(index));
                             events.append(" " + timeList.get(index) + ": ");
-                            events.append(descriptionList.get(index) + "\n" + locationString);
-
+                            events.append(locationString + "\n" + descriptionList.get(index));
 
                             String localEvent = dateList.get(index) + " " + timeList.get(index) + ": "
-                                    + descriptionList.get(index) + "\n" + locationString;
+                                    + locationString + "\n" + descriptionList.get(index) + "\n";
+
                             CreateTaskAsyncTask ctat = new CreateTaskAsyncTask(getActivity(), groupName);
                             ctat.execute(localEvent);
+
+                            Toast.makeText(getActivity(), "Event added!", Toast.LENGTH_SHORT).show();
                         }
 
                     })
@@ -284,7 +285,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                     });
 
         // create alert dialog
-        descriptionDialog = alertDialogBuilder.create();
+        descriptionDialog = descriptionDialogBuilder.create();
         locationDialog = locationBuilder.create();
 
         //initialize each time
@@ -321,6 +322,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         }
     }
+
     class mDateCancelListener implements DatePickerDialog.OnCancelListener{
         @Override
         public void onCancel(DialogInterface dialog) {
@@ -345,8 +347,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 descriptionDialog.cancel();
                 locationDialog.cancel();
             }
-
-
         }
     }
 
