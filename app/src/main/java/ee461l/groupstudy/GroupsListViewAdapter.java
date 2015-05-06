@@ -3,6 +3,7 @@ package ee461l.groupstudy;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +45,7 @@ public class GroupsListViewAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder v;
 
         if (convertView == null) {
@@ -65,7 +66,8 @@ public class GroupsListViewAdapter extends BaseAdapter {
             v = (ViewHolder) convertView.getTag();
         }
 
-        Groups group = groups.get(position);
+        Groups group = getItem(position);
+        Log.d("GroupsListView", "position: " + position);
 
         // assign values if the object is not null
         if(group != null) {
@@ -78,8 +80,9 @@ public class GroupsListViewAdapter extends BaseAdapter {
             v.groupButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.d("GroupsListView", "group name in onClick: " + groupName);
                     Intent intent = new Intent(context, NavDrawerGroups.class);
-                    intent.putExtra("groupName", groupName);
+                    intent.putExtra("groupName", getItem(position).getGroupName());
                     intent.putExtra("username", username);
                     context.startActivity(intent);
                 }
@@ -94,7 +97,7 @@ public class GroupsListViewAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public Groups getItem(int position) {
         return groups.get(position);
     }
 

@@ -36,11 +36,9 @@ public class NavDrawerGroups extends AppCompatActivity {
 
         Log.d(TAG, "NavDrawerGroup opened");
 
-        //default view when group is opened is list of tasks?
+        //default view when group is opened is list of groups
         groupName = getIntent().getStringExtra("groupName");
         username = getIntent().getStringExtra("username");
-
-        
 
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame,
@@ -138,13 +136,10 @@ public class NavDrawerGroups extends AppCompatActivity {
             case 4: //go to files
                 fragment = FileSharingFragment.newInstance(groupName);
                 break;
-            case 5: //go to meetings
-                fragment = MeetingsFragment.newInstance(groupName);
-                break;
-            case 6: //view info about the app
+            case 5: //view info about the app
                 fragment = AboutFragment.newInstance();
                 break;
-            case 7: //log out of app
+            case 6: //log out of app
                 Intent i = new Intent(this, LoginScreenActivity.class);
                 startActivity(i);
             default:

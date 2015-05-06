@@ -21,7 +21,6 @@
         <item >Calendar</item>
         <item >Messages</item>
         <item >Files</item>
-        <item >Meetings</item>
         <item >About</item>
         <item >Log Out</item>
     </string-array>

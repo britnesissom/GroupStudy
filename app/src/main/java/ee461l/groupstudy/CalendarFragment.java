@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -35,7 +36,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public static final String GROUP_NAME = "groupName";
     private static final String TAG = "CalendarFragment";
 
-    //static TextView users; //**maybe shouldnt be static
     private TextView events;
     private TextView eventDate;
     private TextView eventTime;
@@ -44,16 +44,15 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private ArrayList<String> descriptionList = new ArrayList<>();
     private Groups group;
     private String groupName;
-    private String lastDate = null;
-    private String lastTime = null;
-    private String lastDescription = null;
     private AlertDialog descriptionDialog = null;
-    AlertDialog locationDialog = null;
+    private AlertDialog locationDialog = null;
     private TimePickerDialog timeDialog = null;
     private DatePickerDialog dateDialog = null;
     boolean dateCancel = false;
     boolean timeAdded = false;
-    List<String> tasks = null;
+
+    private LayoutInflater mInflater;
+    private ViewGroup mContainer;
 
 
     // if we want the default location to be PCL:            ADDED BY DANIEL
@@ -86,16 +85,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             groupName = getArguments().getString(GROUP_NAME);
         }
 
-        LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(),
-                new OnRetrieveSingleGroupTaskCompleted() {
-            @Override
-            public void onRetrieveSingleGroupCompleted(Groups g) {
-                group = g;
-            }
-        });
+        LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(), this);
 
         //defeats purpose of async task
-        try {
+        /*try {
             group = lsgat.execute(groupName).get();
         }
         catch(InterruptedException e) {
@@ -103,19 +96,53 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
         catch(ExecutionException e) {
             Log.e(TAG, "ExecutionException: " + e.getMessage());
-        }
+        }*/
+        lsgat.execute(groupName);
     }
 
+    @Override
     public void onRetrieveSingleGroupCompleted(Groups g) {
         group = g;
+        updateView();
+    }
+
+    private void updateView() {
+        mInflater.inflate(R.layout.fragment_calendar, mContainer, false);
+
+        Log.d(TAG, "updating view");
+        getActivity().setTitle("Calendar");
+
+        List<String> tasks = group.getTasks();
+
+        // tasks have been created so they can be loaded
+        // otherwise no tasks will show initially
+        if (tasks != null) {
+            Collections.sort(tasks);
+            Collections.sort(tasks, new Comparator<String>(){
+                public int compare(String a, String b){
+                    String[] as = a.split("/");
+                    String[] bs = b.split("/");
+                    int result = Integer.valueOf(as[0]).compareTo(Integer.valueOf(bs[0]));
+                    if(result==0)
+                        result = Integer.valueOf(as[1]).compareTo(Integer.valueOf(bs[1]));
+                    return result;
+                }
+            });
+
+            for (int i = 0; i < tasks.size(); i++) {
+                events.append(tasks.get(i) + "\n");
+            }
+
+        }
+        Log.d(TAG, "view updated!");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        //return inflater.inflate(R.layout.fragment_home_page, container, false);
-
+        mInflater = inflater;
+        mContainer = container;
 
         View rootView = inflater.inflate(R.layout.fragment_calendar, container, false);
         Button newEvent = (Button)rootView.findViewById(R.id.newEvent);
@@ -127,7 +154,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         eventTime.setVisibility(View.GONE);
 
 
-        getActivity().setTitle("Calendar");
+        /*getActivity().setTitle("Calendar");
 
         tasks = group.getTasks();
 
@@ -151,7 +178,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             }
 
         }
-
+*/
         return rootView;
     }
 
@@ -181,7 +208,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         locationBuilder.setTitle("Pick a location:");
 //        eventLocationSpinner = rootView.findViewById((R.id.eventLocationSpinner));
 //        String location = String.valueOf(eventLocationSpinner.getSelectedItem());
-        String[] types = {"ECJ - Ernest Cockrell Jr. Hall","ETC - Engineering Teaching Center II","FAC - Peter T. Flawn Academic Center",
+        String[] types = {"ECJ - Ernest Cockrell Jr. Hall","ETC - Engineering Teaching Center II",
+                "FAC - Peter T. Flawn Academic Center",
                 "PCL - Perry-Castañeda Library","UNB - Union Building"};
         locationBuilder.setItems(types, new DialogInterface.OnClickListener() {
             @Override
@@ -272,8 +300,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
 
-
-
     class mDateSetListener implements DatePickerDialog.OnDateSetListener {
 
         @Override
@@ -303,7 +329,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
-    class mTimeDismissListener implements DialogInterface.OnDismissListener{
+    class mTimeDismissListener implements DialogInterface.OnDismissListener {
         @Override
         public void onDismiss(DialogInterface dialog) {
 
@@ -361,9 +387,5 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
 
     }
-
-
-
-
 
 }

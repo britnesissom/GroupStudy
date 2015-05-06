@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -37,7 +38,7 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
  * Use the {@link AppHomePageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AppHomePageFragment extends Fragment {
+public class AppHomePageFragment extends Fragment implements AdapterView.OnItemClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String USERNAME = "username";
@@ -121,20 +122,20 @@ public class AppHomePageFragment extends Fragment {
         groupsListView.setAdapter(adapter);
 
         //open home page for specified group when it is clicked
-        groupsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView parent, View view, int position, long arg3) {
-                Log.d(TAG, "item clicked");
-                // get the list adapter
-                GroupsListViewAdapter groupsAdapter = (GroupsListViewAdapter) parent.getAdapter();
-
-                //get view/open website for selected recipe
-                groupsAdapter.getView(position, view, parent);
-            }
-        });
+        groupsListView.setOnItemClickListener(this);
 
         return rootView;
+    }
+
+    @Override
+    public void onItemClick(AdapterView parent, View view, int position, long arg3) {
+        Log.d(TAG, "item clicked, position: " + position);
+        Toast.makeText(getActivity().getApplicationContext(), "You selected: " + position, Toast.LENGTH_LONG).show();
+        // get the list adapter
+        GroupsListViewAdapter groupsAdapter = (GroupsListViewAdapter) parent.getAdapter();
+
+        //open home page for selected group
+        groupsAdapter.getView(position, view, parent);
     }
 
     @Override

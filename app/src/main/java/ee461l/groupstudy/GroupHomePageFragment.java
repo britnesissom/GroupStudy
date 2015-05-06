@@ -2,6 +2,7 @@ package ee461l.groupstudy;
 
 
 import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.Collections;
@@ -29,7 +31,7 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
  * Use the {@link GroupHomePageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GroupHomePageFragment extends Fragment {
+public class GroupHomePageFragment extends Fragment implements OnRetrieveSingleGroupTaskCompleted {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String TAG = "GroupHomePage";
@@ -43,6 +45,9 @@ public class GroupHomePageFragment extends Fragment {
 
     private TextView upcomingTasks;
     private TextView newMessages;
+    private LayoutInflater mInflater;
+    private ViewGroup mContainer;
+    private View rootView;
 
 
     /**
@@ -79,20 +84,37 @@ public class GroupHomePageFragment extends Fragment {
             groupName = getArguments().getString(GROUP_NAME);
         }
 
-        LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(), new OnRetrieveSingleGroupTaskCompleted() {
-            @Override
-            public void onRetrieveSingleGroupCompleted(Groups g) {
-                group = g;
-                refreshData();
-                getActivity().invalidateOptionsMenu();  //updates options menu because group has been retrieved
-            }
-        });
+        LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(), this);
+
         Log.d(TAG, "group name: " + groupName);
         lsgat.execute(groupName);
     }
 
-    private void refreshData() {
-        getActivity().setTitle(group.getGroupName() + " Home");
+    @Override
+    public void onRetrieveSingleGroupCompleted(Groups g) {
+        group = g;
+        Log.d(TAG, "group name: " + group.getGroupName());
+        refreshData();
+
+        if (isAdded()) {
+            getActivity().invalidateOptionsMenu();  //updates options menu because group has been retrieved
+        }
+    }
+
+    private View refreshData() {
+
+        if (rootView == null || mContainer == null || mInflater == null) {
+            Log.d(TAG, "rootView or container or inflater is null");
+            return null;
+        }
+        //need to reinflate view to set the title and update textviews
+        rootView = mInflater.inflate(R.layout.fragment_group_home_page, mContainer, false);
+
+        Log.d(TAG, "refreshData: " + group.getGroupName());
+
+        if (isAdded()) {
+            getActivity().setTitle(group.getGroupName() + " Home");
+        }
 
         List<String> tasks = group.getTasks();
         List<String> messages = group.getMessages();
@@ -138,17 +160,23 @@ public class GroupHomePageFragment extends Fragment {
                 }
             }
         }
+
+        return rootView;
     }
 
     //will display most recent messages and next three upcoming tasks
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mInflater = inflater;
+        mContainer = container;
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_group_home_page, container, false);
+        rootView = inflater.inflate(R.layout.fragment_group_home_page, container, false);
 
         upcomingTasks = (TextView) rootView.findViewById(R.id.upcoming_tasks);
         newMessages = (TextView) rootView.findViewById(R.id.new_messages);
+
+        Log.d(TAG, "fragment view created");
 
         /*if (group != null) {
             getActivity().setTitle(group.getGroupName() + " Home");

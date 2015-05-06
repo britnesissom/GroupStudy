@@ -12,10 +12,9 @@
     <ListView
         android:id="@+id/groups_list"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:divider="#00000000"
         android:dividerHeight="2dp"
-        android:scrollbars="none"
-        android:clickable="true"/>
+        android:scrollbars="none"/>
 
 </LinearLayout>
