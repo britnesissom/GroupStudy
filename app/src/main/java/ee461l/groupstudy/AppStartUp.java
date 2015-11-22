@@ -16,7 +16,7 @@ public class AppStartUp extends Application {
         // Enable Local Datastore.
         Parse.enableLocalDatastore(this);
 
-        Parse.initialize(this, "qrPs7HqfjcQOkltZJsXRp7jKbETuUmA3CFt6aSHa", "FFNOSY7R193SX1r0Nl1ywB7zJGbaIZ1btqh1oTAE");
+        Parse.initialize(this, BuildConfig.PARSE_APP_ID, BuildConfig.PARSE_CLIENT_ID);
 
     }
 }
