@@ -1,39 +1,61 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="10dp"
-    tools:context="ee461l.groupstudy.MessagingFragment">
+      xmlns:tools="http://schemas.android.com/tools"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      android:orientation="vertical"
+      tools:context="ee461l.groupstudy.fragments.MessagingFragment">
 
-    <!--<TextView
-        android:id="@+id/display_message"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>-->
-    <ListView
-        android:id="@+id/message_list_view"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/edit_message"
-        android:divider="@null"
-        android:dividerHeight="0dp"
-        android:layout_marginBottom="30dp"
-        android:stackFromBottom="true"
-        android:transcriptMode="alwaysScroll">
-    </ListView>
+        android:theme="@style/ThemeOverlay.AppCompat.Light"
+        android:elevation="4dp">
 
-    <EditText android:id="@+id/edit_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="@string/hint"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/sendButton"
-        android:layout_alignParentLeft="true"/>
-    <Button
-        android:id="@+id/sendButton"
-        android:layout_height="wrap_content"
-        android:layout_width="70dp"
-        android:text="@string/button"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"/>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#eb9f77"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_below="@+id/appbar"
+                    android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="ee461l.groupstudy.fragments.MessagingFragment">
+
+        <ListView
+            android:id="@+id/message_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/edit_message"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:layout_marginBottom="30dp"
+            android:stackFromBottom="true"
+            android:transcriptMode="alwaysScroll">
+        </ListView>
+
+        <EditText android:id="@+id/edit_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/sendButton"
+            android:layout_alignParentLeft="true"/>
+        <Button
+            android:id="@+id/sendButton"
+            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:text="@string/button"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
 </RelativeLayout>

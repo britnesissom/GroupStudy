@@ -1,8 +1,11 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#abcabc</item>
+        <item name="colorPrimaryDark">#abc000</item>
+        <item name="colorAccent">#555aaa</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
 
 </resources>

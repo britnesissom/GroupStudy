@@ -1,47 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ee461l.groupstudy" >
+<manifest package="ee461l.groupstudy"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
+        android:name="ee461l.groupstudy.AppStartUp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginScreenActivity"
-            android:label="@string/app_name" >
+            android:name=".activities.LoginScreenActivity"
+            android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
-            android:name=".CreateNewAccountActivity"
-            android:label="@string/app_name" >
+            android:name=".activities.CreateNewAccountActivity"
+            android:label="@string/app_name">
         </activity>
         <activity
-            android:name=".NavDrawerGroups"
-            android:label="@string/app_name" >
+            android:name=".activities.MainActivity"
+            android:label="@string/app_name">
         </activity>
         <activity
-            android:name=".NavDrawerHomePage"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name=".CreateGroupActivity"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name=".AddMemberToGroupActivity"
-            android:label="@string/title_activity_add_member_to_group" >
-        </activity>
-        <activity
-            android:name=".DeleteMemberFromGroupActivity"
-            android:label="@string/title_activity_delete_member_from_group" >
+            android:name=".activities.CreateGroupActivity"
+            android:label="@string/app_name">
         </activity>
     </application>
 

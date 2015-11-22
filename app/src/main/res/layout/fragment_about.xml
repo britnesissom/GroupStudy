@@ -1,7 +1,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ee461l.groupstudy.AboutFragment"
+    tools:context="ee461l.groupstudy.fragments.AboutFragment"
 
     android:id="@+id/scroll"
     android:layout_width="fill_parent"
