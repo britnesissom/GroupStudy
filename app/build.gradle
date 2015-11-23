@@ -1,5 +1,16 @@
 apply plugin: 'com.android.application'
 
+def retrieveProp(String key) {
+    try {
+        Properties props = new Properties()
+        props.load(new FileInputStream("private.properties"))
+        def val = props.getProperty(key)
+        return val
+    } catch (FileNotFoundException ignored) {
+        return ''
+    }
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -11,6 +22,9 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+
+        buildConfigField "String", "PARSE_APP_ID", "\"${retrieveProp('PARSE_APP_ID')}\""
+        buildConfigField "String", "PARSE_CLIENT_ID", "\"${retrieveProp('PARSE_CLIENT_ID')}\""
     }
     buildTypes {
         release {

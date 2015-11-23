@@ -9,8 +9,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import ee461l.groupstudy.async.LoadSingleUserAsyncTask;
-import ee461l.groupstudy.OnRetrieveSingleUserTaskCompleted;
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+
 import ee461l.groupstudy.R;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
@@ -55,31 +57,25 @@ public class LoginScreenActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    //make sure the user actually exists before going to new homepage activity
-    public void verifyUser(View v) {
-        Toast.makeText(this, "Logging in...", Toast.LENGTH_SHORT).show();
-        LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
-            @Override
-            public void onRetrieveUserCompleted(User userLogin) {
-                user = userLogin;
-                login();
-            }
-        }, TAG);
-        lsuat.execute(username.getText().toString());
-    }
-
-    private void login() {
+    public void login(View v) {
         String passwordText = password.getText().toString();
 
-        //username, password combo is correct so log in the user
-        if (user.getPassword().equals(passwordText)) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("username", user.getUsername());
-            startActivity(intent);
-        } else {
-            Toast.makeText(getApplicationContext(), "Invalid username or password",
-                    Toast.LENGTH_LONG).show();
-        }
+        ParseUser.logInInBackground(username.getText().toString(), passwordText, new LogInCallback
+                () {
+            public void done(ParseUser user, ParseException e) {
+                if (user != null) {
+                    // Hooray! The user is logged in.
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.putExtra("username", user.getUsername());
+                    startActivity(intent);
+                } else {
+                    // Login failed. Look at the ParseException to see what happened.
+                    Toast.makeText(getApplicationContext(), "Invalid username or password", Toast
+                            .LENGTH_SHORT).show();
+                    password.setText("");
+                }
+            }
+        });
     }
 
     //go to a new create account activity

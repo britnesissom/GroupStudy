@@ -2,7 +2,8 @@ package ee461l.groupstudy.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +14,7 @@ import android.widget.Button;
 import java.util.List;
 
 import ee461l.groupstudy.R;
-import ee461l.groupstudy.activities.MainActivity;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
+import ee461l.groupstudy.fragments.GroupHomePageFragment;
 
 /**
  * Created by britne on 4/24/15.
@@ -22,7 +22,7 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
  * Displays user's list of groups on home page
  */
 public class GroupsListViewAdapter extends BaseAdapter {
-    private List<Groups> groups;
+    private List<String> groups;
     private Context context;
     private int layoutResourceId;
     private String groupName;
@@ -32,7 +32,7 @@ public class GroupsListViewAdapter extends BaseAdapter {
         Button groupButton;
     }
 
-    public GroupsListViewAdapter(Context context, int layoutResourceId, List<Groups> groups,
+    public GroupsListViewAdapter(Context context, int layoutResourceId, List<String> groups,
                                  String username) {
         this.context = context;
         this.groups = groups;
@@ -67,25 +67,24 @@ public class GroupsListViewAdapter extends BaseAdapter {
             v = (ViewHolder) convertView.getTag();
         }
 
-        Groups group = getItem(position);
+        String group = getItem(position);
         Log.d("GroupsListView", "position: " + position);
 
         // assign values if the object is not null
         if(group != null) {
             // get the Button from the ViewHolder and then set the text (group name)
             // and tag (item ID) values
-            v.groupButton.setText(group.getGroupName());
-            groupName = group.getGroupName();
-            v.groupButton.setTag(group.getId());
+            v.groupButton.setText(group);
+            groupName = group;
+            v.groupButton.setTag(groupName);
 
             v.groupButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("GroupsListView", "group name in onClick: " + groupName);
-                    Intent intent = new Intent(context, MainActivity.class);
-                    intent.putExtra("groupName", getItem(position).getGroupName());
-                    intent.putExtra("username", username);
-                    context.startActivity(intent);
+                    FragmentTransaction transaction = ((FragmentActivity) context)
+                            .getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.content_fragment,
+                            GroupHomePageFragment.newInstance(username, getItem(position))).commit();
                 }
             });
         }
@@ -94,7 +93,7 @@ public class GroupsListViewAdapter extends BaseAdapter {
     }
 
     @Override
-    public Groups getItem(int position) {
+    public String getItem(int position) {
         return groups.get(position);
     }
 

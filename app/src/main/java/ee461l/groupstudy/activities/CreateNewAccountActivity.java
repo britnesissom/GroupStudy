@@ -11,11 +11,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
+
 import java.util.List;
 
-import ee461l.groupstudy.async.CreateUserEndpointsAsyncTask;
-import ee461l.groupstudy.async.LoadSingleUserAsyncTask;
-import ee461l.groupstudy.OnRetrieveSingleUserTaskCompleted;
 import ee461l.groupstudy.R;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
@@ -69,54 +70,46 @@ public class CreateNewAccountActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void createNewAccount(View v) {
-        Toast.makeText(this, "Creating account...", Toast.LENGTH_SHORT).show();
 
-        //make sure user does not already exist
-        LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(this, new OnRetrieveSingleUserTaskCompleted() {
-            @Override
-            public void onRetrieveUserCompleted(User userLogin) {
-                user = userLogin;
-                create();
+    public void create(View v) {
+        final String usernameText = username.getText().toString();
 
-            }
-        }, TAG);
-        lsuat.execute(username.getText().toString());
-    }
+        if (createPassword.getText().toString().equals(confirmPassword.getText().toString())) {
+            ParseUser user = new ParseUser();
+            user.setUsername(usernameText);
+            user.setPassword(createPassword.getText().toString());
+            user.put("groups", null);
 
-    private void create() {
-        String usernameText = username.getText().toString();
+            user.signUpInBackground(new SignUpCallback() {
+                public void done(ParseException e) {
+                    if (e == null) {
+                        // Hooray! Let them use the app now.
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.putExtra("username", usernameText);
+                        startActivity(intent);
+                    } else {
+                        // Sign up didn't succeed. Look at the ParseException
+                        // to figure out what went wrong
+                        Log.d("NewAccount", e.getMessage());
 
-        //if user doesn't exist, add new user to list of users
-        //else, tell them to choose a new name
-        if (user == null) {
-            Log.d(TAG, "user does not exist");
-            //be sure to change to NavDrawerHomePage!
-            //makes sure the inputted passwords are the same
-            //makes sure user doesn't already exist
-            if (createPassword.getText().toString().equals(confirmPassword.getText().toString())) {
-
-                //add user to server
-                CreateUserEndpointsAsyncTask cueat = new CreateUserEndpointsAsyncTask(this);
-                cueat.execute(usernameText, createPassword.getText().toString());
-
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.putExtra("username", usernameText);
-                startActivity(intent);
-            } else {
-                Toast.makeText(getApplicationContext(), "Passwords do not match",
-                        Toast.LENGTH_LONG).show();
-                clearTextFields();
-            }
-
+                        if (e.getCode() == ParseException.USERNAME_TAKEN) {
+                            Toast.makeText(getApplicationContext(), "Username already taken",
+                                    Toast.LENGTH_SHORT).show();
+                            clearTextFields();
+                        }
+                    }
+                }
+            });
         } else {
-            Toast.makeText(getApplicationContext(), "Username already taken",
+            Toast.makeText(getApplicationContext(), "Passwords do not match",
                     Toast.LENGTH_LONG).show();
             clearTextFields();
         }
+
     }
     
     private void clearTextFields() {
+        username.setText("");
         createPassword.setText("");
         confirmPassword.setText("");
     }

@@ -23,6 +23,11 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -33,10 +38,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import ee461l.groupstudy.OnRetrieveSingleGroupTaskCompleted;
 import ee461l.groupstudy.adapter.FileListViewAdapter;
 import ee461l.groupstudy.FileUtils;
-import ee461l.groupstudy.async.LoadSingleGroupAsyncTask;
 import ee461l.groupstudy.R;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.FilesEntity;
@@ -49,13 +52,13 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
  */
 public class FileSharingFragment extends Fragment {
 
-    private static final String GROUP_NAME = "groupName";
+    private static final String GROUP_ID = "groupId";
 
     private TextView users;
     private ListView files;
     private List<FilesEntity> filesFromServer;
     //private List<File> filesToView;
-    private String groupName;
+    private String groupId;
     private Groups group;
     private FileListViewAdapter adapter;
     private static final String TAG = "FileSharingFragment";
@@ -73,7 +76,7 @@ public class FileSharingFragment extends Fragment {
     public static Fragment newInstance(String groupName) {
         Fragment fragment = new FileSharingFragment();
         Bundle args = new Bundle();
-        args.putString(GROUP_NAME, groupName);
+        args.putString(GROUP_ID, groupName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -87,20 +90,24 @@ public class FileSharingFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         if (getArguments() != null) {
-            groupName = getArguments().getString(GROUP_NAME);
+            groupId = getArguments().getString(GROUP_ID);
         }
 
         filesFromServer = new ArrayList<>();
 
-        LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(), new OnRetrieveSingleGroupTaskCompleted() {
-            @Override
-            public void onRetrieveSingleGroupCompleted(Groups g) {
-                group = g;
-                Log.d(TAG, "group name retrieved: " + group.getGroupName());
-                filesFromServer = group.getFiles();
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
+        query.getInBackground(groupId, new GetCallback<ParseObject>() {
+            public void done(ParseObject group, ParseException e) {
+                if (e == null) {
+                    // The query was successful.
+
+                    //get files here? idk
+                } else {
+                    // Something went wrong.
+                    Log.d(TAG, e.getMessage());
+                }
             }
         });
-        lsgat.execute(groupName);
     }
 
     @Override
@@ -253,7 +260,7 @@ public class FileSharingFragment extends Fragment {
                 fe.setFileName(file.getName());
                 fe.setFileContents(fileBytes);
 
-                Groups groupReturned = groupEndpointApi.addFile(groupName, fe).execute();
+                Groups groupReturned = groupEndpointApi.addFile(groupId, fe).execute();
 
                 Log.d(TAG, "file added to group");
                 return groupReturned;

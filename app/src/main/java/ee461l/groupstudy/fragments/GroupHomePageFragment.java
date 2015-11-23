@@ -15,6 +15,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -22,8 +30,8 @@ import java.util.List;
 import ee461l.groupstudy.OnRetrieveSingleGroupTaskCompleted;
 import ee461l.groupstudy.async.AddMemberAsyncTask;
 import ee461l.groupstudy.async.DeleteMemberAsyncTask;
-import ee461l.groupstudy.async.LoadSingleGroupAsyncTask;
 import ee461l.groupstudy.R;
+import ee461l.groupstudy.models.Group;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 
@@ -32,17 +40,17 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
  * Use the {@link GroupHomePageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GroupHomePageFragment extends Fragment implements OnRetrieveSingleGroupTaskCompleted {
+public class GroupHomePageFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String TAG = "GroupHomePage";
     private static final String USERNAME = "username";
-    private static final String GROUP_NAME = "groupName";
+    private static final String GROUP_ID = "groupId";
 
     // TODO: Rename and change types of parameters
     private String username;
-    private String groupName;
-    private Groups group;
+    private String groupId;
+    private Group group;
 
     private TextView upcomingTasks;
     private TextView newMessages;
@@ -62,7 +70,7 @@ public class GroupHomePageFragment extends Fragment implements OnRetrieveSingleG
         GroupHomePageFragment fragment = new GroupHomePageFragment();
         Bundle args = new Bundle();
         args.putString(USERNAME, username);
-        args.putString(GROUP_NAME, groupName);
+        args.putString(GROUP_ID, groupName);
         fragment.setArguments(args);
 
         Log.d(TAG, "Group home fragment instantiated");
@@ -82,27 +90,27 @@ public class GroupHomePageFragment extends Fragment implements OnRetrieveSingleG
 
         if (getArguments() != null) {
             username = getArguments().getString(USERNAME);
-            groupName = getArguments().getString(GROUP_NAME);
+            groupId = getArguments().getString(GROUP_ID);
         }
 
-        LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(), this);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
+        query.getInBackground(groupId, new GetCallback<ParseObject>() {
+            public void done(ParseObject g, ParseException e) {
+                if (e == null) {
+                    group = (Group) g;
+                    //refreshData();
 
-        Log.d(TAG, "group name: " + groupName);
-        lsgat.execute(groupName);
+                    if (isAdded()) {
+                        getActivity().invalidateOptionsMenu();  //updates options menu because group has been retrieved
+                    }
+                } else {
+                    // something went wrong
+                }
+            }
+        });
     }
 
-    @Override
-    public void onRetrieveSingleGroupCompleted(Groups g) {
-        group = g;
-        Log.d(TAG, "group name: " + group.getGroupName());
-        refreshData();
-
-        if (isAdded()) {
-            getActivity().invalidateOptionsMenu();  //updates options menu because group has been retrieved
-        }
-    }
-
-    private View refreshData() {
+/*    private View refreshData() {
 
         if (rootView == null || mContainer == null || mInflater == null) {
             Log.d(TAG, "rootView or container or inflater is null");
@@ -111,18 +119,20 @@ public class GroupHomePageFragment extends Fragment implements OnRetrieveSingleG
         //need to reinflate view to set the title and update textviews
         rootView = mInflater.inflate(R.layout.fragment_group_home_page, mContainer, false);
 
-        Log.d(TAG, "refreshData: " + group.getGroupName());
+        Log.d(TAG, "refreshData: " + group.get("name"));
 
         if (isAdded()) {
-            getActivity().setTitle(group.getGroupName() + " Home");
+            getActivity().setTitle(group.get("name") + " Home");
         }
 
-        List<String> tasks = group.getTasks();
-        List<String> messages = group.getMessages();
+        List<String> tasks = group.get("tasks");
+        List<String> messages = group.get("messages");
 
         //view first three (if there are that many) upcoming events on group home screen
         if (tasks != null) {
             Collections.sort(tasks);
+
+            //sorts by soonest first
             Collections.sort(tasks, new Comparator<String>(){
                 public int compare(String a, String b){
                     String[] as = a.split("/");
@@ -162,7 +172,7 @@ public class GroupHomePageFragment extends Fragment implements OnRetrieveSingleG
         }
 
         return rootView;
-    }
+    }*/
 
     //will display most recent messages and next three upcoming tasks
     @Override
@@ -233,7 +243,7 @@ public class GroupHomePageFragment extends Fragment implements OnRetrieveSingleG
                                 //add member here
                                 String memberToAdd = userInput.getText().toString();
 
-                                AddMemberAsyncTask amat = new AddMemberAsyncTask(getActivity(), groupName);
+                                AddMemberAsyncTask amat = new AddMemberAsyncTask(getActivity(), groupId);
                                 amat.execute(memberToAdd);
 
                             }
@@ -271,7 +281,7 @@ public class GroupHomePageFragment extends Fragment implements OnRetrieveSingleG
                                 String memberToRemove = userInput.getText().toString();
 
                                 //delete member here
-                                DeleteMemberAsyncTask dmat = new DeleteMemberAsyncTask(getActivity(), groupName);
+                                DeleteMemberAsyncTask dmat = new DeleteMemberAsyncTask(getActivity(), groupId);
                                 dmat.execute(memberToRemove);
                             }
                         })

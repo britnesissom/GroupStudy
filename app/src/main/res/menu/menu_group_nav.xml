@@ -2,8 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:id="@+id/group_main" android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/nav_group_home"
             android:title="Home" />
+        <item
+            android:id="@+id/nav_all_groups"
+            android:title="Groups" />
         <item
             android:id="@+id/nav_calendar"
             android:title="Calendar" />

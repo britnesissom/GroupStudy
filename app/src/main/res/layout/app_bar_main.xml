@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#eb9f77"
+        android:fitsSystemWindows="true"
         android:title="jgjg"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>

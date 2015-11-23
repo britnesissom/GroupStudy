@@ -2,9 +2,9 @@ package ee461l.groupstudy.fragments;
 
 import android.support.v4.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,15 +23,21 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ee461l.groupstudy.activities.CreateGroupActivity;
 import ee461l.groupstudy.adapter.GroupsListViewAdapter;
 import ee461l.groupstudy.OnRetrieveSingleUserTaskCompleted;
 import ee461l.groupstudy.R;
+import ee461l.groupstudy.models.Group;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
@@ -53,11 +59,11 @@ public class AppHomePageFragment extends Fragment implements AdapterView.OnItemC
 
     // TODO: Rename and change types of parameters
     private String menuChoice;
-    private List<Groups> groups;
+    private List<String> groups;
     private ListView groupsListView;
     private String username;
     private GroupsListViewAdapter adapter;
-    private User user;
+    private ParseUser user;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -90,19 +96,13 @@ public class AppHomePageFragment extends Fragment implements AdapterView.OnItemC
             Log.d(TAG, "username passed successfully: " + username);
         }
 
-
+        user = ParseUser.getCurrentUser();
 
         groups = new ArrayList<>();
-
-        //retrieves a single user so their groups can be retrieved and viewed in home page
-        LoadSingleUserAsyncTask lsuat = new LoadSingleUserAsyncTask(getActivity(),
-                new OnRetrieveSingleUserTaskCompleted() {
-            @Override
-            public void onRetrieveUserCompleted(User u) {
-                user = u;
-            }
-        });
-        lsuat.execute(username);
+        List<Object> list = user.getList("Group");
+        for (Object item : list) {
+            groups.add((String) item);
+        }
     }
 
     @Override
@@ -112,12 +112,12 @@ public class AppHomePageFragment extends Fragment implements AdapterView.OnItemC
         View rootView = inflater.inflate(R.layout.fragment_home_page, container, false);
 
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-        //toolbar.setTitle("Home");
+        toolbar.setTitle("Home");
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         assert actionBar != null;   //maybe change this line?
-        actionBar.setTitle("Home");
+        //actionBar.setTitle("Home");
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_36dp);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -165,72 +165,12 @@ public class AppHomePageFragment extends Fragment implements AdapterView.OnItemC
         // handle item selection
         switch (item.getItemId()) {
             case R.id.create_group:
-                Intent intent = new Intent(getActivity(), CreateGroupActivity.class);
-                intent.putExtra("username", username);
-                startActivity(intent);
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.content_fragment,
+                        AppHomePageFragment.newInstance(username)).commit();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    /**
-     * Created by britne on 4/11/15.
-     */
-    private class LoadSingleUserAsyncTask extends AsyncTask<String, Void, User> {
-        private static final String TAG = "LoadSingleUserAsync";
-        private GroupstudyEndpoint usersEndpointApi = null;
-        private Context context;
-        private OnRetrieveSingleUserTaskCompleted listener;
-
-        LoadSingleUserAsyncTask(Context context, OnRetrieveSingleUserTaskCompleted listener) {
-            this.context = context;
-            this.listener = listener;
-        }
-
-        @Override
-        protected User doInBackground(String... username) {
-            if(usersEndpointApi == null) {  // Only do this once
-                GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
-                        new AndroidJsonFactory(), null)
-                        .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
-                        .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-                            @Override
-                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                                abstractGoogleClientRequest.setDisableGZipContent(true);
-                            }
-                        });
-
-                usersEndpointApi = builder.build();
-            }
-
-            try {
-                User user = usersEndpointApi.retrieveSingleUser(username[0], "AppHomePageFragment").execute();
-                Log.d(TAG, "user retrieved and name: " + user.getUsername());
-                //Log.d(TAG, "user's groups size: " + user.getListOfGroups().size());
-
-                //groups = user.getListOfGroups();
-                if (user.getListOfGroups() != null && user.getListOfGroups().size() > 0)
-                    Log.d(TAG, "user's groups: " + user.getListOfGroups().get(0).getGroupName());
-
-                return user;
-            } catch (IOException e) {
-                Log.d(TAG, "" + e.getMessage());
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(User result) {
-
-            if (result.getListOfGroups() == null)
-                groups.addAll(new ArrayList<Groups>());
-            else {
-                groups.addAll(result.getListOfGroups());
-            }
-
-            adapter.notifyDataSetChanged();
-            listener.onRetrieveUserCompleted(result);
         }
     }
 }

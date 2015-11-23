@@ -7,10 +7,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 
-import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import ee461l.groupstudy.fragments.AppHomePageFragment;
 import ee461l.groupstudy.fragments.GroupHomePageFragment;
@@ -26,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "NavDrawerGroups";
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;    //title of action bar
-    private String groupName;
+    private String groupId;
     private String username;
 
     @Override
@@ -42,12 +41,8 @@ public class MainActivity extends AppCompatActivity {
             setSupportActionBar(toolbar);
         }
 
-        ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("foo", "bar");
-        testObject.saveInBackground();
-
         //default view when group is opened is list of groups
-        groupName = getIntent().getStringExtra("groupName");
+        groupId = null;
         username = getIntent().getStringExtra("username");
 
         //if no savedInstanceState, go to the first page in menu (home)
@@ -58,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setupDrawer(DrawerLayout dl, NavigationView nv) {
+    private void setupDrawer(DrawerLayout dl, final NavigationView nv) {
         this.drawerLayout = dl;
         nv.getMenu().getItem(0).setChecked(true);
         nv.setNavigationItemSelectedListener(
@@ -68,23 +63,44 @@ public class MainActivity extends AppCompatActivity {
                         menuItem.setChecked(true);
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         switch (menuItem.getItemId()) {
-                            case R.id.nav_home:
-                                transaction.replace(R.id.content_fragment, GroupHomePageFragment.newInstance(groupName, username));
+                            case R.id.nav_app_home:
+                                if (nv.getMenu().getItem(0).getItemId() != R.id.nav_app_home) {
+                                    nv.getMenu().clear();
+                                    nv.inflateMenu(R.menu.main_menu);
+                                }
+                                transaction.replace(R.id.content_fragment, AppHomePageFragment
+                                        .newInstance(username));
+                                transaction.commit();
+                                break;
+                            case R.id.nav_all_groups:
+                                nv.getMenu().clear();
+                                nv.inflateMenu(R.menu.main_menu);
+                                transaction.replace(R.id.content_fragment, AppHomePageFragment
+                                        .newInstance(username));
+                                transaction.commit();
+                                break;
+                            case R.id.nav_group_home:
+                                //only change menu if you're not already in group page
+                                if (nv.getMenu().getItem(0).getItemId() != R.id.nav_group_home) {
+                                    nv.getMenu().clear();
+                                    nv.inflateMenu(R.menu.menu_group_nav);
+                                }
+                                transaction.replace(R.id.content_fragment, GroupHomePageFragment.newInstance(groupId, username));
                                 transaction.commit();
                                 break;
                             case R.id.nav_calendar:
                                 transaction.replace(R.id.content_fragment, CalendarFragment
-                                        .newInstance(groupName));
+                                        .newInstance(groupId));
                                 transaction.commit();
                                 break;
                             case R.id.nav_messages:
                                 transaction.replace(R.id.content_fragment, MessagingFragment
-                                        .newInstance(groupName, username));
+                                        .newInstance(groupId, username));
                                 transaction.commit();
                                 break;
                             case R.id.nav_files:
                                 transaction.replace(R.id.content_fragment, FileSharingFragment
-                                        .newInstance(groupName));
+                                        .newInstance(groupId));
                                 transaction.commit();
                                 break;
                             case R.id.nav_about:
@@ -92,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                                 transaction.commit();
                                 break;
                             case R.id.nav_logout:
+                                ParseUser.logOut();
                                 startActivity(new Intent(MainActivity.this, LoginScreenActivity
                                         .class));
                                 break;
@@ -101,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
