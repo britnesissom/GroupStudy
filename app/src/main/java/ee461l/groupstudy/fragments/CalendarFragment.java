@@ -2,10 +2,11 @@ package ee461l.groupstudy.fragments;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.support.v4.app.Fragment;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,21 +18,21 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
-import ee461l.groupstudy.OnRetrieveSingleGroupTaskCompleted;
-import ee461l.groupstudy.async.CreateTaskAsyncTask;
-import ee461l.groupstudy.async.LoadSingleGroupAsyncTask;
 import ee461l.groupstudy.R;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
+import ee461l.groupstudy.models.Group;
 
 
-public class CalendarFragment extends Fragment implements View.OnClickListener, OnRetrieveSingleGroupTaskCompleted {
+//store calendar items to parse
+//load items from parse and display on calendar
+public class CalendarFragment extends BaseFragment implements View.OnClickListener {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String GROUP_NAME = "groupName";
@@ -43,7 +44,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private ArrayList<String> dateList = new ArrayList<>();
     private ArrayList<String> timeList = new ArrayList<>();
     private ArrayList<String> descriptionList = new ArrayList<>();
-    private Groups group;
+    private Group group;
     private String groupName;
     private AlertDialog descriptionDialog = null;
     private AlertDialog locationDialog = null;
@@ -84,21 +85,25 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             groupName = getArguments().getString(GROUP_NAME);
         }
 
-        LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(), this);
-        lsgat.execute(groupName);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
+        query.whereEqualTo("name", groupName);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if (e == null) {
+                    group = (Group) parseObject;
+                    //updateView();
+                } else {
+                    Log.d(TAG, e.getMessage());
+                }
+            }
+        });
     }
 
-    @Override
-    public void onRetrieveSingleGroupCompleted(Groups g) {
-        group = g;
-        updateView();
-    }
-
-    private void updateView() {
+    /*private void updateView() {
         mInflater.inflate(R.layout.fragment_calendar, mContainer, false);
 
         Log.d(TAG, "updating view");
-        getActivity().setTitle("Calendar");
 
         List<String> tasks = group.getTasks();
 
@@ -123,7 +128,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         }
         Log.d(TAG, "view updated!");
-    }
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -141,6 +146,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         eventTime = (TextView) rootView.findViewById(R.id.eventTime);
         eventTime.setVisibility(View.GONE);
 
+        setupToolbar((Toolbar) rootView.findViewById(R.id.toolbar), "Calendar");
+
         return rootView;
     }
 
@@ -154,28 +161,31 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         int minute = c.get(Calendar.MINUTE);
 
 
-        dateDialog = new DatePickerDialog(getActivity(),
+        dateDialog = new DatePickerDialog(getContext(),
                 new mDateSetListener(), mYear, mMonth, mDay);
         dateDialog.setOnCancelListener(new mDateCancelListener());
 
-        timeDialog = new TimePickerDialog(getActivity(),
+        timeDialog = new TimePickerDialog(getContext(),
                 new mTimeSetListener(), hour, minute, false);
         timeDialog.setOnDismissListener(new mTimeDismissListener());
 
         // get prompts.xml view
-        LayoutInflater li = LayoutInflater.from(getActivity());
+        LayoutInflater li = LayoutInflater.from(getContext());
         View promptsView = li.inflate(R.layout.prompts, null);
 
-        AlertDialog.Builder locationBuilder = new AlertDialog.Builder(getActivity());       // ADDED BY DANIEL
+        AlertDialog.Builder locationBuilder = new AlertDialog.Builder(getContext());       // ADDED BY
+        // DANIEL
         locationBuilder.setTitle("Pick a location:");
 
-        String[] types = {"ECJ - Ernest Cockrell Jr. Hall","ETC - Engineering Teaching Center II",
+        String[] types = {"ECJ - Ernest Cockrell Jr. Hall",
+                "ETC - Engineering Teaching Center II",
                 "FAC - Peter T. Flawn Academic Center",
-                "PCL - Perry-Castañeda Library","UNB - Union Building"};
+                "PCL - Perry-Castañeda Library",
+                "UNB - Union Building"};
         setLocationItems(locationBuilder, types);
 
         AlertDialog.Builder descriptionDialogBuilder = new AlertDialog.Builder(
-                getActivity());
+                getContext());
 
         // set prompts.xml to alertdialog builder
         descriptionDialogBuilder.setView(promptsView);
@@ -202,6 +212,15 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         timeDialog.show(); //time
         dateDialog.show();  //date
 
+        ParseObject calendarItem = new ParseObject("Task");
+        calendarItem.put("description", "stuff");
+        calendarItem.put("date", "stuff");
+        calendarItem.put("location", "stuff");
+        calendarItem.saveInBackground();
+
+        group.add("tasks", calendarItem);
+        group.saveInBackground();
+
     }
 
     private void setDialogMessage(AlertDialog.Builder descriptionDialogBuilder, final EditText userInput) {
@@ -223,10 +242,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                         String localEvent = dateList.get(index) + " " + timeList.get(index) + ": "
                                 + locationString + "\n" + descriptionList.get(index) + "\n";
 
-                        CreateTaskAsyncTask ctat = new CreateTaskAsyncTask(getActivity(), groupName);
-                        ctat.execute(localEvent);
+                        //TODO: SAVE TASK TO PARSE
 
-                        Toast.makeText(getActivity(), "Event added!", Toast.LENGTH_SHORT).show();
+
+                        Toast.makeText(getContext(), "Event added!", Toast.LENGTH_SHORT).show();
                     }
 
                 })

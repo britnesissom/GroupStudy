@@ -15,10 +15,9 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import ee461l.groupstudy.R;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 
 /**
@@ -32,8 +31,6 @@ public class CreateNewAccountActivity extends AppCompatActivity {
     EditText createPassword;
     EditText confirmPassword;
     Button createAccountButton;
-    List<User> users;
-    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,17 +70,19 @@ public class CreateNewAccountActivity extends AppCompatActivity {
 
     public void create(View v) {
         final String usernameText = username.getText().toString();
+        ParseUser.logOut();
 
         if (createPassword.getText().toString().equals(confirmPassword.getText().toString())) {
             ParseUser user = new ParseUser();
             user.setUsername(usernameText);
             user.setPassword(createPassword.getText().toString());
-            user.put("groups", null);
+            user.put("Groups", new ArrayList<String>());
 
             user.signUpInBackground(new SignUpCallback() {
                 public void done(ParseException e) {
                     if (e == null) {
                         // Hooray! Let them use the app now.
+                        Log.d(TAG, "user saved!");
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.putExtra("username", usernameText);
                         startActivity(intent);

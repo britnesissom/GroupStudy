@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,24 +16,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import ee461l.groupstudy.OnRetrieveSingleGroupTaskCompleted;
+import ee461l.groupstudy.R;
 import ee461l.groupstudy.async.AddMemberAsyncTask;
 import ee461l.groupstudy.async.DeleteMemberAsyncTask;
-import ee461l.groupstudy.R;
 import ee461l.groupstudy.models.Group;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
 
 
 /**
@@ -40,16 +31,16 @@ import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
  * Use the {@link GroupHomePageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GroupHomePageFragment extends Fragment {
+public class GroupHomePageFragment extends BaseFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String TAG = "GroupHomePage";
     private static final String USERNAME = "username";
-    private static final String GROUP_ID = "groupId";
+    private static final String GROUP_NAME = "groupName";
 
     // TODO: Rename and change types of parameters
     private String username;
-    private String groupId;
+    private String groupName;
     private Group group;
 
     private TextView upcomingTasks;
@@ -70,10 +61,10 @@ public class GroupHomePageFragment extends Fragment {
         GroupHomePageFragment fragment = new GroupHomePageFragment();
         Bundle args = new Bundle();
         args.putString(USERNAME, username);
-        args.putString(GROUP_ID, groupName);
+        args.putString(GROUP_NAME, groupName);
         fragment.setArguments(args);
 
-        Log.d(TAG, "Group home fragment instantiated");
+        //Log.d(TAG, "Group home fragment instantiated");
         return fragment;
     }
 
@@ -86,25 +77,35 @@ public class GroupHomePageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        Log.d(TAG, "Group home fragment created");
+        //Log.d(TAG, "Group home fragment created");
 
         if (getArguments() != null) {
             username = getArguments().getString(USERNAME);
-            groupId = getArguments().getString(GROUP_ID);
+            groupName = getArguments().getString(GROUP_NAME);
+
+            Log.d(TAG, "group name: " + groupName);
+
+            /*MainActivity main = new MainActivity();
+            main.sendGroupName(groupName);*/
         }
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
-        query.getInBackground(groupId, new GetCallback<ParseObject>() {
-            public void done(ParseObject g, ParseException e) {
+        ParseQuery<Group> query = ParseQuery.getQuery("Group");
+        query.whereEqualTo("name", groupName);
+        query.getFirstInBackground(new GetCallback<Group>() {
+            public void done(Group g, ParseException e) {
                 if (e == null) {
+                    Log.d(TAG, "group name: " + g.getGroupName());
                     group = (Group) g;
                     //refreshData();
 
                     if (isAdded()) {
-                        getActivity().invalidateOptionsMenu();  //updates options menu because group has been retrieved
+                        getActivity().invalidateOptionsMenu();  //updates options menu because group
+                        // has
+                        // been retrieved
                     }
                 } else {
                     // something went wrong
+                    Log.d(TAG, "error: " + e.getMessage());
                 }
             }
         });
@@ -122,7 +123,7 @@ public class GroupHomePageFragment extends Fragment {
         Log.d(TAG, "refreshData: " + group.get("name"));
 
         if (isAdded()) {
-            getActivity().setTitle(group.get("name") + " Home");
+            getContext().setTitle(group.get("name") + " Home");
         }
 
         List<String> tasks = group.get("tasks");
@@ -186,7 +187,9 @@ public class GroupHomePageFragment extends Fragment {
         upcomingTasks = (TextView) rootView.findViewById(R.id.upcoming_tasks);
         newMessages = (TextView) rootView.findViewById(R.id.new_messages);
 
-        Log.d(TAG, "fragment view created");
+        setupToolbar((Toolbar) rootView.findViewById(R.id.toolbar), "Home");
+
+        //Log.d(TAG, "fragment view created");
 
         return rootView;
     }
@@ -223,10 +226,10 @@ public class GroupHomePageFragment extends Fragment {
 
     private void addMember() {
 
-        LayoutInflater li = LayoutInflater.from(getActivity());
+        LayoutInflater li = LayoutInflater.from(getContext());
         View promptsView = li.inflate(R.layout.add_member_layout, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                getActivity());
+                getContext());
 
         // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView);
@@ -243,7 +246,8 @@ public class GroupHomePageFragment extends Fragment {
                                 //add member here
                                 String memberToAdd = userInput.getText().toString();
 
-                                AddMemberAsyncTask amat = new AddMemberAsyncTask(getActivity(), groupId);
+                                AddMemberAsyncTask amat = new AddMemberAsyncTask(getContext(),
+                                        groupName);
                                 amat.execute(memberToAdd);
 
                             }
@@ -261,10 +265,10 @@ public class GroupHomePageFragment extends Fragment {
     }
 
     private void deleteMember() {
-        LayoutInflater li = LayoutInflater.from(getActivity());
+        LayoutInflater li = LayoutInflater.from(getContext());
         View promptsView = li.inflate(R.layout.delete_member_layout, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                getActivity());
+                getContext());
 
         // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView);
@@ -281,7 +285,8 @@ public class GroupHomePageFragment extends Fragment {
                                 String memberToRemove = userInput.getText().toString();
 
                                 //delete member here
-                                DeleteMemberAsyncTask dmat = new DeleteMemberAsyncTask(getActivity(), groupId);
+                                DeleteMemberAsyncTask dmat = new DeleteMemberAsyncTask(getContext
+                                        (), groupName);
                                 dmat.execute(memberToRemove);
                             }
                         })

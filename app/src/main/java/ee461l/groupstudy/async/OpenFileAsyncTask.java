@@ -2,15 +2,8 @@ package ee461l.groupstudy.async;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.FilesEntity;
 
 /**
  * Created by britne on 4/27/15.
@@ -20,11 +13,10 @@ public class OpenFileAsyncTask extends AsyncTask<Void, String, Void> {
 
     private static final String TAG = "OpenFileAsyncTask";
 
-    private FilesEntity file;
     private Context context;
 
-    public OpenFileAsyncTask(Context context, FilesEntity file) {
-        this.file = file;
+    public OpenFileAsyncTask(Context context) {
+        //this.file = file;
         this.context = context;
     }
 
@@ -37,7 +29,7 @@ public class OpenFileAsyncTask extends AsyncTask<Void, String, Void> {
     @Override
     protected Void doInBackground(Void... params) {
 
-        try {
+        /*try {
             Toast.makeText(context, "File downloading...", Toast.LENGTH_LONG).show();
             //publishProgress("File downloading...");
             //pick place to store file
@@ -56,7 +48,7 @@ public class OpenFileAsyncTask extends AsyncTask<Void, String, Void> {
             Log.d(TAG, "incorrect encoding for file");
         } catch (IOException e) {
             Log.d(TAG, e.getMessage());
-        }
+        }*/
 
         return null;
     }

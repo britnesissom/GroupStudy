@@ -14,7 +14,6 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import ee461l.groupstudy.R;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.User;
 
 
 public class LoginScreenActivity extends AppCompatActivity {
@@ -22,7 +21,6 @@ public class LoginScreenActivity extends AppCompatActivity {
     private static final String TAG = "LoginScreen";
     private EditText username;
     private EditText password;
-    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -2,6 +2,7 @@ package ee461l.groupstudy.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import java.util.List;
 
 import ee461l.groupstudy.R;
+import ee461l.groupstudy.activities.MainActivity;
 import ee461l.groupstudy.fragments.GroupHomePageFragment;
 
 /**
@@ -76,15 +78,26 @@ public class GroupsListViewAdapter extends BaseAdapter {
             // and tag (item ID) values
             v.groupButton.setText(group);
             groupName = group;
+            Log.d("GroupAdapter", "group name in adapter: " + groupName);
             v.groupButton.setTag(groupName);
 
             v.groupButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    MainActivity main = new MainActivity();
+                    main.sendGroupName(groupName);
+
+                    NavigationView nv = (NavigationView) ((Activity) context).findViewById(R.id
+                            .nav_view);
+                    nv.getMenu().clear();
+                    nv.inflateMenu(R.menu.menu_group_nav);
+                    nv.getMenu().getItem(0).setChecked(true);
+
                     FragmentTransaction transaction = ((FragmentActivity) context)
                             .getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.content_fragment,
-                            GroupHomePageFragment.newInstance(username, getItem(position))).commit();
+                            GroupHomePageFragment.newInstance(groupName, username))
+                            .commit();
                 }
             });
         }

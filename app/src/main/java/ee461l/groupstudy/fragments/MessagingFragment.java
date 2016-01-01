@@ -1,7 +1,9 @@
 package ee461l.groupstudy.fragments;
 
-import android.support.v4.app.Fragment;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -11,40 +13,43 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import ee461l.groupstudy.OnRetrieveSingleGroupTaskCompleted;
-import ee461l.groupstudy.async.CreateMessageAsyncTask;
-import ee461l.groupstudy.async.LoadSingleGroupAsyncTask;
-import ee461l.groupstudy.adapter.MessagingListViewAdapter;
 import ee461l.groupstudy.R;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
+import ee461l.groupstudy.adapter.MessagingListViewAdapter;
+import ee461l.groupstudy.models.Group;
+import ee461l.groupstudy.models.Message;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MessagingFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MessagingFragment extends Fragment implements View.OnClickListener,
+
+//TODO: SET UP GOOGLE CLOUD MESSAGING
+public class MessagingFragment extends BaseFragment implements View.OnClickListener,
         TextView.OnEditorActionListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String GROUP_NAME = "groupName";
     private static final String USERNAME = "username";
-    private static GroupstudyEndpoint groupEndpointApi = null;
     private static final String TAG = "MessagingLoadGroup";
 
     private EditText messageEditor;
-    private ListView messages;
-    private List<String> listOfMessages;
+    private ListView messageListView;
     private Button sendButton;
-    private Groups group;
+    private Group group;
     private MessagingListViewAdapter adapter;
     private List<String> messagesForAdapter;
+    private List<Message> messages;
+    private CircularProgressView progressView;
 
     private String groupName;
     private String username;
@@ -75,40 +80,13 @@ public class MessagingFragment extends Fragment implements View.OnClickListener,
         if (getArguments() != null) {
             groupName = getArguments().getString(GROUP_NAME);
             username = getArguments().getString(USERNAME);
+
+            /*MainActivity main = new MainActivity();
+            main.sendGroupName(groupName);*/
         }
 
-        LoadSingleGroupAsyncTask lsgat = new LoadSingleGroupAsyncTask(getActivity(),
-                new OnRetrieveSingleGroupTaskCompleted() {
-            @Override
-            public void onRetrieveSingleGroupCompleted(Groups g) {
-                group = g;
-            }
-        });
-
-        Toast.makeText(getActivity(), "Loading messages...", Toast.LENGTH_SHORT).show();
-        //defeats purpose of async task
-        //but the group is loading too slowly so messages are null in onCreateView and it crashes
-        try {
-            group = lsgat.execute(groupName).get();
-        }
-        catch(InterruptedException e) {
-            Log.e(TAG, "InterruptedException: " + e.getMessage());
-        }
-        catch(ExecutionException e) {
-            Log.e(TAG, "ExecutionException: " + e.getMessage());
-        }
-
-        listOfMessages = group.getMessages();
-
-        //no messages yet so nothing to show
-        if (listOfMessages == null)
-            messagesForAdapter = new ArrayList<>();
-        else
-            messagesForAdapter = new ArrayList<>(listOfMessages);
-
-        adapter = new MessagingListViewAdapter(getActivity(), username, messagesForAdapter,
-                R.layout.fragment_messaging);
-
+        GetMessagesAsyncTask gmat = new GetMessagesAsyncTask();
+        gmat.execute();
     }
 
     @Override
@@ -117,17 +95,20 @@ public class MessagingFragment extends Fragment implements View.OnClickListener,
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_messaging, container, false);
-        getActivity().setTitle("Messaging");
+        //getContext().setTitle("Messaging");
+        progressView = (CircularProgressView) rootView.findViewById(R.id.progress_view);
 
         sendButton = (Button) rootView.findViewById(R.id.sendButton);
         messageEditor = (EditText) rootView.findViewById(R.id.edit_message);
-        messages = (ListView) rootView.findViewById(R.id.message_list_view);
+        messageListView = (ListView) rootView.findViewById(R.id.message_list_view);
 
-        messages.setAdapter(adapter);
+        messageListView.setAdapter(adapter);
         sendButton.setOnClickListener(this);
 
         //this is if the enter button is pressed to send the message
         messageEditor.setOnEditorActionListener(this);
+
+        setupToolbar((Toolbar) rootView.findViewById(R.id.toolbar), "Messages");
 
         return rootView;
     }
@@ -136,8 +117,19 @@ public class MessagingFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onClick(View v) {
         String text = username + ": " + messageEditor.getText().toString();
-        CreateMessageAsyncTask cmat = new CreateMessageAsyncTask(getActivity(), groupName);
-        cmat.execute(text);
+        //save message to parse here
+        Message message = new Message();
+        message.put("author", ParseUser.getCurrentUser().getUsername());
+        message.put("messageText", messageEditor.getText().toString());
+        message.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Log.d(TAG, "message saved");
+            }
+        });
+
+        group.add("messages", message);
+        group.saveInBackground();
 
         messagesForAdapter.add(text);
         adapter.notifyDataSetChanged();
@@ -148,8 +140,19 @@ public class MessagingFragment extends Fragment implements View.OnClickListener,
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         String text = username + ": " + messageEditor.getText().toString();
-        CreateMessageAsyncTask cmat = new CreateMessageAsyncTask(getActivity(), groupName);
-        cmat.execute(text);
+
+        Message message = new Message();
+        message.put("author", ParseUser.getCurrentUser().getUsername());
+        message.put("messageText", messageEditor.getText().toString());
+        message.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Log.d(TAG, "message saved");
+            }
+        });
+
+        group.add("messages", message);
+        group.saveInBackground();
 
         messagesForAdapter.add(text);
         adapter.notifyDataSetChanged();
@@ -160,5 +163,55 @@ public class MessagingFragment extends Fragment implements View.OnClickListener,
 
     private void clearText() {
         messageEditor.setText("");
+    }
+
+    public class GetMessagesAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onProgressUpdate(Void... params) {
+            progressView.startAnimation();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ParseQuery<Group> query = ParseQuery.getQuery("Group");
+            query.whereEqualTo("name", groupName);
+            try {
+                group = query.getFirst();
+                Log.d(TAG, "group: " + group.getGroupName() + " " + group.getAdminUser());
+            }
+            catch (ParseException e) {
+                Log.d(TAG, "error: " + e.getMessage());
+            }
+            /*query.getFirstInBackground(new GetCallback<Group>() {
+                @Override
+                public void done(Group g, ParseException e) {
+                    if (e == null) {
+                        group = g;
+                        Log.d(TAG, "group: " + group.getGroupName() + " " + group.getAdminUser());
+                        //updateView();
+                    } else {
+                        Log.d(TAG, "error: " + e.getMessage());
+                    }
+                }
+            });*/
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            Log.d(TAG, "after query");
+            messages = group.getList("messages");
+            messagesForAdapter = new ArrayList<>();
+
+            if (messages != null) {
+                for (Message message : messages) {
+                    messagesForAdapter.add(message.getString("messageText"));
+                }
+            }
+
+            adapter = new MessagingListViewAdapter(getContext(), username, messagesForAdapter,
+                    R.layout.fragment_messaging);
+        }
     }
 }

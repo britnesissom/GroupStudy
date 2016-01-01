@@ -7,6 +7,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,53 +17,42 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
+import com.parse.ParseFile;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import ee461l.groupstudy.adapter.FileListViewAdapter;
 import ee461l.groupstudy.FileUtils;
 import ee461l.groupstudy.R;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.GroupstudyEndpoint;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.FilesEntity;
-import ee461l.groupstudyendpoints.groupstudyEndpoint.model.Groups;
+import ee461l.groupstudy.adapter.FileRVAdapter;
+import ee461l.groupstudy.models.Group;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link FileSharingFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FileSharingFragment extends Fragment {
+public class FileSharingFragment extends BaseFragment {
 
     private static final String GROUP_ID = "groupId";
 
-    private TextView users;
-    private ListView files;
-    private List<FilesEntity> filesFromServer;
-    //private List<File> filesToView;
+    private List<ParseFile> filesToView;
     private String groupId;
-    private Groups group;
-    private FileListViewAdapter adapter;
+    private Group group;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager mLayoutManager;
     private static final String TAG = "FileSharingFragment";
 
     // A request code's purpose is to match the result of a "startActivityForResult" with
@@ -93,15 +85,19 @@ public class FileSharingFragment extends Fragment {
             groupId = getArguments().getString(GROUP_ID);
         }
 
-        filesFromServer = new ArrayList<>();
+        filesToView = new ArrayList<>();
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Group");
-        query.getInBackground(groupId, new GetCallback<ParseObject>() {
-            public void done(ParseObject group, ParseException e) {
+        ParseQuery<Group> query = ParseQuery.getQuery("Group");
+        query.whereEqualTo("name", groupId);
+        query.getFirstInBackground(new GetCallback<Group>() {
+            public void done(Group g, ParseException e) {
                 if (e == null) {
                     // The query was successful.
+                    Log.d(TAG, "group retrieved");
+                    group = g;
 
                     //get files here? idk
+                    loadFiles();
                 } else {
                     // Something went wrong.
                     Log.d(TAG, e.getMessage());
@@ -110,35 +106,38 @@ public class FileSharingFragment extends Fragment {
         });
     }
 
+    private void loadFiles() {
+        filesToView.clear();
+        filesToView.addAll(group.getFiles());
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_file_sharing, container, false);
-        getActivity().setTitle("Files");
 
-        files = (ListView) rootView.findViewById(R.id.filesInGroup);
-        adapter = new FileListViewAdapter(getActivity(), R.layout.file_list_item, filesFromServer);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.file_rv);
 
-        files.setAdapter(adapter);
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
 
-        files.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView parent, View view, int pos, long id) {
-                // get the list adapter
-                FileListViewAdapter fileAdapter = (FileListViewAdapter) parent.getAdapter();
+        // use a linear layout manager
+        mLayoutManager = new GridLayoutManager(getContext(), 2);
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
-                //get view for file
-                fileAdapter.getView(pos, view, parent);
-            }
-        });
+        // specify an adapter (see also next example)
+        adapter = new FileRVAdapter(getContext(), filesToView);
+        mRecyclerView.setAdapter(adapter);
+
+        setupToolbar((Toolbar) rootView.findViewById(R.id.toolbar), "Files");
 
         return rootView;
     }
 
     @Override
-    public void onCreateOptionsMenu(
-            Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.file_sharing_upload_file, menu);
     }
 
@@ -203,8 +202,7 @@ public class FileSharingFragment extends Fragment {
     }
 
     //convert file to byte array then save it as entity in group
-    private class SendFileToGroupEndpoint extends AsyncTask<Uri, Void, Groups> {
-        private GroupstudyEndpoint groupEndpointApi = null;
+    private class SendFileToGroupEndpoint extends AsyncTask<Uri, Void, Void> {
         private Context context;
 
         private SendFileToGroupEndpoint(Context context) {
@@ -213,27 +211,14 @@ public class FileSharingFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            Toast.makeText(getActivity(), "Uploading file...", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Uploading file...", Toast.LENGTH_LONG).show();
         }
 
         //need to open endpoint for saving
         //convert file to byte array to save
         //save file to arraylist for files in specific group
         @Override
-        protected Groups doInBackground(Uri... uri) {
-            if(groupEndpointApi == null) {  // Only do this once
-                GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
-                        new AndroidJsonFactory(), null)
-                        .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
-                        .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-                            @Override
-                            public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                                abstractGoogleClientRequest.setDisableGZipContent(true);
-                            }
-                        });
-
-                groupEndpointApi = builder.build();
-            }
+        protected Void doInBackground(Uri... uri) {
 
             //File file = new File(uri[0].toString());
             try {
@@ -254,16 +239,18 @@ public class FileSharingFragment extends Fragment {
 
                 Log.d(TAG, "inputStream length: " + i);
 
-                String fileBytes = new String(bFile, "UTF-16");
-                FilesEntity fe = new FilesEntity();
-                fe.setId(file.getName());
-                fe.setFileName(file.getName());
-                fe.setFileContents(fileBytes);
-
-                Groups groupReturned = groupEndpointApi.addFile(groupId, fe).execute();
+                final ParseFile parseFile = new ParseFile(file.getName(), bFile);
+                parseFile.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        Log.d(TAG, "file saved to parse");
+                        group.add("files", parseFile);
+                        group.saveInBackground();
+                    }
+                });
 
                 Log.d(TAG, "file added to group");
-                return groupReturned;
+                return null;
             }
             catch(IOException e) {
                 Log.e(TAG, e.getMessage());
@@ -273,17 +260,14 @@ public class FileSharingFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(Groups result) {
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+
             Toast.makeText(getActivity().getApplicationContext(), "File uploaded!",
                     Toast.LENGTH_LONG).show();
 
-            super.onPostExecute(result);
-
-            //group did not load correctly so it can't be returned
-            if (result != null)
-                filesFromServer.addAll(result.getFiles());
-            else
-                filesFromServer.addAll(new ArrayList<FilesEntity>());
+            filesToView.clear();
+            filesToView.addAll(group.getFiles());
             adapter.notifyDataSetChanged();
         }
     }

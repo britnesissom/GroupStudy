@@ -6,21 +6,8 @@
     android:orientation="vertical"
     tools:context="ee461l.groupstudy.fragments.CalendarFragment">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Light"
-        android:elevation="4dp">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="#eb9f77"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-
-    </android.support.design.widget.AppBarLayout>
+    <include layout="@layout/app_bar_main"
+        android:id="@id/appbar"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

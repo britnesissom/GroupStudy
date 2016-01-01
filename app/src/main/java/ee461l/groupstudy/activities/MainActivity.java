@@ -7,25 +7,27 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.parse.ParseUser;
 
-import ee461l.groupstudy.fragments.AppHomePageFragment;
-import ee461l.groupstudy.fragments.GroupHomePageFragment;
+import ee461l.groupstudy.OnSendGroupNameListener;
 import ee461l.groupstudy.R;
 import ee461l.groupstudy.fragments.AboutFragment;
+import ee461l.groupstudy.fragments.AppHomePageFragment;
 import ee461l.groupstudy.fragments.CalendarFragment;
 import ee461l.groupstudy.fragments.FileSharingFragment;
+import ee461l.groupstudy.fragments.GroupHomePageFragment;
 import ee461l.groupstudy.fragments.MessagingFragment;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnSendGroupNameListener {
 
     private static final String TAG = "NavDrawerGroups";
     private DrawerLayout drawerLayout;
     private CharSequence mTitle;    //title of action bar
-    private String groupId;
+    private static String groupId;
     private String username;
 
     @Override
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(final MenuItem menuItem) {
+                        Log.d(TAG, "group name in main: " + groupId);
                         menuItem.setChecked(true);
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         switch (menuItem.getItemId()) {
@@ -123,5 +126,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    public void sendGroupName(String groupName) {
+        groupId = groupName;
+        Log.d(TAG, "sendGroupName: " + groupId);
     }
 }
