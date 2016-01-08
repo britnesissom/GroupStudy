@@ -15,3 +15,17 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+-dontwarn org.apache.http.annotation.**
+
+-keep class com.sinch.** { *; }
+-keep interface com.sinch.** { *; }
+-keep class org.webrtc.** { *; }
+
+-keep class com.google.android.gms.** { *; }
+
+-dontwarn com.google.android.gms.**
+-dontwarn android.media.**

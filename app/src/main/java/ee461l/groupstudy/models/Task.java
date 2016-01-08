@@ -24,4 +24,8 @@ public class Task extends ParseObject {
     public String getDate() {
         return getString("date");
     }
+
+    public String getTime() {
+        return getString("time");
+    }
 }

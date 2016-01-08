@@ -24,6 +24,5 @@ public class AppStartUp extends Application {
         ParseObject.registerSubclass(Message.class);
         ParseObject.registerSubclass(Task.class);
         Parse.initialize(this, BuildConfig.PARSE_APP_ID, BuildConfig.PARSE_CLIENT_ID);
-
     }
 }

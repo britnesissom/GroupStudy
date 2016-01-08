@@ -30,6 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:inputType="textPassword"
+        android:fontFamily="sans-serif"
         android:ems="10"
         android:layout_gravity="center"
         android:hint="@string/enter_password"/>
@@ -40,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:inputType="textPassword"
+        android:fontFamily="sans-serif"
         android:ems="10"
         android:layout_gravity="center"
         android:hint="@string/confirm_password"/>

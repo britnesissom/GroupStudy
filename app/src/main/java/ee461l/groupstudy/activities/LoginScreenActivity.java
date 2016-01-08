@@ -29,9 +29,7 @@ public class LoginScreenActivity extends AppCompatActivity {
 
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

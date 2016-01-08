@@ -18,7 +18,7 @@
     <string-array name="nav_drawer_group_items">
         <item>Home</item>
         <item>Groups</item>
-        <item>Calendar</item>
+        <item>Tasks</item>
         <item>Messages</item>
         <item>Files</item>
         <item>About</item>
@@ -50,6 +50,7 @@
     <string name="title_activity_calendar">CalendarActivity</string>
 
     <string name="upload_file">Upload File</string>
+    <string name="new_task">New Task</string>
     <string name="use_eid">Please use your UT EID as your username</string>
     <string name="title_activity_add_group">AddGroupActivity</string>
     <string name="create_group">Create Group</string>
@@ -57,7 +58,10 @@
     <string name="delete_member">Delete Teammate</string>
 
     <!-- Calendar -->
-    <string name="addEvent">Add Event</string>
+    <string name="create_task">Create</string>
+    <string name="add_description">Enter description</string>
+    <string name="task_desc">Description</string>
+    <string name="task_loc">Location</string>
 
     <!-- Message Fragment -->
     <string name="hint">Type a message</string>

@@ -16,13 +16,14 @@ import ee461l.groupstudy.OnSendGroupNameListener;
 import ee461l.groupstudy.R;
 import ee461l.groupstudy.fragments.AboutFragment;
 import ee461l.groupstudy.fragments.AppHomePageFragment;
-import ee461l.groupstudy.fragments.CalendarFragment;
+import ee461l.groupstudy.fragments.TaskDialogFragment;
+import ee461l.groupstudy.fragments.TaskFragment;
 import ee461l.groupstudy.fragments.FileSharingFragment;
 import ee461l.groupstudy.fragments.GroupHomePageFragment;
 import ee461l.groupstudy.fragments.MessagingFragment;
 
 
-public class MainActivity extends AppCompatActivity implements OnSendGroupNameListener {
+public class MainActivity extends AppCompatActivity implements OnSendGroupNameListener, TaskDialogFragment.OnSendTaskListener {
 
     private static final String TAG = "NavDrawerGroups";
     private DrawerLayout drawerLayout;
@@ -91,9 +92,9 @@ public class MainActivity extends AppCompatActivity implements OnSendGroupNameLi
                                 transaction.replace(R.id.content_fragment, GroupHomePageFragment.newInstance(groupId, username));
                                 transaction.commit();
                                 break;
-                            case R.id.nav_calendar:
-                                transaction.replace(R.id.content_fragment, CalendarFragment
-                                        .newInstance(groupId));
+                            case R.id.nav_tasks:
+                                transaction.replace(R.id.content_fragment, TaskFragment
+                                        .newInstance(groupId, null, null, null, null));
                                 transaction.commit();
                                 break;
                             case R.id.nav_messages:
@@ -131,5 +132,12 @@ public class MainActivity extends AppCompatActivity implements OnSendGroupNameLi
     public void sendGroupName(String groupName) {
         groupId = groupName;
         Log.d(TAG, "sendGroupName: " + groupId);
+    }
+
+    public void sendTaskToTaskFrag(String desc, String loc, String date, String time) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.content_fragment, TaskFragment.newInstance(groupId, desc, loc,
+                date, time));
+        transaction.commit();
     }
 }

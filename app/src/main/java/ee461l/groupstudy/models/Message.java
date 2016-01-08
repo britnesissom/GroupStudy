@@ -9,25 +9,25 @@ import com.parse.ParseObject;
 @ParseClassName("Message")
 public class Message extends ParseObject {
 
-    private String userId;
+    private String author;
     private String messageText;
 
     public Message() { }
 
     public String getMessageText() {
-        return messageText;
+        return getString("messageText");
     }
 
     public void setMessageText(String messageText) {
         this.messageText = messageText;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getAuthor() {
+        return getString("author");
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUAuthor(String author) {
+        this.author = author;
     }
 
 }

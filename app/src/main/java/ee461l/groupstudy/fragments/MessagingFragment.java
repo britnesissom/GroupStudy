@@ -84,9 +84,6 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
             /*MainActivity main = new MainActivity();
             main.sendGroupName(groupName);*/
         }
-
-        GetMessagesAsyncTask gmat = new GetMessagesAsyncTask();
-        gmat.execute();
     }
 
     @Override
@@ -98,11 +95,13 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
         //getContext().setTitle("Messaging");
         progressView = (CircularProgressView) rootView.findViewById(R.id.progress_view);
 
+        GetMessagesAsyncTask gmat = new GetMessagesAsyncTask();
+        gmat.execute();
+
         sendButton = (Button) rootView.findViewById(R.id.sendButton);
         messageEditor = (EditText) rootView.findViewById(R.id.edit_message);
         messageListView = (ListView) rootView.findViewById(R.id.message_list_view);
 
-        messageListView.setAdapter(adapter);
         sendButton.setOnClickListener(this);
 
         //this is if the enter button is pressed to send the message
@@ -168,7 +167,7 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
     public class GetMessagesAsyncTask extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected void onProgressUpdate(Void... params) {
+        protected void onPreExecute() {
             progressView.startAnimation();
         }
 
@@ -176,9 +175,12 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
         protected Void doInBackground(Void... params) {
             ParseQuery<Group> query = ParseQuery.getQuery("Group");
             query.whereEqualTo("name", groupName);
+            query.include("messages");
             try {
                 group = query.getFirst();
-                Log.d(TAG, "group: " + group.getGroupName() + " " + group.getAdminUser());
+                //Log.d(TAG, "group: " + group.getGroupName() + " " + group.getAdminUser());
+                messages = group.getMessages();
+                //Log.d(TAG, "message: " + messages.get(0).getMessageText());
             }
             catch (ParseException e) {
                 Log.d(TAG, "error: " + e.getMessage());
@@ -201,17 +203,18 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
         @Override
         protected void onPostExecute(Void result) {
             Log.d(TAG, "after query");
-            messages = group.getList("messages");
             messagesForAdapter = new ArrayList<>();
 
-            if (messages != null) {
+            if (messages != null && messages.size() > 0) {
                 for (Message message : messages) {
-                    messagesForAdapter.add(message.getString("messageText"));
+                    //Log.d(TAG, "message: " + message.getMessageText());
+                    messagesForAdapter.add(message.getAuthor() + ": " + message.getMessageText());
                 }
             }
 
             adapter = new MessagingListViewAdapter(getContext(), username, messagesForAdapter,
                     R.layout.fragment_messaging);
+            messageListView.setAdapter(adapter);
         }
     }
 }

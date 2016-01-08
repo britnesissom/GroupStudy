@@ -1,12 +1,18 @@
 package ee461l.groupstudy.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -46,6 +52,7 @@ import ee461l.groupstudy.models.Group;
 public class FileSharingFragment extends BaseFragment {
 
     private static final String GROUP_ID = "groupId";
+    private static final int PERMISSION_CODE = 6;
 
     private List<ParseFile> filesToView;
     private String groupId;
@@ -86,6 +93,7 @@ public class FileSharingFragment extends BaseFragment {
         }
 
         filesToView = new ArrayList<>();
+        adapter = new FileRVAdapter(getContext(), filesToView);
 
         ParseQuery<Group> query = ParseQuery.getQuery("Group");
         query.whereEqualTo("name", groupId);
@@ -109,6 +117,7 @@ public class FileSharingFragment extends BaseFragment {
     private void loadFiles() {
         filesToView.clear();
         filesToView.addAll(group.getFiles());
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -128,7 +137,6 @@ public class FileSharingFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        adapter = new FileRVAdapter(getContext(), filesToView);
         mRecyclerView.setAdapter(adapter);
 
         setupToolbar((Toolbar) rootView.findViewById(R.id.toolbar), "Files");
@@ -146,7 +154,7 @@ public class FileSharingFragment extends BaseFragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.upload_file:
-                startFileChooser();
+                askForPermission();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -171,6 +179,50 @@ public class FileSharingFragment extends BaseFragment {
 
         startActivityForResult(intent, READ_REQUEST_CODE);
         // END_INCLUDE (use_open_document_intent)
+    }
+
+    private void askForPermission() {
+        if (ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("Access to external storage is necessary to view files on your" +
+                        " device.");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        requestPermissions(new String[]{Manifest.permission
+                                .READ_EXTERNAL_STORAGE}, PERMISSION_CODE);
+                    }
+                });
+                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSION_CODE);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }
     }
 
     @Override
@@ -201,6 +253,37 @@ public class FileSharingFragment extends BaseFragment {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    startFileChooser();
+                } else {
+                    //permission denied, do something
+                    Log.d(TAG, "ext. storage permission denied");
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("You cannot share files without this permission.");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
     //convert file to byte array then save it as entity in group
     private class SendFileToGroupEndpoint extends AsyncTask<Uri, Void, Void> {
         private Context context;
@@ -223,6 +306,12 @@ public class FileSharingFragment extends BaseFragment {
             //File file = new File(uri[0].toString());
             try {
                 String path = FileUtils.getPath(context, uri[0]);
+
+                if (path == null) {
+                    Toast.makeText(getContext(), "File not shared", Toast.LENGTH_SHORT).show();
+                    return null;
+                }
+
                 Log.d(TAG, "file path: " + path);
                 File file = new File(path);
 

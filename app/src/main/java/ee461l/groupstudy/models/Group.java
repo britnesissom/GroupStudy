@@ -1,5 +1,7 @@
 package ee461l.groupstudy.models;
 
+import android.util.Log;
+
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -48,6 +50,7 @@ public class Group extends ParseObject {
         List<Object> list = this.getList("files");
         files.clear();
         for (Object obj : list) {
+            Log.d("Group Model", "file name: " + ((ParseFile) obj).getName());
             files.add((ParseFile) obj);
         }
         return files;

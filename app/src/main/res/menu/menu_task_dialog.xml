@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:title="@string/create_group"
-        android:id="@+id/create_group"
-        android:icon="@drawable/ic_action_add"
+        android:title="@string/create_task"
+        android:id="@+id/create_task"
         app:showAsAction="always|withText"
         android:orderInCategory="10">
     </item>
