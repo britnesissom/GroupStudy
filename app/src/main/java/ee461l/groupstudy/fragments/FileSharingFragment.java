@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -17,6 +19,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,14 +29,18 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.parse.GetCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -49,7 +56,7 @@ import ee461l.groupstudy.models.Group;
  * Use the {@link FileSharingFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FileSharingFragment extends BaseFragment {
+public class FileSharingFragment extends BaseFragment implements FileRVAdapter.FileCallback {
 
     private static final String GROUP_ID = "groupId";
     private static final int PERMISSION_CODE = 6;
@@ -57,9 +64,10 @@ public class FileSharingFragment extends BaseFragment {
     private List<ParseFile> filesToView;
     private String groupId;
     private Group group;
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private FileRVAdapter adapter;
+    private ActionMode mActionMode;
+    private byte[] fileBytes;
+    private ParseFile selectedFile;
     private static final String TAG = "FileSharingFragment";
 
     // A request code's purpose is to match the result of a "startActivityForResult" with
@@ -93,7 +101,7 @@ public class FileSharingFragment extends BaseFragment {
         }
 
         filesToView = new ArrayList<>();
-        adapter = new FileRVAdapter(getContext(), filesToView);
+        adapter = new FileRVAdapter(getContext(), filesToView, this);
 
         ParseQuery<Group> query = ParseQuery.getQuery("Group");
         query.whereEqualTo("name", groupId);
@@ -126,14 +134,14 @@ public class FileSharingFragment extends BaseFragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_file_sharing, container, false);
 
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.file_rv);
+        RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.file_rv);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        mLayoutManager = new GridLayoutManager(getContext(), 2);
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
@@ -154,7 +162,10 @@ public class FileSharingFragment extends BaseFragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.upload_file:
-                askForPermission();
+
+                if (askForPermission()) {
+                    startFileChooser();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -181,25 +192,25 @@ public class FileSharingFragment extends BaseFragment {
         // END_INCLUDE (use_open_document_intent)
     }
 
-    private void askForPermission() {
+    private boolean askForPermission() {
         if (ContextCompat.checkSelfPermission(getContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE)
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
             // Should we show an explanation?
-            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("Access to external storage is necessary to view files on your" +
-                        " device.");
+                builder.setMessage("Access to external storage is necessary to view and save " +
+                        "files on your device.");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         requestPermissions(new String[]{Manifest.permission
-                                .READ_EXTERNAL_STORAGE}, PERMISSION_CODE);
+                                .WRITE_EXTERNAL_STORAGE}, PERMISSION_CODE);
                     }
                 });
                 builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -215,14 +226,19 @@ public class FileSharingFragment extends BaseFragment {
 
                 // No explanation needed, we can request the permission.
 
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         PERMISSION_CODE);
 
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                 // app-defined int constant. The callback method gets the
                 // result of the request.
             }
+        } else {
+            // permission already granted
+            return true;
         }
+
+        return false;
     }
 
     @Override
@@ -262,7 +278,6 @@ public class FileSharingFragment extends BaseFragment {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    startFileChooser();
                 } else {
                     //permission denied, do something
                     Log.d(TAG, "ext. storage permission denied");
@@ -355,9 +370,127 @@ public class FileSharingFragment extends BaseFragment {
             Toast.makeText(getActivity().getApplicationContext(), "File uploaded!",
                     Toast.LENGTH_LONG).show();
 
+            Log.d(TAG, "first file: " + group.getFiles().get(0).getName());
+
             filesToView.clear();
             filesToView.addAll(group.getFiles());
             adapter.notifyDataSetChanged();
         }
+    }
+
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        // Called when the action mode is created; startActionMode() was called
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.file_context_menu, menu);
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.save_file:
+                    if (askForPermission()) {
+                        saveFile();
+                    }
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+        }
+    };
+
+    public void onItemClicked(int index, boolean longClick) {
+        selectedFile = adapter.getItem(index);
+        selectedFile.getDataInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] bytes, ParseException e) {
+                if (e == null) {
+                    Log.d(TAG, "file bytes retrieved");
+                    fileBytes = bytes;
+                } else {
+                    Log.d(TAG, e.getMessage());
+                }
+            }
+        });
+
+        if (longClick) {
+            Log.d(TAG, "long click save started");
+            if (mActionMode != null) {
+                return;
+            }
+
+            // Start the CAB using the ActionMode.Callback defined above
+            mActionMode = getActivity().startActionMode(mActionModeCallback);
+        } else {
+            //view file in-app (or in another app)
+        }
+    }
+
+    private void saveFile() {
+        if (isExternalStorageWritable()) {
+            File folder = new File(Environment.getExternalStoragePublicDirectory(Environment
+                    .DIRECTORY_PICTURES), "GroupStudy");
+
+            boolean success = true;
+            if (!folder.exists()) {
+                success = folder.mkdir();
+            }
+
+            try {
+                if (success) {
+                    Log.d(TAG, "folder path: " + folder.getAbsolutePath());
+                    File file = new File(folder.getAbsolutePath(), "hello.jpg");
+                    MediaScannerConnection.scanFile(getContext(), new String[] { file.getPath() }, new String[] { "image/jpeg" }, null);
+                    BufferedOutputStream buf = new BufferedOutputStream(new FileOutputStream(file));
+                    buf.write(fileBytes, 0, fileBytes.length);
+                    buf.flush();
+                    buf.close();
+                }
+            }
+            catch (FileNotFoundException e) {
+                Log.d(TAG, e.getMessage());
+                Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
+            }
+            catch (IOException e) {
+                Log.d(TAG, e.getMessage());
+            }
+        }
+    }
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.parse.ParseFile;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -20,12 +21,20 @@ import ee461l.groupstudy.R;
  */
 public class FileRVAdapter extends RecyclerView.Adapter<FileRVAdapter.ViewHolder> {
 
+    private static final String TAG = "FileAdapter";
+
     private Context context;
+    private FileCallback callback;
     private List<ParseFile> files;
 
-    public FileRVAdapter(Context context, List<ParseFile> files) {
+    public FileRVAdapter(Context context, List<ParseFile> files, FileCallback callback) {
         this.context = context;
         this.files = files;
+        this.callback = callback;
+    }
+
+    public interface FileCallback {
+        void onItemClicked(int index, boolean longClick);
     }
 
     // Provide a reference to the views for each data item
@@ -56,16 +65,26 @@ public class FileRVAdapter extends RecyclerView.Adapter<FileRVAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.fileName.setText(files.get(position).getName());
-        //holder.filePic.setImageBitmap(something);
+        Picasso.with(context).load(files.get(position).getUrl()).into(holder.filePic);
 
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // download/open file
+                callback.onItemClicked(position, false);
+            }
+        });
+
+        holder.card.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                v.setSelected(true);
+                callback.onItemClicked(position, true);
+                return true;
             }
         });
     }
@@ -73,5 +92,9 @@ public class FileRVAdapter extends RecyclerView.Adapter<FileRVAdapter.ViewHolder
     @Override
     public int getItemCount() {
         return files.size();
+    }
+
+    public ParseFile getItem(int index) {
+        return files.get(index);
     }
 }
