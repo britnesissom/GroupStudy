@@ -1,4 +1,4 @@
-package ee461l.groupstudy;
+package ee461l.groupstudy.utils;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -17,7 +17,6 @@ import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 

@@ -29,7 +29,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.parse.GetCallback;
-import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
@@ -46,8 +45,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import ee461l.groupstudy.FileUtils;
+import ee461l.groupstudy.utils.FileUtils;
 import ee461l.groupstudy.R;
+import ee461l.groupstudy.activities.MainActivity;
 import ee461l.groupstudy.adapter.FileRVAdapter;
 import ee461l.groupstudy.models.Group;
 
@@ -61,6 +61,7 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
     private static final String GROUP_ID = "groupId";
     private static final int PERMISSION_CODE = 6;
 
+    private OnViewImageListener listener;
     private List<ParseFile> filesToView;
     private String groupId;
     private Group group;
@@ -103,6 +104,7 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
         filesToView = new ArrayList<>();
         adapter = new FileRVAdapter(getContext(), filesToView, this);
 
+        //get group here to view files in gridlayout
         ParseQuery<Group> query = ParseQuery.getQuery("Group");
         query.whereEqualTo("name", groupId);
         query.getFirstInBackground(new GetCallback<Group>() {
@@ -152,6 +154,31 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
         return rootView;
     }
 
+
+    //this onAttach is for phones with API < 23
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            listener = (OnViewImageListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement " +
+                    "OnViewImageListener");
+        }
+    }
+
+    public void onAttach (Context context) {
+        super.onAttach(context);
+        Activity activity = (MainActivity) context;
+
+        try {
+            listener = (OnViewImageListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnViewImageListener");
+        }
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.file_sharing_upload_file, menu);
@@ -181,18 +208,13 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
         // Filter to only show results that can be "opened", such as a file (as opposed to a list
         // of contacts or timezones)
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-        // Filter to show only images, using the image MIME data type.
-        // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
-        // To search for all documents available via installed storage providers, it would be
-        // "*/*".
-        intent.setType("*/*");
-
+        intent.setType("*/*");  //want to look at all file types
         startActivityForResult(intent, READ_REQUEST_CODE);
         // END_INCLUDE (use_open_document_intent)
     }
 
     private boolean askForPermission() {
+        //if permission isn't already granted, ask for permission
         if (ContextCompat.checkSelfPermission(getContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -223,15 +245,9 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
                 alert.show();
 
             } else {
-
                 // No explanation needed, we can request the permission.
-
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         PERMISSION_CODE);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
             }
         } else {
             // permission already granted
@@ -261,7 +277,7 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
                 Log.d(TAG, "Android Uri: " + androidUri.toString());
 
                 //begin sending file to server
-                SendFileToGroupEndpoint sendFile = new SendFileToGroupEndpoint(getActivity());
+                SendFileToGroupAsyncTask sendFile = new SendFileToGroupAsyncTask(getActivity());
                 sendFile.execute(androidUri);
 
             }
@@ -274,11 +290,11 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_CODE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // If request is granted, we don't need to do anything so just account for if
+                // access isn't granted
+                if (grantResults.length <= 0
+                        || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
 
-                } else {
                     //permission denied, do something
                     Log.d(TAG, "ext. storage permission denied");
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -300,10 +316,10 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
     }
 
     //convert file to byte array then save it as entity in group
-    private class SendFileToGroupEndpoint extends AsyncTask<Uri, Void, Void> {
+    private class SendFileToGroupAsyncTask extends AsyncTask<Uri, Void, Void> {
         private Context context;
 
-        private SendFileToGroupEndpoint(Context context) {
+        private SendFileToGroupAsyncTask(Context context) {
             this.context = context;
         }
 
@@ -327,11 +343,7 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
                     return null;
                 }
 
-                Log.d(TAG, "file path: " + path);
                 File file = new File(path);
-
-                Log.d(TAG, "file name: " + file.getName());
-                Log.d(TAG, "file length: " + file.length());
 
                 InputStream fileInputStream = null;
                 byte[] bFile = new byte[(int) file.length()];
@@ -340,8 +352,6 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
                 fileInputStream = new BufferedInputStream(new FileInputStream(file));
                 int i = fileInputStream.read(bFile);
                 fileInputStream.close();
-
-                Log.d(TAG, "inputStream length: " + i);
 
                 final ParseFile parseFile = new ParseFile(file.getName(), bFile);
                 parseFile.saveInBackground(new SaveCallback() {
@@ -353,7 +363,6 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
                     }
                 });
 
-                Log.d(TAG, "file added to group");
                 return null;
             }
             catch(IOException e) {
@@ -370,9 +379,9 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
             Toast.makeText(getActivity().getApplicationContext(), "File uploaded!",
                     Toast.LENGTH_LONG).show();
 
-            Log.d(TAG, "first file: " + group.getFiles().get(0).getName());
-
             filesToView.clear();
+            Log.d(TAG, "sendFile onPostExecute");   //if this prints before "file saved to parse"
+            // then recyclerview will not update with new files
             filesToView.addAll(group.getFiles());
             adapter.notifyDataSetChanged();
         }
@@ -420,28 +429,39 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
 
     public void onItemClicked(int index, boolean longClick) {
         selectedFile = adapter.getItem(index);
-        selectedFile.getDataInBackground(new GetDataCallback() {
-            @Override
-            public void done(byte[] bytes, ParseException e) {
-                if (e == null) {
-                    Log.d(TAG, "file bytes retrieved");
-                    fileBytes = bytes;
-                } else {
-                    Log.d(TAG, e.getMessage());
+
+        try {
+            fileBytes = selectedFile.getData();
+
+            if (longClick) {
+                Log.d(TAG, "long click save started");
+                if (mActionMode != null) {
+                    return;
                 }
-            }
-        });
 
-        if (longClick) {
-            Log.d(TAG, "long click save started");
-            if (mActionMode != null) {
-                return;
-            }
+                // Start the CAB using the ActionMode.Callback defined above
+                mActionMode = getActivity().startActionMode(mActionModeCallback);
+            } else {
+                //temp file because we're viewing this from the app, not saving to device
+                File pic = File.createTempFile("temp_pic", null, getContext()
+                        .getExternalCacheDir());
+                pic.deleteOnExit();
 
-            // Start the CAB using the ActionMode.Callback defined above
-            mActionMode = getActivity().startActionMode(mActionModeCallback);
-        } else {
-            //view file in-app (or in another app)
+                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(pic));
+                bos.write(fileBytes);
+                bos.flush();
+                bos.close();
+
+                Log.d(TAG, "uri: " + Uri.fromFile(pic));
+
+                listener.onViewImage(pic);
+            }
+        }
+        catch (ParseException e) {
+            Log.d(TAG, e.getMessage());
+        }
+        catch (IOException e) {
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -457,18 +477,18 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
 
             try {
                 if (success) {
-                    Log.d(TAG, "folder path: " + folder.getAbsolutePath());
-                    File file = new File(folder.getAbsolutePath(), "hello.jpg");
+                    File file = new File(folder.getAbsolutePath(), selectedFile.getName());
                     MediaScannerConnection.scanFile(getContext(), new String[] { file.getPath() }, new String[] { "image/jpeg" }, null);
                     BufferedOutputStream buf = new BufferedOutputStream(new FileOutputStream(file));
                     buf.write(fileBytes, 0, fileBytes.length);
                     buf.flush();
                     buf.close();
+
+                    Toast.makeText(getContext(), "File saved!", Toast.LENGTH_SHORT).show();
                 }
             }
             catch (FileNotFoundException e) {
                 Log.d(TAG, e.getMessage());
-                Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
             }
             catch (IOException e) {
                 Log.d(TAG, e.getMessage());
@@ -478,19 +498,12 @@ public class FileSharingFragment extends BaseFragment implements FileRVAdapter.F
 
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
+    public interface OnViewImageListener {
+        void onViewImage(File file);
     }
+
+
 }

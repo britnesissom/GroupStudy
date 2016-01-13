@@ -1,6 +1,7 @@
 package ee461l.groupstudy.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -9,21 +10,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.webkit.MimeTypeMap;
 
 import com.parse.ParseUser;
+
+import java.io.File;
 
 import ee461l.groupstudy.OnSendGroupNameListener;
 import ee461l.groupstudy.R;
 import ee461l.groupstudy.fragments.AboutFragment;
 import ee461l.groupstudy.fragments.AppHomePageFragment;
-import ee461l.groupstudy.fragments.TaskDialogFragment;
-import ee461l.groupstudy.fragments.TaskFragment;
 import ee461l.groupstudy.fragments.FileSharingFragment;
 import ee461l.groupstudy.fragments.GroupHomePageFragment;
 import ee461l.groupstudy.fragments.MessagingFragment;
+import ee461l.groupstudy.fragments.TaskDialogFragment;
+import ee461l.groupstudy.fragments.TaskFragment;
 
 
-public class MainActivity extends AppCompatActivity implements OnSendGroupNameListener, TaskDialogFragment.OnSendTaskListener {
+public class MainActivity extends AppCompatActivity implements OnSendGroupNameListener, TaskDialogFragment.OnSendTaskListener, FileSharingFragment.OnViewImageListener {
 
     private static final String TAG = "NavDrawerGroups";
     private DrawerLayout drawerLayout;
@@ -139,5 +143,20 @@ public class MainActivity extends AppCompatActivity implements OnSendGroupNameLi
         transaction.replace(R.id.content_fragment, TaskFragment.newInstance(groupId, desc, loc,
                 date, time));
         transaction.commit();
+    }
+
+    public void onViewImage(File file) {
+        MimeTypeMap map = MimeTypeMap.getSingleton();
+        String ext = MimeTypeMap.getFileExtensionFromUrl(file.getName());
+        String type = map.getMimeTypeFromExtension(ext);
+
+        if (type == null)
+            type = "*/*";
+
+        Intent intent = new Intent();
+        //intent.setClass(getApplicationContext(), MainActivity.class);
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(file), type);
+        startActivity(intent);
     }
 }

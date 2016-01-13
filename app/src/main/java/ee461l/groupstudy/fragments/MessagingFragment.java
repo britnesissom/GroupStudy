@@ -3,6 +3,8 @@ package ee461l.groupstudy.fragments;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -11,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ee461l.groupstudy.R;
-import ee461l.groupstudy.adapter.MessagingListViewAdapter;
+import ee461l.groupstudy.adapter.MessagingRVAdapter;
 import ee461l.groupstudy.models.Group;
 import ee461l.groupstudy.models.Message;
 
@@ -43,10 +44,8 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
     private static final String TAG = "MessagingLoadGroup";
 
     private EditText messageEditor;
-    private ListView messageListView;
-    private Button sendButton;
     private Group group;
-    private MessagingListViewAdapter adapter;
+    private MessagingRVAdapter adapter;
     private List<String> messagesForAdapter;
     private List<Message> messages;
     private CircularProgressView progressView;
@@ -84,6 +83,10 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
             /*MainActivity main = new MainActivity();
             main.sendGroupName(groupName);*/
         }
+
+
+        GetMessagesAsyncTask gmat = new GetMessagesAsyncTask();
+        gmat.execute();
     }
 
     @Override
@@ -92,15 +95,26 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_messaging, container, false);
+
+        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.message_rv);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        recyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+        // specify an adapter (see also next example)
+        adapter = new MessagingRVAdapter(getContext(), username, messages);
+        recyclerView.setAdapter(adapter);
+
         //getContext().setTitle("Messaging");
         progressView = (CircularProgressView) rootView.findViewById(R.id.progress_view);
 
-        GetMessagesAsyncTask gmat = new GetMessagesAsyncTask();
-        gmat.execute();
-
-        sendButton = (Button) rootView.findViewById(R.id.sendButton);
+        Button sendButton = (Button) rootView.findViewById(R.id.sendButton);
         messageEditor = (EditText) rootView.findViewById(R.id.edit_message);
-        messageListView = (ListView) rootView.findViewById(R.id.message_list_view);
 
         sendButton.setOnClickListener(this);
 
@@ -138,25 +152,27 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        String text = username + ": " + messageEditor.getText().toString();
+        if (event.getAction() == KeyEvent.KEYCODE_ENTER) {
+            String text = username + ": " + messageEditor.getText().toString();
 
-        Message message = new Message();
-        message.put("author", ParseUser.getCurrentUser().getUsername());
-        message.put("messageText", messageEditor.getText().toString());
-        message.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                Log.d(TAG, "message saved");
-            }
-        });
+            Message message = new Message();
+            message.put("author", ParseUser.getCurrentUser().getUsername());
+            message.put("messageText", messageEditor.getText().toString());
+            message.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    Log.d(TAG, "message saved");
+                }
+            });
 
-        group.add("messages", message);
-        group.saveInBackground();
+            group.add("messages", message);
+            group.saveInBackground();
 
-        messagesForAdapter.add(text);
-        adapter.notifyDataSetChanged();
+            messagesForAdapter.add(text);
+            adapter.notifyDataSetChanged();
 
-        clearText();
+            clearText();
+        }
         return false;
     }
 
@@ -192,6 +208,7 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
                         group = g;
                         Log.d(TAG, "group: " + group.getGroupName() + " " + group.getAdminUser());
                         //updateView();
+                        messages = group.getMessages();
                     } else {
                         Log.d(TAG, "error: " + e.getMessage());
                     }
@@ -212,9 +229,7 @@ public class MessagingFragment extends BaseFragment implements View.OnClickListe
                 }
             }
 
-            adapter = new MessagingListViewAdapter(getContext(), username, messagesForAdapter,
-                    R.layout.fragment_messaging);
-            messageListView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
         }
     }
 }

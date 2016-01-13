@@ -5,14 +5,12 @@
         android:title="@string/add_member"
         android:id="@+id/add_member"
         android:icon="@android:drawable/ic_menu_add"
-        app:showAsAction="ifRoom|withText"
-        android:orderInCategory="10">
+        app:showAsAction="never">
     </item>
     <item
         android:title="@string/delete_member"
         android:id="@+id/delete_member"
         android:icon="@android:drawable/ic_menu_delete"
-        app:showAsAction="ifRoom|withText"
-        android:orderInCategory="9">
+        app:showAsAction="never">
     </item>
 </menu>

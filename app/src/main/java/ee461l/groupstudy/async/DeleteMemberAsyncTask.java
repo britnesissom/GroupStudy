@@ -2,6 +2,16 @@ package ee461l.groupstudy.async;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
+
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import java.util.Collections;
+
+import ee461l.groupstudy.models.Group;
 
 /**
  * Created by Brit'ne on 4/27/15.
@@ -11,35 +21,31 @@ public class DeleteMemberAsyncTask extends AsyncTask<String, Void, Void> { //fir
 
     private static final String TAG = "DeleteMemberAsync";
     private Context context;
-    private String groupName = null;
+    private Group group;
 
-    public DeleteMemberAsyncTask(Context context, String groupName){
-        this.context=context;
-        this.groupName=groupName;
+    public DeleteMemberAsyncTask(Context context, Group group){
+        this.context = context;
+        this.group = group;
     }
 
     @Override
     protected Void doInBackground(String... member) {
-        /*if(groupEndpointApi == null) {  // Only do this once
-            GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
-                    new AndroidJsonFactory(), null)
-                    .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
-                    .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-                        @Override
-                        public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                            abstractGoogleClientRequest.setDisableGZipContent(true);
-                        }
-                    });
-
-            groupEndpointApi = builder.build();
-        }
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("username", member);
 
         try {
-            groupEndpointApi.removeMember(groupName, member[0]).execute();
-            Log.d(TAG, "group member removed");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+            ParseUser user = query.getFirst();
+            group.removeAll("members", Collections.singletonList(user.getObjectId()));
+            group.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    Log.d(TAG, "member removed from group");
+                }
+            });
+        }
+        catch (ParseException e) {
+            Log.d(TAG, e.getMessage());
+        }
 
         return null;
     }

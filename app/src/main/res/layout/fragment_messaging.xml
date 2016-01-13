@@ -6,7 +6,6 @@
       android:orientation="vertical"
       tools:context="ee461l.groupstudy.fragments.MessagingFragment">
 
-
     <include layout="@layout/app_bar_main"
         android:id="@+id/app_bar"/>
 
@@ -17,41 +16,45 @@
         android:layout_height="40dp"
         app:cpv_indeterminate="true" />
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-                    android:layout_marginTop="5dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-                    android:layout_below="@+id/app_bar"
-        tools:context="ee461l.groupstudy.fragments.MessagingFragment">
 
-        <ListView
-            android:id="@+id/message_list_view"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/message_rv"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/edit_message"
+            android:layout_below="@+id/app_bar"
             android:divider="@null"
             android:dividerHeight="0dp"
             android:layout_marginBottom="30dp"
             android:stackFromBottom="true"
             android:transcriptMode="alwaysScroll">
-        </ListView>
+        </android.support.v7.widget.RecyclerView>
+
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:context="ee461l.groupstudy.fragments.MessagingFragment"
+                    android:padding="16dp"
+                    android:layout_alignParentBottom="true">
 
         <EditText android:id="@+id/edit_message"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint"
-            android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@+id/sendButton"
-            android:layout_alignParentLeft="true"/>
+                  android:layout_alignBottom="@+id/sendButton"
+                  android:theme="@style/EditTextTheme"/>
 
         <Button
             android:id="@+id/sendButton"
-            android:layout_height="wrap_content"
-            android:layout_width="70dp"
-            android:text="@string/button"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"/>
+            android:layout_height="40dp"
+            android:layout_width="40dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/circular_button"/>
 
     </RelativeLayout>
 </RelativeLayout>

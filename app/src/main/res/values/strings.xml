@@ -10,9 +10,9 @@
     <string name="create_account">Create Account</string>
 
     <!--create_new_account.xml/login screen-->
-    <string name="enter_username">Enter username</string>
-    <string name="enter_password">Enter password</string>
-    <string name="confirm_password">Re-enter password</string>
+    <string name="enter_username">Username</string>
+    <string name="enter_password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
 
     <!-- Group Nav Drawer Menu Items -->
     <string-array name="nav_drawer_group_items">
@@ -57,6 +57,7 @@
     <string name="create_group">Create Group</string>
     <string name="add_member">Add Teammate</string>
     <string name="delete_member">Delete Teammate</string>
+    <string name="members_name">Member\'s Username</string>
 
     <!-- Calendar -->
     <string name="create_task">Create</string>

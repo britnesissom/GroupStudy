@@ -140,6 +140,7 @@ public class CreateGroupFragment extends BaseFragment {
         nv.inflateMenu(R.menu.menu_group_nav);
         nv.getMenu().getItem(0).setChecked(true);
 
+        //open group home page once created
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.content_fragment,
                 GroupHomePageFragment.newInstance(groupName.getText().toString(), user.getUsername())).commit();

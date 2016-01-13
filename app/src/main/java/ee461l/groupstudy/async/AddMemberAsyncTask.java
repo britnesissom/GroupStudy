@@ -2,6 +2,14 @@ package ee461l.groupstudy.async;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
+
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import ee461l.groupstudy.models.Group;
 
 /**
  * Allows the admin user to add a member to the group
@@ -10,36 +18,31 @@ public class AddMemberAsyncTask extends AsyncTask<String, Void, Void> {
 
     private static final String TAG = "AddMemberAsync";
     private Context context;
-    private String groupName = null;
+    private Group group;
 
-    public AddMemberAsyncTask(Context context, String groupName){
-        this.context=context;
-        this.groupName=groupName;
+    public AddMemberAsyncTask(Context context, Group group){
+        this.context = context;
+        this.group = group;
     }
 
     @Override
     protected Void doInBackground(String... member) {
-        //build the endpoint to access its methods
-        /*if(groupEndpointApi == null) {  // Only do this once
-            GroupstudyEndpoint.Builder builder = new GroupstudyEndpoint.Builder(AndroidHttp.newCompatibleTransport(),
-                    new AndroidJsonFactory(), null)
-                    .setRootUrl("https://groupstudy-461l.appspot.com/_ah/api")
-                    .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-                        @Override
-                        public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                            abstractGoogleClientRequest.setDisableGZipContent(true);
-                        }
-                    });
-
-            groupEndpointApi = builder.build();
-        }
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("username", member);
 
         try {
-            groupEndpointApi.addMember(groupName, member[0]).execute();
-            Log.d(TAG, "group member added");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+            ParseUser user = query.getFirst();
+            group.add("members", user.getObjectId());
+            group.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    Log.d(TAG, "member removed from group");
+                }
+            });
+        }
+        catch (ParseException e) {
+            Log.d(TAG, e.getMessage());
+        }
 
         return null;
     }

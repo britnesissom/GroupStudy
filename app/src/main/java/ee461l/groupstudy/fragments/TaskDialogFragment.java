@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -155,9 +156,11 @@ public class TaskDialogFragment extends BaseFragment {
             case R.id.create_task:
                 if (descriptionEditText.getText().toString().equals("") || locationEditText.getText
                         ().toString().equals("") || date == null || time == null) {
+
                     Log.d("TaskDialog", "desc: " + descriptionEditText.getText().toString() + ", " +
                             "loc: " + locationEditText.getText().toString() + ", date: " + date +
                             ", time: " + time);
+
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
                     alertBuilder.setMessage("Please fill in all fields to create a task.");
                     alertBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -169,6 +172,15 @@ public class TaskDialogFragment extends BaseFragment {
                     AlertDialog alertDialog = alertBuilder.create();
                     alertDialog.show();
                 } else {
+
+                    //close keyboard on save
+                    View view = getActivity().getCurrentFocus();
+                    if (view != null) {
+                        InputMethodManager imm = (InputMethodManager) getActivity()
+                                .getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+
                     mListener.sendTaskToTaskFrag(descriptionEditText.getText().toString(), locationEditText
                             .getText().toString(), date, time);
                 }
